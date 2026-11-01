@@ -1,0 +1,207 @@
+/* Maker-guide theme: calm workshop. guide-module.
+   Text/background token pairs all meet WCAG AA (4.5:1); see
+   tests/test_guide_accessibility.py, which recomputes every pair. */
+:root {
+  --paper: #faf6ef;
+  --card: #ffffff;
+  --ink: #22201b;
+  --muted: #5c5546;
+  --accent: #7a5200;
+  --ok-ink: #1d6b38;
+  --ok-bg: #e8f4eb;
+  --unchecked-ink: #6a5a33;
+  --unchecked-bg: #f5edd8;
+  --focus: #1a5fb4;
+  --line: #ddd5c2;
+  /* Desktop two-column guide:
+     video pinned left, step cards scroll right. All layout values live
+     here; the rules below reference them, never literals. */
+  --guide-gutter: 2rem;
+  --guide-max: 110rem;
+  --guide-video-col: 3fr;
+  --guide-steps-col: 2fr;
+  --guide-col-gap: 2rem;
+  --guide-sticky-top: 1rem;
+  /* Dark frame behind the player, with or without a source. */
+  --guide-video-bg: #171410;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+
+.guide {
+  max-width: 40rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 3rem;
+}
+
+.guide-head .kicker {
+  margin: 1.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.875rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.guide-head h1 {
+  margin: 0.25rem 0;
+  font-size: 1.9rem;
+  line-height: 1.2;
+}
+
+.guide-head .meta { color: var(--muted); margin: 0 0 0.5rem; }
+.draft-notes ul { color: var(--muted); font-size: 0.9375rem; padding-left: 1.25rem; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 1.25rem;
+  margin: 1.25rem 0;
+}
+
+.card header h2 { margin: 0; font-size: 1.375rem; }
+.card .time { color: var(--muted); margin: 0.125rem 0; }
+.card .check-time {
+  display: inline-block;
+  margin: 0.25rem 0;
+  padding: 0.125rem 0.625rem;
+  border-radius: 999px;
+  background: var(--unchecked-bg);
+  color: var(--unchecked-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+.card .action { margin: 0.75rem 0; font-size: 1.125rem; }
+
+.shot { margin: 1rem 0; }
+picture { display: contents; }
+.shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+}
+.shot figcaption { margin-top: 0.5rem; }
+.part-shot { margin: 0.5rem 0; }
+.part-shot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 0.5rem;
+  border: 1px solid var(--line);
+}
+.part-shot figcaption { margin-top: 0.5rem; }
+
+.toggle {
+  font: inherit;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--accent);
+  background: var(--card);
+  color: var(--accent);
+  cursor: pointer;
+}
+
+.tools, .parts { padding-left: 1.25rem; margin: 0.75rem 0 0; }
+.tools li::marker { color: var(--muted); }
+.parts li { margin: 0.25rem 0; }
+
+.status-ok, .status-unchecked {
+  display: inline-block;
+  padding: 0.0625rem 0.5rem;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.status-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.status-unchecked { background: var(--unchecked-bg); color: var(--unchecked-ink); }
+
+.guide-foot { color: var(--muted); font-size: 0.9375rem; }
+
+a:focus-visible, button:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (min-width: 60rem) {
+  .guide { max-width: 52rem; }
+  .card { padding: 1.75rem 2rem; }
+}
+
+/* Step cards are clickable (seek the video); the active card carries an
+   inset amber bar. Inset shadow only, so activation never shifts layout. */
+.card, .step-card, #main .step { cursor: pointer; }
+.card.is-active, .step-card.is-active, #main .step.is-active {
+  box-shadow: inset 0.375rem 0 0 var(--accent);
+}
+
+/* Fixed 16:9 player frame at every width: the video keeps its frame
+   with or without a source, never a bare control bar. On phones the
+   frame stacks over the cards as before. */
+.guide-video video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: contain;
+  background: var(--guide-video-bg);
+  display: block;
+}
+
+/* Now playing: the active step's title and time range under the video,
+   so the left column reads as what is playing, not empty space. The
+   reader script rewrites both lines whenever the active card moves. */
+.guide-now {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  margin: 0.75rem 0 0;
+}
+.guide-now-title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+.guide-now-time {
+  margin: 0.125rem 0 0;
+  color: var(--muted);
+}
+
+/* Desktop: the page fills the screen, video sticky left, cards scroll
+   right. Below the breakpoint the columns stack as before (phone
+   unchanged). In fixing view the filmed-only video hides, so the steps
+   take the full width back. */
+@media (min-width: 64rem) {
+  .guide, .steps-preview {
+    max-width: var(--guide-max);
+    padding-inline: var(--guide-gutter);
+  }
+  .guide-cols {
+    display: grid;
+    grid-template-columns: var(--guide-video-col) var(--guide-steps-col);
+    gap: var(--guide-col-gap);
+    align-items: start;
+  }
+  .guide-video {
+    position: sticky;
+    top: var(--guide-sticky-top);
+  }
+  .guide-video video {
+    max-height: calc(100vh - 2 * var(--guide-sticky-top));
+    /* Short window: shrink the width so the 16:9 frame still fits. */
+    max-width: calc((100vh - 2 * var(--guide-sticky-top)) * 16 / 9);
+    margin-inline: auto;
+    object-fit: contain;
+  }
+  body.simple .guide-cols { display: block; }
+}

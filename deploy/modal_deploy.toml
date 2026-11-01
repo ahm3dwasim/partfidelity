@@ -1,0 +1,32 @@
+# Modal deploy settings read by deploy/modal_app.py and app/hosting.py.
+# Every changeable value lives here; secrets never do (the Secret is named,
+# its contents stay in Modal). The Secret must hold META_API_KEY and
+# META_FILES_BASE_URL (production mode refuses to start without them), and
+# BASETEN_API_KEY for the Spark Open second check (without it every second
+# check shows "not available"; the app still starts).
+
+[modal]
+app_name = "partfidelity"
+volume_name = "partfidelity-data"
+secret_name = "partfidelity-meta"
+python_version = "3.12"
+remote_root = "/srv/partfidelity"
+volume_mount = "/vol"
+timeout_s = 3600          # per-request ceiling (long pipeline runs)
+scaledown_window_s = 900  # min_containers=1 keeps it warm; this is the floor
+max_inputs = 16           # concurrent requests in the single container
+# What the running app reads under the root. config/ holds the render tools' settings too
+# (teardown.toml), so only the web app's files ship, not the folder.
+image_folders = ["app", "migrations", "static", "templates", "deploy"]
+image_files = ["config/film.toml", "config/display_images.toml", "config/wait.toml", "config/upload.toml", "config/outline.toml", "app/sample_real/sample.mp4", "app/sample_real/frames/step-01.png", "app/sample_real/frames/step-02.png", "app/sample_real/frames/step-03.png", "app/sample_real/frames/step-04.png", "app/sample_real/frames/step-05.png", "app/sample_real/frames/step-06.png", "app/sample_real/frames/step-07.png", "app/sample_real/frames/step-08.png", "app/sample_real/frames/step-09.png", "app/sample_real/labels/step-06-part-1.png", "app/sample_real/labels/step-06-part-2.png", "app/sample_real/labels/step-07-part-2.png", "app/sample_real/labels/step-08-part-2.png", "app/sample_real/labels/step-06-part-1.mask.png", "app/sample_real/labels/step-06-part-2.mask.png", "app/sample_real/labels/step-07-part-2.mask.png", "app/sample_real/labels/step-08-part-2.mask.png", "config/built.toml", "docs/FEATURES.md", "config/brand.toml", "static/ui/apple-touch-icon.png", "config/retention.toml", "config/open_readback.toml", "config/how_it_works.toml", "config/how_media.json", "config/guide_text.toml", "config/catch_table.json", "config/proof_links.toml", "config/exports.toml", "config/disagreement_replay.toml", "config/disagreement_probe.toml", "docs/evidence/disagreement-probe/run-1-battery.json", "docs/evidence/disagreement-probe/run-2-keyboard.json"]
+
+[host]
+# Volume mount: job files only (written temp-then-rename) plus the snapshots.
+data_root = "/vol/data"
+snapshot_dir = "/vol/snapshots"
+# Container-local disk: the live SQLite file never sits on the Volume.
+local_db = "/tmp/pf/partfidelity.sqlite3"
+snapshot_interval_s = 60   # crash loss window is at most this plus settle
+snapshot_settle_s = 2      # debounce after a guide publish or delete
+snapshot_max_age_s = 180   # health check fails when the last commit is older
+sweep_interval_s = 3600    # hourly in-process expiry sweep

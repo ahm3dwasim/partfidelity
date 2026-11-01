@@ -1,0 +1,18 @@
+<!-- Canonical guide-end share markup, expiring-URL variant.
+     Reader pages render this server-side via app/routes/site.py share_html();
+     the gallery shows the no-link state only (no share-link backend ships
+     yet, so nothing there may look like a live link). Without a
+     server-issued URL the section fails closed: the consent tick and the
+     copy row are omitted (no data-ge-consent, data-ge-link, or data-ge-copy)
+     and the note promises no expiry. -->
+<section class="ge-share" aria-label="Share this guide">
+  <h2 data-copy="guide.share.title">Share this guide</h2>
+  <label class="ge-consent" data-copy="guide.share.consent"><input type="checkbox" data-ge-consent> <span>This is my own repair. I agree to share it for 24 hours.</span></label>
+  <div class="ge-share-row">
+    <input class="ge-share-link" data-ge-link readonly value="DATA_SHARE_URL" aria-label="24-hour link to this guide" data-copy="guide.share.link">
+    <button class="ge-btn primary" type="button" data-ge-copy data-copy="guide.share.copy" disabled>Copy 24-h link</button>
+    <button class="ge-btn ghost" type="button" data-ge-download data-copy="guide.share.download" disabled>Download images</button>
+  </div>
+  <p class="ge-status" role="status" data-ge-status></p>
+  <p class="ge-fine" data-copy="guide.share.note">The link and our copies die after 24 hours. A downloaded set is yours to keep.</p>
+</section>

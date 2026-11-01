@@ -1,0 +1,7 @@
+# Rendered part outlines (app/render.py): colour, stroke and smallest mask.
+# Loaded strictly by app/outline_config.py (a missing or misspelled key fails).
+# The colour matches the How-it-works outline stage (--pf-amber, #e87032).
+[outline]
+color = [232, 112, 50]
+width_px = 4      # stroke width in pixels, drawn outward from the part edge
+min_mask_px = 25  # masks with fewer part pixels use the box edge instead

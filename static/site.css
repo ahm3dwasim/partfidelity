@@ -1,0 +1,408 @@
+/* PartFidelity first screen + reader (the reader module). Calm workshop, phone first.
+   Flat colour only: no gradients, no shadows at rest, square buttons. */
+
+:root {
+  --paper: #faf7f0;
+  --card: #ffffff;
+  --field: #f1ece0;
+  --ink: #211c15;
+  --muted: #5f5747;
+  --accent: #1e5b3c;
+  --accent-ink: #ffffff;
+  --danger: #a4261c;
+  --danger-bg: #f9e9e6;
+  --focus: #0b4fd6;
+  --replay-bg: #e7dfce;
+  --medium-bg: #7a4a00;
+  --radius: 2px;
+  --measure: 46rem;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.125rem;
+  line-height: 1.55;
+}
+
+main {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1rem 1.25rem 4rem;
+}
+
+h1 {
+  font-size: clamp(2rem, 6vw + 1rem, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 2rem 0 1rem;
+}
+
+h2 { font-size: 1.5rem; line-height: 1.2; margin: 2.5rem 0 0.75rem; }
+h3 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+
+p { margin: 0 0 1rem; }
+
+a { color: var(--accent); }
+a:visited { color: var(--accent); }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.skip {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.5rem 1rem;
+  z-index: 10;
+}
+.skip:focus { top: 0.5rem; color: var(--paper); }
+
+.top {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 1rem 1.25rem 0;
+}
+.wordmark {
+  font-weight: bold;
+  text-decoration: none;
+  color: var(--ink);
+}
+
+.hero .sub { font-size: 1.25rem; max-width: 34rem; }
+
+.cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem 1.5rem;
+  align-items: baseline;
+  margin: 1.75rem 0 0.5rem;
+}
+.cta-primary {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--accent-ink);
+  text-decoration: none;
+  font-weight: bold;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--radius);
+}
+.cta-primary:visited { color: var(--accent-ink); }
+.cta-secondary { font-size: 1.125rem; }
+.own-video { font-size: 1rem; }
+
+.sample { margin-top: 3rem; background: var(--card); padding: 1.5rem; border-radius: var(--radius); }
+.sample-steps { margin: 0 0 1rem; padding-left: 1.5rem; }
+.sample-steps li { margin-bottom: 0.5rem; }
+.sample-links { margin-bottom: 0; }
+
+.replay-badge {
+  display: inline-block;
+  background: var(--replay-bg);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius);
+  vertical-align: middle;
+}
+
+.provenance, .fixture-note {
+  background: var(--field);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+}
+.fixture-note { margin-top: 2rem; }
+
+.badges { margin: 0 0 1rem; }
+.badge-easy, .badge-medium, .badge-hard {
+  display: inline-block;
+  color: #ffffff;
+  font-weight: bold;
+  padding: 0.15rem 0.75rem;
+  border-radius: var(--radius);
+  margin-right: 0.5rem;
+}
+.badge-easy { background: var(--accent); }
+.badge-medium { background: var(--medium-bg); }
+.badge-hard { background: var(--danger); }
+.verdict-line { font-weight: bold; }
+
+.view-row { margin: 1.5rem 0 0; }
+.simple-toggle { font-size: 1.125rem; }
+.simple-toggle input { width: 1.25rem; height: 1.25rem; accent-color: var(--accent); }
+
+.tools {
+  background: var(--card);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius);
+  margin-top: 1rem;
+}
+.tools h2 { margin-top: 0; font-size: 1.25rem; }
+.tool-list { margin: 0; padding-left: 1.25rem; }
+
+.step {
+  background: var(--card);
+  padding: 1.5rem;
+  border-radius: var(--radius);
+  margin-top: 1.5rem;
+}
+.step figure { margin: 1rem 0 0; }
+.step img { width: 100%; height: auto; display: block; border-radius: var(--radius); }
+.step figcaption { font-size: 1rem; color: var(--muted); margin-top: 0.5rem; }
+.time { color: var(--muted); }
+
+.chips {
+  list-style: none;
+  margin: 0 0 1rem;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.chips li {
+  background: var(--field);
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+}
+
+.badges-list { list-style: none; margin: 1rem 0 0; padding: 0; }
+.badges-list li { margin-bottom: 0.5rem; }
+.badge {
+  display: inline-block;
+  background: var(--field);
+  font-weight: bold;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius);
+  margin-right: 0.5rem;
+}
+
+.long-mark {
+  display: inline-block;
+  background: var(--field);
+  font-size: 1rem;
+  font-weight: bold;
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius);
+  margin-left: 0.5rem;
+}
+.full { margin-top: 0.75rem; }
+.full summary { cursor: pointer; color: var(--accent); font-weight: bold; }
+.full p { margin: 0.5rem 0 0; }
+
+.stop {
+  background: var(--danger-bg);
+  color: var(--ink);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  margin: 0 0 1rem;
+}
+.stop strong { color: var(--danger); }
+.stop p:last-child { margin-bottom: 0; }
+.ack { font-weight: bold; }
+.acked { color: var(--muted); font-weight: bold; }
+.locked {
+  background: var(--field);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+  margin-top: 1.5rem;
+  font-weight: bold;
+}
+
+.draft {
+  background: var(--danger-bg);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius);
+}
+.draft strong { color: var(--danger); }
+
+.unmatched { margin-top: 2rem; }
+
+.guide-foot {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.foot {
+  max-width: var(--measure);
+  margin: 0 auto;
+  padding: 0 1.25rem 2rem;
+  color: var(--muted);
+  font-size: 1rem;
+}
+
+/* Simple view hides chips, times, and read-back notes only. Actions,
+   frames, stops, and status badges are always shown. */
+body.simple .hide-simple { display: none; }
+
+@media (min-width: 45rem) {
+  main { padding-top: 2rem; }
+  .step { padding: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
+  }
+}
+
+/* Home scroll film. Default = static layout (poster, then the chapters as blocks): it is what
+   reduced motion, Save-Data and no-JS get. film.js adds .is-live and pins the stage. Tokens only. */
+main:has(> .film) { max-width: none; padding: 0; }
+.film-stage { position: relative; padding: var(--pf-space-48) clamp(20px, 5vw, 64px); }
+.film-art { position: relative; max-width: 60rem; margin: 0 auto var(--pf-space-32); aspect-ratio: 16 / 9; }
+.film-poster, .film-canvas { display: block; width: 100%; height: auto; }
+/* The renders sit on near-black: lighten drops that onto the page ink, and the feathered mask hides the frame edge. */
+.film-art {
+  mix-blend-mode: lighten;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent), linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent), linear-gradient(to bottom, transparent, black 7%, black 93%, transparent);
+  mask-composite: intersect;
+}
+.film-canvas { display: none; }
+.film-eyebrow, .film-n {
+  font: 500 0.75rem/1 var(--pf-font-body); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pf-on-ink-muted); margin: 0;
+}
+.film-n { color: var(--pf-amber); }
+.film-open h1 { font-size: clamp(2.75rem, 5.2vw, 5rem); line-height: 1.02; margin: var(--pf-space-16) 0 var(--pf-space-24); }
+.film-open .sub { max-width: 26rem; color: var(--pf-on-ink-muted); }
+.film-fine { font-size: 0.8125rem; color: var(--pf-on-ink-muted); margin: var(--pf-space-16) 0 0; }
+.film-roles { max-width: 26rem; margin-top: var(--pf-space-12); }
+.film-roles a { color: inherit; text-decoration: underline; }
+.film-chap { max-width: 31rem; margin: var(--pf-space-48) 0 0; }
+.film-chap h2 { font-size: clamp(2rem, 3.8vw, 3.25rem); line-height: 1.05; margin: var(--pf-space-12) 0; }
+.film-chap p { color: var(--pf-on-ink-muted); }
+.film-labels { display: none; }
+.film-parts { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.cta-ghost {
+  display: inline-block; color: var(--pf-on-ink); text-decoration: none; font-weight: bold;
+  padding: 0.9rem 1.5rem; border: 1px solid var(--pf-on-ink-muted); border-radius: var(--radius);
+}
+.cta-ghost:visited { color: var(--pf-on-ink); }
+.cta-ghost:hover { border-color: var(--pf-on-ink); }
+.film-end { background: var(--pf-ink-2); border-top: 1px solid var(--pf-ink-line); padding: clamp(64px, 10vw, 128px) 0; }
+.film-end-inner { max-width: 72rem; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
+.film-end h2 { font-size: clamp(2.25rem, 5.4vw, 4.75rem); line-height: 1.02; margin: 0 0 var(--pf-space-16); }
+.film-end p { color: var(--pf-on-ink-muted); }
+.film-end .cta-row { margin-top: var(--pf-space-32); }
+/* The sample: one card, facts from the guide itself, one call to action. */
+.film ~ .sample { max-width: 72rem; margin: 0 auto; padding: clamp(56px, 8vw, 104px) clamp(20px, 5vw, 64px); background: none; border-radius: 0; }
+.sample-inner { max-width: 46rem; }
+.sample-kicker { display: flex; align-items: center; gap: 10px; margin: 0; font: 500 0.75rem/1 var(--pf-font-body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--pf-on-ink-muted); }
+.sample-kicker .replay-badge { padding: 3px 10px; border: 1px solid var(--pf-ink-line-strong); border-radius: var(--pf-radius-pill); background: none; color: var(--pf-on-ink); font: 500 0.6875rem/1 var(--pf-font-body); letter-spacing: 0.12em; }
+.sample h2 { font-size: clamp(1.875rem, 3.6vw, 2.75rem); line-height: 1.08; margin: var(--pf-space-16) 0 var(--pf-space-12); }
+.sample-lede { color: var(--pf-on-ink-muted); margin: 0 0 var(--pf-space-24); }
+.sample-facts { display: flex; flex-wrap: wrap; gap: var(--pf-space-12) var(--pf-space-32); margin: 0 0 var(--pf-space-24); padding: var(--pf-space-16) 0; border-block: 1px solid var(--pf-ink-line); }
+.sample-facts dt { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pf-on-ink-dim); }
+.sample-facts dd { margin: 4px 0 0; font: 400 1.25rem/1.2 var(--pf-font-display); color: var(--pf-on-ink); }
+.film ~ .sample .sample-steps { margin: 0 0 var(--pf-space-32); padding-left: 1.25rem; color: var(--pf-on-ink); }
+.film ~ .sample .sample-steps li::marker { color: var(--pf-accent); }
+.sample-warn { display: inline-block; padding: 2px 10px; border: 1px solid var(--pf-warn-line); border-radius: var(--pf-radius-pill); background: var(--pf-warn-bg); color: var(--pf-warn-title); font-size: 0.8125rem; }
+.sample-badges, .sample-warns { display: flex; flex-wrap: wrap; gap: var(--pf-space-8); margin: 0 0 var(--pf-space-16); padding: 0; list-style: none; }
+.sample-badge { padding: 4px 12px; border: 1px solid var(--pf-ink-line-strong); border-radius: var(--pf-radius-pill); color: var(--pf-on-ink); font-size: 0.8125rem; }
+.sample-draft { margin: 0 0 var(--pf-space-16); color: var(--pf-on-ink-muted); font-size: 0.9375rem; }
+.sample-warn-head { margin: 0 0 var(--pf-space-8); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--pf-on-ink-dim); }
+.sample-more { margin: calc(-1 * var(--pf-space-16)) 0 var(--pf-space-32); }
+.sample-more a { display: inline-flex; align-items: center; min-height: 44px; color: var(--pf-on-ink); }
+.film ~ .sample .cta-row { margin: 0 0 var(--pf-space-24); }
+.film ~ .sample .cta-primary {
+  display: inline-flex; align-items: center; min-height: 48px; padding: 0 26px; border-radius: var(--pf-radius-pill);
+  background: var(--pf-accent); border: 1px solid var(--pf-accent); color: var(--pf-accent-ink); font: 500 0.9375rem/1 var(--pf-font-body);
+}
+.film ~ .sample .cta-primary:hover { background: var(--pf-accent-hover); border-color: var(--pf-accent-hover); }
+.film ~ .sample .provenance { font-size: 0.8125rem; }
+
+/* Live: the stage is pinned for the film's scroll length (height set from config by film.js). */
+.film.is-live .film-stage {
+  position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; padding: 0;
+  background: var(--pf-ink);
+}
+.film.is-live .film-art {
+  position: absolute; right: 0; top: 50%; width: min(56rem, 62vw); max-width: none; margin: 0;
+  transform: translateY(-50%);
+}
+.film.is-live .film-poster { position: absolute; inset: 0; }
+.film.is-live.has-frame .film-poster { visibility: hidden; }
+.film.is-live .film-canvas { display: block; }
+.film.is-live .film-open {
+  position: absolute; left: clamp(20px, 5vw, 64px); top: 50%; transform: translateY(calc(-50% - var(--film-open-lift, 0px)));
+  width: min(36rem, 44vw);
+}
+.film.is-live .film-open.is-off { pointer-events: none; visibility: hidden; }
+/* Keep readable explanatory copy on the left throughout the stages: on wide screens the
+   caption is a column on the left, centred, ending well before the stack (the art's left 30% is empty frame). */
+.film.is-live .film-chap {
+  position: absolute; left: clamp(20px, 5vw, 64px); top: 50%; margin: 0; opacity: 0;
+  width: min(27rem, 30vw); pointer-events: none; transform: translateY(calc(-50% + 16px));
+}
+/* One caption per stage (film.js toggles .on at the stage's first frame): the old one goes at once, the new fades in. */
+.film.is-live .film-chap.on {
+  pointer-events: auto; opacity: 1; transform: translateY(-50%);
+  transition: opacity var(--film-caption-fade, 0ms) ease-out, transform var(--film-caption-fade, 0ms) ease-out;
+}
+/* Part labels: film.js places each name in a column beside the stack, on a thin leader line to its part. */
+.film.is-live .film-labels { display: block; position: absolute; inset: 0; pointer-events: none; }
+.film-labels svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.film-labels line { stroke: var(--pf-on-ink-muted); stroke-width: 1; opacity: 0; transition: opacity 240ms ease-out; }
+.film-labels line.on { opacity: 0.8; }
+.film-label {
+  position: absolute; top: 0; transform: translateY(-50%); margin: 0; opacity: 0; transition: opacity 240ms ease-out;
+  font: 500 0.8125rem/1.2 var(--pf-font-body); letter-spacing: 0.02em; color: var(--pf-on-ink);
+}
+.film-label.is-left { text-align: right; }
+.film-label.on { opacity: 1; }
+/* Phone composition: film.js sets data-layout from the configured css-width breakpoints (config/film.toml [[sets]]). */
+/* Phone: the copy and the render are two blocks in one flow, copy first, so their boxes cannot overlap. */
+.film.is-live[data-layout="phone"] .film-art {
+  position: relative; right: auto; top: auto; transform: none; margin: var(--pf-space-24) 0 0 calc(50% - var(--film-phone-width, 108vw) / 2); width: var(--film-phone-width, 108vw);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent), linear-gradient(to bottom, transparent, black var(--film-phone-feather, 7%), black calc(100% - var(--film-phone-feather, 7%)), transparent);
+  mask-image: linear-gradient(to right, transparent, black 9%, black 91%, transparent), linear-gradient(to bottom, transparent, black var(--film-phone-feather, 7%), black calc(100% - var(--film-phone-feather, 7%)), transparent);
+}
+.film.is-live[data-layout="phone"] .film-stage { display: flex; flex-direction: column; padding-top: 24px; }
+.film.is-live[data-layout="phone"] .film-open { position: relative; left: auto; top: auto; transform: none; order: -1; width: calc(100% - 2 * 20px); margin: 0 20px; }
+.film.is-live[data-layout="phone"] .film-open h1 { font-size: 2.5rem; margin: var(--pf-space-12) 0; }
+.film.is-live[data-layout="phone"] .film-open .sub { font-size: 1rem; margin-bottom: var(--pf-space-12); }
+.film.is-live[data-layout="phone"] .film-open .cta-row { margin-top: var(--pf-space-16); }
+.film.is-live[data-layout="phone"] .film-chap {
+  top: auto; bottom: var(--pf-space-24); width: calc(100% - 2 * 20px); transform: translateY(16px);
+}
+.film.is-live[data-layout="phone"] .film-chap.on { transform: none; }
+.film.is-live[data-layout="phone"] .film-chap h2 { font-size: 2rem; }
+.film.is-live[data-layout="phone"] .film-chap p { font-size: 0.9375rem; }
+.film.is-live[data-layout="phone"] .film-label { font-size: 0.75rem; letter-spacing: 0; }
+
+/* Site-wide refinements: pill buttons with a 48 px target, the mark large where the
+   page closes. */
+.film .cta-row, .film-end .cta-row { align-items: center; gap: 12px 16px; }
+.film .cta-primary, .film-end .cta-primary, .cta-ghost {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 26px;
+  border-radius: var(--pf-radius-pill);
+  font: 500 0.9375rem/1 var(--pf-font-body);
+  transition: background-color var(--pf-motion-ui) var(--pf-ease), border-color var(--pf-motion-ui) var(--pf-ease);
+}
+.film .cta-primary, .film-end .cta-primary { background: var(--pf-accent); color: var(--pf-accent-ink); border: 1px solid var(--pf-accent); }
+.film .cta-primary:hover, .film-end .cta-primary:hover { background: var(--pf-accent-hover); border-color: var(--pf-accent-hover); }
+.cta-ghost { border-color: var(--pf-ink-line-strong); }
+.film-end .cta-secondary { font-size: 0.9375rem; color: var(--pf-on-ink); text-underline-offset: 0.25em; text-decoration-color: var(--pf-accent); }
+.end-mark { display: block; width: clamp(72px, 9vw, 112px); height: auto; margin: 0 0 var(--pf-space-32); }
+
+
+/* The fixed bottom bar never covers the pinned film: the stage ends where the bar begins,
+   so the "See the sample guide" link is never partly covered. */
+.film.is-live .film-stage { height: calc(100vh - var(--pf-bar)); height: calc(100svh - var(--pf-bar)); }

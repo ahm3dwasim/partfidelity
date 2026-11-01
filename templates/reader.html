@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title — PartFidelity reader</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/site.css">
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/guide_step.css">
+<link rel="stylesheet" href="/static/ui/guide-end.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+<script src="/static/reader.js" defer></script>
+<!-- ui-guide-step: filmed-view set-start controls need the time-control script. -->
+<script src="/static/time_controls.js" defer></script>
+<script src="/static/ui/guide_step.js" defer></script>
+<script src="/static/ui/guide-end.js" defer></script>
+</head>
+<body class="pf-theme-guide">
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="skip" href="#main">Skip to content</a>
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+<main id="main"$main_attr>
+$notice_html
+<div class="ge-title"><div class="ge-title-text">
+<h1>$heading</h1>
+<p class="badges"><span class="badge-$difficulty_class">$difficulty</span> <span class="verdict-line">Should you try this? $verdict</span></p>
+$ge_meta_html
+</div>$ge_plate_html
+</div>
+$draft_html
+<p class="view-row pf-view-row"><span class="pf-view" role="group" aria-label="Guide view"><label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box"><span class="pf-view-opt" data-filmed data-copy="view.filmed">I filmed this</span><span class="pf-view-opt" data-fixing data-copy="view.fixing">I&#8217;m fixing this</span></label></span></p>
+<!-- ui-guide-step: filmed-view video target for per-step data-set-start. Own block. -->
+<div class="pf-filmed-only pf-video-block">
+<video id="guide-video" controls playsinline></video>
+<p class="video-note">Pause the video, then “Set start here” takes that time.</p>
+</div>
+<section class="tools" aria-label="Tools for this guide">
+<h2>Tools</h2>
+<ul class="tool-list ge-checklist">
+$tools_html
+</ul>
+</section>
+$steps_html
+$locked_html
+$labels_unmatched_html
+$share_html
+<nav class="guide-foot" aria-label="Guide evidence">
+<a href="/catch">@@catch_cta@@</a>
+<a href="/calls/sample">Calls</a>
+<a href="/calls/sample#battery-order">Battery order evidence</a>
+$cross_link_html
+</nav>
+</main>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">the same steps, frames, and labels as the maker guide</p>
+<p data-copy="footer.shell"><a href="/built">How this was built</a> · PartFidelity · guides from your own footage</p>
+</div></footer>
+</body>
+</html>

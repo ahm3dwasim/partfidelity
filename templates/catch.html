@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The catch · PartFidelity</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css"><link rel="stylesheet" href="/static/ui/shell.css"><link rel="stylesheet" href="/static/ui/catch.css">
+</head><body class="pf-theme-start">
+$header
+<main id="main" class="catch">
+<div class="catch-intro"><p class="catch-kicker">A recorded comparison</p><h1>The catch</h1>
+<p>When a redrawn image replaces a frame, the gate checks that the part is still the same part. It is strict. What follows is a recording of one measured run, not a live check: you cannot upload anything here.</p></div>
+<section class="catch-section"><h2>What the record says</h2><ul class="catch-points">
+<li>The real altered edit was rejected ($altered_rejected of $altered_total).</li>
+<li>Held-out recipe corruptions: $recipes_rejected of $recipes_total rejected. The blur recipe is the known blind spot: $blur_accepted of $blur_total held-out blur cases got through, because the gate still finds the part.</li>
+<li>The gate is strict. It also rejected $faithful_rejected of $faithful_total faithful edits, which is why redraws from Muse Image go to a person for a look rather than being trusted.</li>
+<li>No paste-back composite result was recorded, so none is shown or claimed.</li>
+</ul></section>
+<section class="catch-section"><h2>Two examples</h2><div class="catch-cases">$altered_case $accepted_case</div>
+<p class="catch-fine">Images are crops of the fan area of the recorded frames.</p></section>
+<section class="catch-section"><h2>The ten redrawn edits</h2><p>The ten redrawn frames were made offline with Muse Image before the gate was run on them. The similarity cutoff was computed by the tool from the earlier recipe cases and left untouched. Overlap and similarity are the gate's two measures.</p>$redrawn_table</section>
+<section class="catch-section" id="recipes"><h2>Held-out recipe corruptions</h2><p>Blur, recolour and shift, applied to frames the gate was not calibrated on. The recipes act on the battery label, so they are shown as rows only.</p>$v3_table</section>
+<section class="catch-section"><h2>Limits</h2><p>$caption</p><p>$limits Small samples: this shows how the gate behaved on these cases, not how it will behave on yours.</p></section>
+</main><footer class="pf-footer"><div class="pf-container pf-footer-inner"><p><a href="/guide/sample">Back to the sample guide</a></p></div></footer>
+</body></html>

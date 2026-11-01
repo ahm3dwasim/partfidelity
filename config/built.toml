@@ -1,0 +1,86 @@
+# Retired looks. Each name is a docs/FEATURES.md entry whose old description is no longer current;
+# /built shows it as history with the replacement named here.
+[superseded]
+"Page shell: tokens, header, footer, themes" = "Site-wide look: guide, upload, wait, preview and shell"
+"Workshop upload page" = "Site-wide look: guide, upload, wait, preview and shell"
+"Waiting screen: your own video, parts outlined live" = "Waiting screen: named stages, real times, honest clock"
+
+# Fonts and icons the project has used. A live feature naming one that static/ui no longer ships is rejected.
+[retired_names]
+fonts = ["Oswald", "Fraunces", "Inter"]
+icons = ["screw-head-check"]
+
+[page]
+title = "How this was built"
+summary_heading = "In short"
+kicker = "PartFidelity / build notes"
+intro = "A record of the work, tools and materials behind PartFidelity."
+window_heading = "Build window"
+window = "Built during the Meta AI Developer Hackathon, Oct 26–Nov 4, 2026 (official rules)."
+repository_heading = "Repository"
+repository_url = ""
+repository_pending = "Repository link added at release"
+features_heading = "Current features"
+features_intro = "What the product does today. The full record of every feature built during the event is below, closed."
+replay_link_text = "Second-check replay (simulated, no model called) and the recorded probe: one real disagreement on an absent label, one agreement control, one visible-label caveat"
+history_summary = "Full feature record"
+history_intro = "Every feature built during the event. Entries marked replaced are history and no longer describe the product."
+current_features = [
+  "Whole-video extraction with clock, cuts, snap, fold, and 12 steps",
+  "Real-frame maker guide",
+  "Real part outlines on the sample guide",
+  "Open-weights second check of part labels",
+  "Second-check flag on the guide",
+  "Model call receipts",
+  "The catch page",
+  "Photoreal laptop teardown film",
+]
+replaced_label = "Replaced by"
+history_label = "History ·"
+tools_heading = "Meta tooling"
+input_heading = "Pre-event input"
+input = "One input existed before the event: a repair clip filmed by a friend of the author, who gave written permission to use it (held privately by the author; no name or record is published). It is raw input only. The application, the guide made from it and every other output were built during the event, Oct 26–Nov 4, 2026."
+licences_heading = "Licences and sources"
+footer = "PartFidelity · guides from your own footage"
+
+[[summary]]
+name = "What it does"
+text = "Turns one repair video you filmed into an illustrated step-by-step guide, with safety hard stops for batteries and glued parts."
+[[summary]]
+name = "Meta models"
+text = "Muse Spark extracts the steps. SAM 3.1 finds the fan and battery. Spark Open gives a background second opinion on part labels."
+[[summary]]
+name = "Live now"
+text = "The site runs on Modal. One real sample guide, made from one laptop repair, is open to everyone; you can make your own from a clip of up to 5 minutes."
+[[summary]]
+name = "Honest limits"
+text = "Only the fan and battery are outlined. Step times are approximate. The sample comes from a single repair, so this shows a working pipeline, not measured accuracy."
+
+[[tools]]
+name = "Muse Spark"
+text = "Extracts repair steps from video and checks uncertain labels."
+[[tools]]
+name = "SAM 3.1"
+text = "Finds the fan and battery in selected video frames and scores each find."
+[[tools]]
+name = "SAM 3 (open weights)"
+text = "The sample guide's part outlines are traced by open-weights SAM 3 from the SAM 3.1 boxes; the outlines ship with the sample."
+[[tools]]
+name = "Muse Spark Open"
+text = "Open-weights second opinion on each part label, served on Baseten. It runs in the background and never changes a label; a disagreement flags the label for a person to review. Its agreements are shown on the call receipts; no accuracy is claimed for it."
+[[tools]]
+name = "Muse Image"
+text = "The live app makes no Muse Image call. Muse Image edits of the pre-event repair clip, used with permission, were made offline and frozen as a test set for the edit check (the ten edits on 26 Oct 2026; the gate was run on them on 29 Oct 2026), which compares an edited frame with its original using the SAM outline overlap and masked image similarity. The check is not part of the live app; its recorded results are on the catch page as a controlled demonstration, not an accuracy figure."
+
+[[licences]]
+name = "Fonts"
+text = "David Libre, Roboto, Fraunces, Inter and Oswald: SIL Open Font License 1.1."
+[[licences]]
+name = "Icons"
+text = "PartFidelity mark: original project artwork."
+[[licences]]
+name = "Blender and 3D assets"
+text = "Blender is free software under the GNU General Public License; that licence covers the program, not what we made with it. The laptop models, textures and rendered film are original project work: every part is modelled and every texture drawn in code, and no outside model or texture is used."
+[[licences]]
+name = "GSAP 3.13.0"
+text = "Vendored copy used for upload and call-page motion. It ships under the GreenSock Standard License (terms at gsap.com/standard-license), as its file header states."

@@ -1,0 +1,6 @@
+# Artifact kinds a published guide keeps until the guide itself is deleted.
+# Only the exact kept set of a done job is exempt from the 7-day sweep.
+guide_lifetime_kinds = ["provisional", "provisional_render"]
+
+# Failed jobs the hourly sweep rescans per pass; the rest wait for later passes.
+failed_rescan_batch = 100

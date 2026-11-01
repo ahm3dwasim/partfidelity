@@ -1,0 +1,212 @@
+/* /how-it-works page. Uses the shared tokens only; the figure's own styles are how-iso.css
+   (the anatomy kit, generated). The kit's variables are pointed at the site's ink, fog and one orange here. */
+.how-main { max-width: none; margin: 0; padding: 0; }
+.how-wrap { max-width: 72rem; margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px); }
+.how-hero { padding: clamp(40px, 7vw, 96px) 0 clamp(24px, 4vw, 48px); }
+.how-eyebrow {
+  font: 500 0.75rem/1 var(--pf-font-body); letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pf-amber); margin: 0;
+}
+.how-hero h1 { font-size: clamp(2.25rem, 5vw, 4.25rem); line-height: 1.04; margin: var(--pf-space-16) 0 var(--pf-space-24); max-width: 18ch; }
+.how-intro, .how-lede { color: var(--pf-on-ink-muted); max-width: 40rem; margin: 0 0 var(--pf-space-24); }
+.how-section-title { font-size: clamp(1.5rem, 2.6vw, 2.25rem); line-height: 1.1; margin: clamp(40px, 6vw, 72px) 0 var(--pf-space-24); }
+.how-limits-title { font-size: 1.25rem; margin: var(--pf-space-48) 0 var(--pf-space-8); }
+
+/* The figure: the kit reads its colours from these variables. */
+.how-iso {
+  --anatomy-card: var(--pf-ink);
+  --anatomy-text: var(--pf-on-ink-muted);
+  --anatomy-strong: var(--pf-on-ink);
+  --anatomy-lit: var(--pf-amber);
+  --anatomy-hi: #ece9e1;
+  --anatomy-mid: #9a968c;
+  --anatomy-lo: #5d5a54;
+  --anatomy-faint: #3a3834;
+  --anatomy-top: #2e2d2a;
+  --anatomy-face: #262522;
+  --anatomy-shade-0: #1b1a19;
+  --anatomy-shade-1: #201f1d;
+  --anatomy-shade-2: #262522;
+  --anatomy-shade-3: #2b2a27;
+  --anatomy-dot: #ece9e1;
+  --anatomy-halo: #000;
+  --anatomy-lit-top: #3a2a05;
+  --anatomy-lit-shade: #2a1e04;
+  --anatomy-mono: var(--pf-font-mono);
+  margin: 0;
+}
+.how-iso .iso-plate { padding: 56px clamp(16px, 3vw, 40px) 52px; box-shadow: 0 0 0 1px var(--pf-ink-line); border-radius: var(--pf-radius-workshop); }
+.how-iso .iso-plate-corner[data-corner="fig"] { color: var(--pf-on-ink-muted); }
+.how-iso .iso-plate-corner[data-corner="readout"] { color: var(--pf-amber); }
+/* The bench: a sticky figure column beside six scrolling stage cards. --pf-bar is the shell's fixed bottom bar (0 when
+   the shell has none); every sticky or scrolled-to position keeps clear of it. */
+.how-lead-row { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--pf-space-12) var(--pf-space-24); margin-bottom: var(--pf-space-24); }
+.how-lead-row .how-lede { margin: 0; flex: 1 1 28rem; }
+.how-concept { display: block; margin-top: var(--pf-space-8); font-size: 0.9375rem; }
+.how-scrolly { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--pf-space-24); }
+.how-art { margin: 0 auto; width: 100%; }
+.how-svg { display: block; width: 100%; height: auto; max-height: calc(100svh - var(--pf-bar, 0px) - 340px); overflow: visible; }
+.how-svg [data-glow] { fill: none; stroke: var(--pf-amber); stroke-width: 1.4; opacity: 0; }
+.how-now { margin: var(--pf-space-8) 0 0; height: 1.5em; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--pf-on-ink); font-weight: 600; }
+.how-now .how-n { color: var(--pf-amber); margin-right: var(--pf-space-8); }
+@media (min-width: 60rem) {
+  .how-scrolly { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: clamp(28px, 3.5vw, 56px); align-items: start; }
+  .how-stick { position: sticky; top: 24px; }
+  .how-stages { padding-bottom: 30svh; }
+  .how-card { min-height: calc(70svh - var(--pf-bar, 0px)); }
+}
+
+/* Labels on the phone: a leader from each layer to its name; the layer of the stage being read is lit. */
+.how-lead { fill: none; stroke: var(--pf-on-ink-muted); stroke-width: 0.8; }
+.how-lead-dot { fill: var(--pf-on-ink-muted); }
+.how-lbl-n { font: 500 12px var(--pf-font-mono); letter-spacing: 0.08em; fill: var(--pf-on-ink-muted); }
+.how-lbl-t { font: 600 17px var(--pf-font-body); fill: var(--pf-on-ink); }
+[data-layer][data-on] .how-lead { stroke: var(--pf-amber); }
+[data-layer][data-on] .how-lead-dot, [data-layer][data-on] .how-lbl-n { fill: var(--pf-amber); }
+
+/* Materials: the kit's four tones, tinted per part so the layers read as glass, aluminium, a battery pouch and a board. */
+.how-svg .m-glass { --anatomy-paper: #1b2631; --anatomy-top: #2b3b4b; --anatomy-shade-0: #141c25; --anatomy-shade-1: #18222c; --anatomy-shade-2: #1c2834; --anatomy-shade-3: #212f3d; }
+.how-svg .m-bezel { --anatomy-paper: #141517; --anatomy-top: #1d1f22; --anatomy-shade-0: #0e0f10; --anatomy-shade-1: #111214; --anatomy-shade-2: #141517; --anatomy-shade-3: #17181b; }
+.how-svg .m-oled { --anatomy-paper: #0a1018; }
+.how-svg .m-alu { --anatomy-paper: #4f5257; --anatomy-top: #6d7075; --anatomy-shade-0: #3c3e42; --anatomy-shade-1: #45484c; --anatomy-shade-2: #4f5257; --anatomy-shade-3: #595c61; }
+.how-svg .m-alu-dark { --anatomy-paper: #2c2e31; --anatomy-top: #36383c; --anatomy-shade-0: #222326; --anatomy-shade-1: #26282b; --anatomy-shade-2: #2b2d30; --anatomy-shade-3: #303235; }
+.how-svg .m-metal { --anatomy-paper: #7c7f84; --anatomy-top: #a4a7ac; --anatomy-shade-0: #5d6064; --anatomy-shade-1: #686b70; --anatomy-shade-2: #73767b; --anatomy-shade-3: #7e8186; }
+.how-svg .m-cell { --anatomy-paper: #23272f; --anatomy-top: #2d323d; --anatomy-shade-0: #181b21; --anatomy-shade-1: #1c1f26; --anatomy-shade-2: #20242b; --anatomy-shade-3: #252931; }
+.how-svg .m-label { --anatomy-paper: #c9c2b0; --anatomy-top: #ddd6c4; --anatomy-shade-0: #9c9686; --anatomy-shade-1: #a8a291; --anatomy-shade-2: #b4ad9c; --anatomy-shade-3: #c0b9a7; }
+.how-svg .m-tab { --anatomy-paper: #a9abae; --anatomy-top: #c4c6c9; --anatomy-shade-0: #85878a; --anatomy-shade-1: #8f9194; --anatomy-shade-2: #999b9e; --anatomy-shade-3: #a3a5a8; }
+.how-svg .m-flex { --anatomy-paper: #7a4a17; --anatomy-top: #9a5f1f; --anatomy-shade-0: #5a3711; --anatomy-shade-1: #643d13; --anatomy-shade-2: #6e4315; --anatomy-shade-3: #784917; }
+.how-svg .m-pcb { --anatomy-paper: #173a2a; --anatomy-top: #1f4a36; --anatomy-shade-0: #0f281d; --anatomy-shade-1: #122e22; --anatomy-shade-2: #153427; --anatomy-shade-3: #183a2c; }
+.how-svg .m-chip { --anatomy-paper: #1a1b1e; --anatomy-top: #26282c; --anatomy-shade-0: #111214; --anatomy-shade-1: #141517; --anatomy-shade-2: #17181b; --anatomy-shade-3: #1b1c1f; }
+.how-svg .m-lens { --anatomy-paper: #10203a; --anatomy-top: #1d3660; --anatomy-shade-0: #0b1729; --anatomy-shade-1: #0d1a2f; --anatomy-shade-2: #0f1e36; --anatomy-shade-3: #12223c; }
+.how-svg .m-flash { --anatomy-paper: #cdbd8a; --anatomy-top: #e6d7a6; --anatomy-shade-0: #a3956a; --anatomy-shade-1: #ad9f73; --anatomy-shade-2: #b7a97c; --anatomy-shade-3: #c1b385; }
+.how-svg .m-back { --anatomy-paper: #2f343b; --anatomy-top: #3b414a; --anatomy-shade-0: #22262b; --anatomy-shade-1: #272b31; --anatomy-shade-2: #2b3036; --anatomy-shade-3: #30353c; }
+
+/* A stage card: what goes in -> what happens -> what comes out */
+.how-flow { display: grid; gap: var(--pf-space-12); grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 40rem) {
+  .how-flow { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "in out" "op op"; }
+  .how-flow > :nth-child(1) { grid-area: in; }
+  .how-flow > :nth-child(3) { grid-area: out; }
+  .how-flow > .how-op { grid-area: op; }
+}
+.how-io { min-width: 0; background: var(--pf-ink-2); border: 1px solid var(--pf-ink-line); border-radius: var(--pf-radius-workshop); padding: var(--pf-space-12) var(--pf-space-16) var(--pf-space-16); }
+.how-io-l { margin: 0; font: 500 0.6875rem/1 var(--pf-font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--pf-on-ink-muted); }
+.how-io-t { margin: var(--pf-space-8) 0 0; font-weight: 600; color: var(--pf-on-ink); }
+.how-io-n { margin: var(--pf-space-4) 0 var(--pf-space-12); font-size: 0.875rem; color: var(--pf-on-ink-muted); }
+.how-op { color: var(--pf-on-ink-muted); font-size: 0.875rem; padding: var(--pf-space-4) 0; display: grid; gap: var(--pf-space-4); }
+.how-op-t { margin: 0; }
+.how-arrow { display: block; width: 2px; height: 18px; background: var(--pf-amber); position: relative; }
+.how-arrow::after { content: ""; position: absolute; left: -4px; bottom: -1px; border: 5px solid transparent; border-top: 7px solid var(--pf-amber); border-bottom: 0; }
+.how-op .how-model { margin: 0; }
+.how-kind { display: inline-block; margin: 0 0 var(--pf-space-8); padding: 0.2rem 0.55rem; border: 1px solid var(--pf-ink-line); border-radius: 999px; font: 500 0.75rem/1.3 var(--pf-font-mono); letter-spacing: 0.04em; color: var(--pf-on-ink-muted); }
+.how-kind[data-kind="ai"] { border-color: var(--pf-amber); color: var(--pf-amber); }
+.how-tag { display: inline-block; margin: 0 0 var(--pf-space-8); padding: 0.15rem 0.5rem; border: 1px dashed var(--pf-on-ink-muted); border-radius: 4px; font: 500 0.6875rem/1.3 var(--pf-font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--pf-on-ink); }
+.how-chip { display: inline-block; margin: var(--pf-space-8) 0 0; padding: 0.25rem 0.625rem; font: 500 0.8125rem/1.3 var(--pf-font-mono); color: var(--pf-ink); background: var(--pf-amber); border-radius: 10px; }
+
+/* Panel visuals: real frames and recorded results */
+.how-io img { display: block; max-width: 100%; height: auto; border-radius: 4px; }
+.how-strip { list-style: none; margin: 0; padding: 0; display: flex; gap: var(--pf-space-4); }
+.how-strip li { flex: 1 1 0; min-width: 0; text-align: center; font: 0.6875rem/1.6 var(--pf-font-mono); color: var(--pf-on-ink-muted); }
+.how-strip img { width: 100%; }
+.how-strip.is-held img { filter: grayscale(0.7) brightness(0.8); outline: 1px dashed var(--pf-ink-line); }
+.how-runs { list-style: none; margin: 0 0 var(--pf-space-4); padding: 0; display: grid; gap: var(--pf-space-4); }
+.how-runs li { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: var(--pf-space-8); align-items: center; height: 20px; }
+.how-track { position: relative; height: 12px; background: var(--pf-ink); border-radius: 3px; }
+.how-run { position: absolute; top: 2px; bottom: 2px; background: var(--pf-amber); border-radius: 2px; }
+.how-run-t { font: 0.6875rem/1 var(--pf-font-mono); color: var(--pf-on-ink-muted); }
+.how-steps { list-style: none; margin: var(--pf-space-12) 0 0; padding: 0; display: grid; gap: 2px; font-size: 0.8125rem; }
+.how-steps li { display: grid; grid-template-columns: 1.25rem minmax(0, 1fr) auto; gap: var(--pf-space-8); padding: 0.25rem 0.375rem; border-radius: 3px; color: var(--pf-on-ink-muted); }
+.how-steps .is-pick { background: var(--pf-ink); color: var(--pf-on-ink); box-shadow: inset 2px 0 var(--pf-amber); }
+.how-st-time { font: 0.6875rem/1.6 var(--pf-font-mono); }
+.how-cands { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(3rem, 1fr)); gap: 3px; }
+.how-cands li { display: grid; grid-template-rows: auto 2.25rem auto; gap: 2px; text-align: center; font: 0.625rem/1.4 var(--pf-font-mono); color: var(--pf-on-ink-muted); }
+.how-cands li.is-kept { color: var(--pf-amber); }
+.how-cands li.is-kept img { outline: 2px solid var(--pf-amber); }
+.how-cands img { width: 100%; }
+.how-bar { display: flex; align-items: flex-end; background: var(--pf-ink); border-radius: 2px; }
+.how-bar i { display: block; width: 100%; background: var(--pf-on-ink-muted); border-radius: 2px; }
+.is-kept .how-bar i { background: var(--pf-amber); }
+.how-kept-row { display: grid; gap: var(--pf-space-8); }
+.how-kept { margin: 0; }
+.how-kept figcaption { font: 0.6875rem/1.6 var(--pf-font-mono); color: var(--pf-on-ink-muted); }
+.how-shot { position: relative; line-height: 0; }
+.how-shot-s { max-width: 11rem; }
+.how-sam { position: absolute; inset: 0; width: 100%; height: 100%; }
+.how-box { fill: rgba(240, 164, 0, 0.12); stroke: var(--pf-amber); stroke-width: 7; stroke-dasharray: 1; stroke-dashoffset: 0; }
+.how-badge circle { fill: var(--pf-amber); stroke: #fff; stroke-width: 5; }
+.how-badge text { font: 700 44px var(--pf-font-body); fill: #1a1a1a; }
+[data-on] .how-box { animation: how-draw 1100ms ease 200ms both; }
+@keyframes how-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+.how-q { margin: 0 0 var(--pf-space-8); font-weight: 600; color: var(--pf-on-ink); }
+.how-fork { display: grid; gap: var(--pf-space-4); }
+.how-fork span { padding: 0.375rem 0.625rem; border: 1px solid var(--pf-ink-line); border-radius: 4px; font: 0.8125rem/1.3 var(--pf-font-mono); color: var(--pf-on-ink); }
+.how-guide { background: var(--pf-ink); border: 1px solid var(--pf-ink-line); border-radius: var(--pf-radius-workshop); padding: var(--pf-space-12); }
+.how-guide-n { margin: 0; font: 500 0.75rem/1 var(--pf-font-mono); letter-spacing: 0.1em; color: var(--pf-amber); text-transform: uppercase; }
+.how-guide-t { margin: var(--pf-space-4) 0 var(--pf-space-8); font-weight: 600; color: var(--pf-on-ink); }
+.how-warn { margin: var(--pf-space-8) 0 0; padding-left: 1.1rem; font-size: 0.8125rem; color: var(--pf-on-ink-muted); }
+
+/* Stage picker under the figure */
+.how-stepper { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--pf-space-4); margin-top: var(--pf-space-12); }
+.how-step { display: grid; align-content: start; gap: 2px; text-align: left; cursor: pointer; min-height: 44px; padding: var(--pf-space-8) var(--pf-space-8); background: transparent; color: var(--pf-on-ink-muted); border: 1px solid var(--pf-ink-line); border-top: 3px solid var(--pf-ink-line); border-radius: var(--pf-radius-workshop); font: 500 0.8125rem/1.25 var(--pf-font-body); }
+.how-step[aria-current="step"] { color: var(--pf-on-ink); border-top-color: var(--pf-amber); background: var(--pf-ink-2); }
+.how-step:hover { color: var(--pf-on-ink); }
+.how-step:focus-visible { outline: 2px solid var(--pf-amber); outline-offset: 2px; }
+.how-prov { display: block; margin-top: var(--pf-space-4); font-size: 0.8125rem; }
+.how-play {
+  flex: none; font: 600 0.9375rem/1 var(--pf-font-body); color: var(--pf-on-ink); background: transparent; cursor: pointer;
+  border: 1px solid var(--pf-on-ink-muted); border-radius: var(--pf-radius-workshop); padding: 0.75rem 1rem; min-height: 44px;
+}
+.how-play:hover { border-color: var(--pf-on-ink); }
+
+/* The six stages */
+.how-stages { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--pf-space-24); grid-template-columns: minmax(0, 1fr); }
+.how-card {
+  background: var(--pf-ink-2); border: 1px solid var(--pf-ink-line); border-top: 3px solid var(--pf-ink-line);
+  border-radius: var(--pf-radius-workshop); padding: var(--pf-space-16) var(--pf-space-24) var(--pf-space-24);
+  transition: border-color var(--pf-motion-ui);
+}
+.how-card[data-on] { border-top-color: var(--pf-amber); }
+.how-stage { margin: 0 0 var(--pf-space-8); display: grid; gap: var(--pf-space-4); padding: var(--pf-space-8) 0 0; color: var(--pf-on-ink); font: 600 1.375rem/1.2 var(--pf-font-body); }
+.how-n { font: 500 0.8125rem/1 var(--pf-font-mono); color: var(--pf-on-ink-muted); letter-spacing: 0.08em; text-transform: uppercase; }
+.how-card[data-on] .how-n { color: var(--pf-amber); }
+.how-play:focus-visible, .how-detail summary:focus-visible { outline: 2px solid var(--pf-amber); outline-offset: 3px; }
+.how-plain { margin: 0 0 var(--pf-space-16); color: var(--pf-on-ink); font-size: 1rem; }
+.how-detail { margin-top: var(--pf-space-16); border-top: 1px solid var(--pf-ink-line); padding-top: var(--pf-space-12); font-size: 0.9375rem; color: var(--pf-on-ink-muted); }
+.how-detail summary { cursor: pointer; font-weight: 600; color: var(--pf-on-ink-muted); min-height: 32px; display: flex; align-items: center; }
+.how-detail p { margin: var(--pf-space-8) 0 0; }
+.how-model { font: 500 0.8125rem/1.3 var(--pf-font-mono); letter-spacing: 0.04em; color: var(--pf-amber); }
+
+/* Which model does what */
+.how-hood { background: var(--pf-ink-2); border-top: 1px solid var(--pf-ink-line); margin-top: clamp(40px, 6vw, 72px); padding-bottom: clamp(40px, 6vw, 80px); }
+.how-tech { margin: 0; display: grid; border-top: 1px solid var(--pf-ink-line); }
+.how-tech-row { display: grid; gap: var(--pf-space-4) var(--pf-space-24); padding: var(--pf-space-16) 0; border-bottom: 1px solid var(--pf-ink-line); }
+@media (min-width: 48rem) { .how-tech-row { grid-template-columns: 16rem 1fr; } }
+.how-tech dt { font-weight: 600; color: var(--pf-on-ink); }
+.how-tech dd { margin: 0; color: var(--pf-on-ink-muted); }
+.how-facts { display: block; font: 0.8125rem/1.5 var(--pf-font-mono); margin-top: var(--pf-space-4); }
+.how-hood a { color: var(--pf-on-ink); text-underline-offset: 0.2em; }
+.how-end { padding: clamp(48px, 8vw, 96px) 0; }
+.how-end h2 { font-size: clamp(1.75rem, 3.6vw, 3rem); line-height: 1.05; margin: 0; }
+.how-end .cta-row { margin-top: var(--pf-space-24); display: flex; flex-wrap: wrap; gap: var(--pf-space-16); }
+
+/* Phone and narrow screens: the figure shrinks to a sticky strip (phone, "now" line, numbered stage buttons) above the cards. */
+@media (max-width: 59.99rem) {
+  .how-stick {
+    position: sticky; top: 0; z-index: 5; background: var(--pf-ink); border-bottom: 1px solid var(--pf-ink-line);
+    margin: 0 calc(-1 * clamp(20px, 5vw, 64px)); padding: var(--pf-space-8) clamp(20px, 5vw, 64px);
+  }
+  .how-iso .iso-plate { padding: 0; box-shadow: none; display: grid; grid-template-columns: 92px minmax(0, 1fr); grid-template-areas: "art now" "art steps"; gap: var(--pf-space-4) var(--pf-space-12); align-items: center; }
+  .how-iso .iso-plate-corners { display: none; }
+  .how-art { grid-area: art; width: 92px; overflow: hidden; }
+  .how-svg { width: 150%; max-width: none; max-height: none; } /* the label column is cropped; the now line names the stage */
+  .how-lbl { display: none; }
+  .how-now { grid-area: now; margin: 0; font-size: 0.9375rem; }
+  .how-stepper { grid-area: steps; grid-template-columns: repeat(6, minmax(0, 1fr)); margin: 0; }
+  .how-step { padding: 0; place-content: center; text-align: center; }
+  .how-step .how-step-t { display: none; }
+  .how-card { padding: var(--pf-space-16); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .how-card { transition: none; }
+  [data-on] .how-box { animation: none; }
+}

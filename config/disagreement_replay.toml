@@ -1,0 +1,38 @@
+# Copy and settings for the simulated disagreement replay at /disagreement-replay (lane mh-disagreement, W-2816).
+# Read strictly by app/disagreement_replay.py (a missing, extra or empty key fails). The note, confirm, confirmed and
+# undo wording is shared with the real guide flag and comes from config/open_readback.toml (flag_*).
+# The probe receipt paths comes from config/disagreement_probe.toml.
+
+[replay]
+title = "Second check: recorded probe and replay"
+kicker = "PartFidelity / second check"
+banner = "Simulated replay: no model was called"
+intro = "The recorded probe below is two recorded runs of the background second check, each a label question plus a fan control. The replay further down is a scripted screen in your browser: no model is called there. It shows what a person sees when the check disagrees with a part label: confirm the label or change it, undo, and come back later."
+separate_text = "This is separate from the edit catch, which is a recorded test of altered edits."
+separate_link_text = "See the catch"
+separate_link = "/catch"
+replay_heading = "Replay of the flagged label"
+card_heading = "A part flagged by the second check"
+label_caption = "Part label"
+shown_label = "keyboard"
+rename_input_label = "New label"
+rename_button = "Change label"
+rename_empty = "Type a label first."
+state_renamed = "You changed this label to \"{label}\". In the real guide a new check would start here; in this replay none ran."
+persist_note = "Your choice is saved in this browser only, so it is still here after a reload."
+static_heading = "The same replay, step by step"
+static_steps = [
+  "The label reads \"keyboard\" and a note says another AI check disagrees. The label is not changed or hidden.",
+  "The person presses \"I checked: label is correct.\" The note then says they confirmed it.",
+  "Or they type a new label and press \"Change label\". The new label replaces the old one.",
+  "Undo brings the note back with the original label. The choice survives a reload.",
+]
+recorded_heading = "Recorded probe"
+recorded_intro = "Two recorded runs of the background second check, each a label question plus a fan control, on one sample photo of the laptop underside with the fan outlined. Each answer is what the model said for that label only."
+recorded_columns = ["Label asked", "Model answer", "Result", "Receipt"]
+recorded_model_line = "Model: {model}, {date}"
+recorded_runs = ["Run 1", "Run 2"]
+recorded_receipt_text = "Receipt (JSON)"
+recorded_limit = "Run 1 shows a limit: the check asks whether the label is visible anywhere in the photo, not whether the outlined part is that thing. The battery is visible beside the outlined fan, so \"yes\" there is not a model error. Two runs on one image are not an accuracy measure."
+persist_failed_note = "This browser would not save your choice, so it lasts only for this visit."
+storage_key = "pf-disagreement-replay-v1"

@@ -1,0 +1,37 @@
+{
+  "schema": "disagreement-probe/1",
+  "model_id": "meta-models/muse-spark-open-1026",
+  "image": {
+    "name": "step-06-part-2.png",
+    "sha256": "6a5d47f6a68977fd5439e8003bfb7482a94c51e95990175e148fcfa7eab5279f"
+  },
+  "note": "Two calls on one image. This shows what the model answered for these two labels only; it is not a measure of accuracy.",
+  "cases": [
+    {
+      "case": "wrong-label case",
+      "request_label": "battery",
+      "model_answer": "yes",
+      "agreement": "agree",
+      "started_at": "2026-11-01T00:44:58+00:00",
+      "finished_at": "2026-11-01T00:45:02+00:00",
+      "latency_ms": 4280,
+      "units_in": 467,
+      "units_out": 77,
+      "cost_usd": "0.000911",
+      "error": null
+    },
+    {
+      "case": "control",
+      "request_label": "fan",
+      "model_answer": "yes",
+      "agreement": "agree",
+      "started_at": "2026-11-01T00:45:02+00:00",
+      "finished_at": "2026-11-01T00:45:05+00:00",
+      "latency_ms": 3201,
+      "units_in": 467,
+      "units_out": 107,
+      "cost_usd": "0.0010385",
+      "error": null
+    }
+  ]
+}

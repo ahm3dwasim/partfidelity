@@ -1,0 +1,30 @@
+{
+  "app_name": "pf-glimmer-proof",
+  "function_name": "glimmer_proof",
+  "cpu": 8,
+  "memory_mb": 49152,
+  "timeout_s": 7200,
+  "volume_name": "pf-glimmer-weights",
+  "volume_mount": "/weights",
+  "remote_root": "/pf",
+  "python_version": "3.12",
+  "apt_packages": [
+    "build-essential",
+    "cmake",
+    "git"
+  ],
+  "hf_base_url": "https://huggingface.co",
+  "vm_id_prefix": "modal-cpu",
+  "image_px": 224,
+  "cmake_args": "-DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DGGML_CUDA=OFF",
+  "runtime_deps": [
+    "numpy==2.4.0",
+    "typing-extensions==4.15.0",
+    "diskcache==5.6.3",
+    "jinja2==3.1.6",
+    "markupsafe==3.0.3"
+  ],
+  "grade_max_tokens": 2048,
+  "download_timeout_s": 120,
+  "proof_timeout_s": 600
+}

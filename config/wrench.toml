@@ -1,0 +1,78 @@
+# The PF mark's rendered wrench. Every changeable value of
+# tools/wrench_render.py and assets/3d/wrench/*.py lives here; loaded strictly by tools/wrench_config.py
+# (missing, unknown or mistyped keys fail). No credentials here. Lengths are mm.
+
+[blender]
+download_url = "https://download.blender.org/release/Blender5.2/blender-5.2.3-linux-x64.tar.xz"
+build = "blender-5.2.3-linux-x64"
+image = "debian_slim"
+python = "3.11"
+apt_packages = ["wget", "xz-utils", "libxi6", "libxxf86vm1", "libxfixes3", "libxrender1", "libgl1", "libxkbcommon0", "libsm6", "libegl1", "libxext6"]
+pip_packages = ["shapely==2.0.7", "numpy==2.2.3"]
+
+[modal]
+app = "logo-wrench"
+cpu_count = 4
+timeout_s = 600
+
+[budget]
+project = "partfidelity"
+job = "wrench-render"
+cap_usd = 1.0
+cpu_usd_per_s = 0.000131   # per core, as in config/teardown.toml
+overhead_s = 40
+ledger = "docs/3d/WRENCH_SPEND.md"
+
+[wrench]
+length = 190.0         # ring centre to jaw centre
+ring_r = 21.0
+ring_hole_r = [13.2, 11.4]   # 12-point star: tip radius, root radius
+jaw_r = 25.0
+slot_w = 21.0
+slot_depth = 9.0       # slot's round end sits this far inside the jaw centre
+shaft_half = [13.0, 16.5]    # half width at the ring end, at the jaw end
+fillet = 9.0           # plan radius where the shaft meets each head
+thickness = 11.0
+edge_bevel = [2.6, 5]  # mm, segments
+ridge = {start = 34.0, end = 122.0, width = 7.5, raise = 2.8}
+metal = {color = [0.80, 0.81, 0.83], roughness = 0.24}
+accent = [0.91, 0.44, 0.19]
+accent_finish = {roughness = 0.32, coat = 0.4}   # the orange ridge's paint
+jaw_soften = 1.4       # mm the jaw tips are rounded by
+ridge_bevel = {ratio = 0.45, segments = 4, angle_deg = 20, smooth_deg = 50}   # ratio of the ridge's raise
+body_smooth_deg = 35   # shade-smooth angle of the body
+circle_res = 24        # segments per quarter circle in the plan
+
+[scene]
+unit_mm = 100.0        # one Blender unit
+elevation_deg = 52.0
+axis_deg = 66.0        # the wrench's steepness on screen, from horizontal (logo A: rotate(114) in a y-down box)
+focal_mm = 120.0
+distance = 8.4        # units
+exposure = -0.2
+look = "Medium High Contrast"
+world = [[0.0, 0.02], [0.6, 0.05], [1.0, 0.25]]   # sky ramp: [position (0 = straight down, 1 = straight up), value]
+# the softbox the flat faces mirror: a gradient card placed where the camera ray bounces off a face lying flat
+card = {distance = 3.2, size = 7.0, strength = 1.5, ramp = [[0.0, 0.0], [0.35, 0.1], [0.6, 0.55], [0.85, 1.0], [1.0, 1.0]]}
+rim = {energy = 2400.0, size_xy = [1.0, 6.0], pos = [6.0, 2.0, 3.0]}
+fill = {energy = 700.0, size = 6.0, pos = [3.0, -7.0, 2.0]}
+
+[render]
+res = 1100
+samples = 96
+denoiser = "OPENIMAGEDENOISE"
+seed = 7
+variants = ["steel", "orange"]   # plain steel, and with the orange ridge accent
+
+[mark]
+# How tools/wrench_compose.py lays the render into the 32-unit PF mark (it writes static/ui/icon-real.svg and the
+# static/ui/wrench-real/ exports). Units are the mark's own 32x32 box.
+variant = "orange"          # the ridge accent (orange) beat plain steel: it still reads at 64 px and ties to the brand colour
+mark_px = 96                # the 1x size of the mark; the exports are 1x, 2x and 3x of it
+hi_px = 640                 # height of the raster embedded in the SVG (it must stay sharp up to the 512 px shot)
+box = [9.5, 1.0, 29.5]      # the wrench's left, top and height
+letters = {scale = 0.7, p = [0.12, 7.57], f = [9.62, 7.57]}   # P and F shrink to leave the ring end above F and the jaw below P's bowl
+tone = {gamma = 0.7, gain = 1.12}   # lifts the render so the steel holds up on the dark page at small sizes
+gap = 0.85                  # width of the dark gap round the wrench
+shadow = {keep = 0.55, falloff_px = 38, reach = 3.0, cutoff = 0.02}   # reach: multiplier on the blurred silhouette (how far the shadow stays solid); cutoff: shadow alpha below this is dropped (no floor haze)
+export = {webp_quality = 90, webp_alpha_quality = 100, webp_method = 6}   # the raster embedded in the SVG and the .webp exports

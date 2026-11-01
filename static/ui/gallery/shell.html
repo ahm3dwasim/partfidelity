@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shell gallery — PartFidelity UI</title>
+@@brand_icons@@
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../shell.css">
+<style>
+/* Gallery-only demo chrome (not part of the shell). */
+.g-sec { padding-block: 48px; }
+.g-sec h2 { font-size: 0.875rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.7; margin: 0 0 24px; font-family: var(--pf-font-body); }
+.g-row { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-end; margin-bottom: 24px; }
+.g-cell { display: grid; gap: 8px; justify-items: center; }
+.g-cell img { display: block; }
+.g-cap { font-size: 0.8125rem; opacity: 0.7; }
+.g-swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.g-sw { border: 1px solid currentColor; }
+.g-sw i { display: block; height: 48px; }
+.g-sw span { display: block; font-size: 0.8125rem; padding: 6px 8px; font-family: var(--pf-font-mono); }
+.g-grid-demo .pf-grid > div { border: 1px dashed currentColor; opacity: 0.9; font-size: 0.8125rem; text-align: center; padding: 12px 4px; font-family: var(--pf-font-mono); }
+.g-type > * { margin: 0 0 16px; }
+.g-note { font-size: 0.9375rem; opacity: 0.7; }
+</style>
+</head>
+<body>
+<!-- Fake data throughout: this page demos the shell, nothing else. -->
+
+<section class="pf-theme-start g-sec" aria-label="Start theme demo">
+<div class="pf-container">
+<h2>Start theme (dark) — home · upload · waiting</h2>
+<div class="g-type">
+<p class="pf-display">Take it apart. Prove every part.</p>
+<p class="pf-display-sm">Building your guide</p>
+<p class="pf-lede">Film a repair. Get a step guide where each labelled part is matched back to your video.</p>
+<p>Body text is Inter everywhere, 1.0625rem on a 1.6 line. <span class="pf-mono">0:47 · t480-fan-swap.mp4</span> <span class="pf-small">Small print stays readable.</span></p>
+</div>
+<h2>Mark at 16 / 24 / 32 / 48 px on dark</h2>
+<div class="g-row">
+<div class="g-cell">@@brand_gallery:0@@<span class="g-cap">@@brand_size:0@@</span></div>
+<div class="g-cell">@@brand_gallery:1@@<span class="g-cap">@@brand_size:1@@</span></div>
+<div class="g-cell">@@brand_gallery:2@@<span class="g-cap">@@brand_size:2@@</span></div>
+<div class="g-cell">@@brand_gallery:3@@<span class="g-cap">@@brand_size:3@@</span></div>
+</div>
+</div>
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+</section>
+
+<section class="pf-seam g-sec" aria-label="Seam demo">
+<div class="pf-container">
+<h2>The seam — amber rule where dark meets paper</h2>
+<p class="g-note">Start pages end dark; the guide begins on paper. The 2px amber rule is the joint.</p>
+</div>
+</section>
+
+<section class="pf-theme-guide g-sec" aria-label="Guide theme demo">
+<div class="pf-container">
+<h2>Guide theme (paper) — guide · share · end</h2>
+<div class="g-type">
+<p class="pf-display">ThinkPad T480: fan and battery</p>
+<p class="pf-display-sm">Step 3 of 5</p>
+<p class="pf-lede">One action line per step. Labels are drawn on copies of your frames.</p>
+<p>Body text is Inter everywhere, 1.0625rem on a 1.6 line. <span class="pf-mono">frame-031.png · matched</span> <span class="pf-small">Small print stays readable.</span></p>
+</div>
+<h2>Mark at 16 / 24 / 32 / 48 px on paper</h2>
+<div class="g-row">
+<div class="g-cell">@@brand_gallery:0@@<span class="g-cap">@@brand_size:0@@</span></div>
+<div class="g-cell">@@brand_gallery:1@@<span class="g-cap">@@brand_size:1@@</span></div>
+<div class="g-cell">@@brand_gallery:2@@<span class="g-cap">@@brand_size:2@@</span></div>
+<div class="g-cell">@@brand_gallery:3@@<span class="g-cap">@@brand_size:3@@</span></div>
+</div>
+</div>
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+<div class="pf-container g-grid-demo">
+<h2 style="margin-top:48px">Grid — 4 columns on phones, 12 on desktop</h2>
+<div class="pf-grid">
+<div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div>
+<div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div>
+</div>
+<h2 style="margin-top:32px">Spans — full / 8+4 / 6+6 / 4+4+4 (desktop)</h2>
+<div class="pf-grid">
+<div class="pf-span-full">full</div>
+<div class="pf-span-8">8</div><div class="pf-span-4">4</div>
+<div class="pf-span-6">6</div><div class="pf-span-6">6</div>
+<div class="pf-span-4">4</div><div class="pf-span-4">4</div><div class="pf-span-4">4</div>
+</div>
+</div>
+<div class="pf-container">
+<h2 style="margin-top:48px">Tokens</h2>
+<div class="g-swatches">
+<div class="g-sw"><i style="background:#131313"></i><span>--pf-ink</span></div>
+<div class="g-sw"><i style="background:#1d1d1d"></i><span>--pf-ink-2</span></div>
+<div class="g-sw"><i style="background:#2c2c2c"></i><span>--pf-ink-line</span></div>
+<div class="g-sw"><i style="background:#f2f0eb"></i><span>--pf-on-ink</span></div>
+<div class="g-sw"><i style="background:#a9a59c"></i><span>--pf-on-ink-muted</span></div>
+<div class="g-sw"><i style="background:#f0eee8"></i><span>--pf-paper</span></div>
+<div class="g-sw"><i style="background:#faf9f5"></i><span>--pf-paper-2</span></div>
+<div class="g-sw"><i style="background:#dcd8cf"></i><span>--pf-paper-line</span></div>
+<div class="g-sw"><i style="background:#1b1d1a"></i><span>--pf-on-paper</span></div>
+<div class="g-sw"><i style="background:#5d5f58"></i><span>--pf-on-paper-muted</span></div>
+<div class="g-sw"><i style="background:#f0a400"></i><span>--pf-amber</span></div>
+<div class="g-sw"><i style="background:#1a1300"></i><span>--pf-amber-ink</span></div>
+<div class="g-sw"><i style="background:#7a5200"></i><span>--pf-amber-deep</span></div>
+<div class="g-sw"><i style="background:#c2331f"></i><span>--pf-danger</span></div>
+<div class="g-sw"><i style="background:#2f7d4f"></i><span>--pf-ok</span></div>
+</div>
+<p class="g-note" style="margin-top:24px">Gallery demo only — fake data, both themes, all specimens.</p>
+</div>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">the sample is a recorded replay</p>
+<p data-copy="footer.shell">PartFidelity · guides from your own footage</p>
+</div></footer>
+</section>
+</body>
+</html>

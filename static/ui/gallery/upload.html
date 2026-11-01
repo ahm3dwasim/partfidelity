@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- Standalone demo of the upload page restyle. Fake data; screenshot target. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Upload a teardown clip — PartFidelity</title>
+@@brand_icons@@
+<link rel="stylesheet" href="../upload.css">
+<style>
+/* Same faces as upload.css, resolved relative for this standalone file. */
+@font-face {
+  font-family: "Oswald"; font-weight: 700; font-style: normal; font-display: swap;
+  src: url("../media/upload/Oswald-700-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("../media/upload/Inter-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Inter"; font-weight: 600; font-style: normal; font-display: swap;
+  src: url("../media/upload/Inter-600-normal.woff2") format("woff2");
+}
+</style>
+</head>
+<body class="pf-upload">
+<main class="pf-wrap">
+<p class="pf-kicker" data-copy="upload.kicker">PartFidelity · your footage</p>
+<h1 class="pf-title" data-copy="upload.title">Start with your video.</h1>
+<p class="pf-lede" data-copy="upload.lede">Your own footage only. <strong>300 seconds or less</strong>, under 100 MB. We trim, cap at 1080p, and strip audio before you confirm.</p>
+<div class="pf-alert client" id="client-error" role="alert" tabindex="-1" hidden></div>
+<section class="pf-panel" aria-label="Upload">
+<span class="pf-sending" aria-hidden="true"></span>
+<form id="upload-form" action="/upload" method="post" enctype="multipart/form-data">
+<label class="pf-drop" id="drop-zone" data-copy="upload.drop">
+<span class="pf-drop-idle">
+<span class="pf-drop-title">Drop your clip here</span>
+<span class="pf-drop-sub">or <u>browse your files</u></span>
+</span>
+<input id="clip" type="file" name="clip" accept="video/mp4,video/*" required>
+<span class="pf-picked" id="picked-file" aria-live="polite"></span>
+</label>
+<ul class="pf-spec" data-copy="upload.spec">
+<li><strong>300 s</strong> max</li>
+<li><strong>100 MB</strong> max</li>
+<li><strong>mp4</strong></li>
+<li>Audio is removed</li>
+</ul>
+<p class="pf-consent" data-copy="upload.consent">By uploading you confirm this is your own footage and you have permission to use it. Nothing goes to Meta until you confirm on the next screen.</p>
+<div class="pf-actions">
+<span class="pf-sample" data-copy="upload.sample">No clip handy? <a class="pf-btn" href="/guide/sample">See a sample guide</a></span>
+<button class="pf-btn pf-btn-ghost" type="submit" data-copy="upload.submit">Continue to preview</button>
+</div>
+</form>
+</section>
+<section class="pf-next" aria-label="What happens next">
+<h2 data-copy="upload.next_h">What happens next</h2>
+<ol class="pf-steps">
+<li data-copy="upload.next_1"><div><h3>You check the trimmed clip</h3><p>The exact 1080p-capped, audio-free cut. Nothing goes to Meta until you confirm.</p></div></li>
+<li data-copy="upload.next_2"><div><h3>We build the guide</h3><p>You see each stage as it happens, with elapsed time for each stage.</p></div></li>
+<li data-copy="upload.next_3"><div><h3>You prove every part</h3><p>Numbered steps illustrated with still frames from your clip, ready to save or share.</p></div></li>
+</ol>
+</section>
+<footer class="pf-foot">
+<p data-copy="upload.retention">Our processing copy is deleted about 24 hours after upload. Meta's copy, sent only after you confirm, expires within 24 hours. A published guide keeps your video until you delete the guide.</p>
+<p data-copy="upload.delete">Need a file removed? <a href="/delete-request">Send a delete request</a>.</p>
+</footer>
+</main>
+<script>window.PARTFIDELITY_LIMITS = {"maxBytes": 104857600, "maxDuration": 300, "message": "Trim it to 300 seconds or less and try again. A 720p phone video is usually under 100 MB."};</script>
+<script src="../../upload.js"></script>
+</body>
+</html>

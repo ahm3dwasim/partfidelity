@@ -1,0 +1,77 @@
+# Keys, local config, and anything that could carry a credential.
+.env*
+*.pem
+*.key
+id_rsa*
+id_ed25519*
+.secrets/
+
+# Raw inputs, footage, consent records, and form answers stay out of the repo.
+footage/
+raw/
+inputs/
+incoming/
+consent*
+*consent*
+
+# Runtime data and local databases.
+var/
+*.db
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Generated private artifacts.
+artifacts/
+out/
+renders/
+
+# Consented local footage for UI galleries: usable, never committed, never trained on.
+static/ui/media/local/
+
+# Worker report files are never committed.
+.lane-report-*.md
+
+# UI work: consented local footage (use, never train, never commit).
+static/ui/media/local/
+
+# Python runtime noise.
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.coverage
+.mypy_cache/
+
+# Consented demo footage (NOT committed, NOT for training).
+static/ui/media/local/
+
+# Home film frames: unpacked from assets/film/*.tar by tools/film_frames.py.
+static/ui/media/teardown/webp-*/
+static/ui/media/teardown/anchors.json
+static/ui/media/teardown/.unpack.lock
+
+# Render spend ledger lock (tools/teardown_render.py).
+docs/3d/*.lock
+
+# Sample source footage and derived frames ship from local media, never git.
+*.mp4
+*.mov
+*.webm
+*.mkv
+*.avi
+app/sample_real/frames/
+app/sample_real/labels/
+
+# Private source footage frames; regenerated locally for deployment.
+static/ui/media/how/*.webp
+static/ui/media/how/.*.tmp
+# Temp files of tools/how_media.py (unpack and pack), wherever it runs.
+**/.how-media-*.tmp
+
+# Private how-it-works frame bundle (tools/how_media.py pack); only config/how_media.json is committed.
+assets/how/
+
+# Catch page crops (tools/catch_media.py pack/unpack); private footage, never committed.
+static/ui/media/catch/

@@ -1,0 +1,33 @@
+# Background second check of part labels with Meta's open-weights Spark Open on Baseten.
+# Loaded strictly by app/providers/open_readback.py (a missing or misspelled key fails). No credentials here:
+# the key is read only from BASETEN_API_KEY.
+# Spend bound: each call reserves its worst case before it is sent, priced at the rates below:
+#   input  <= prompt_overhead_tokens + question template bytes + 4 * label_max_chars + image_token_ceiling
+#   output <= max_tokens
+# A config whose max_cost_usd_per_job cannot cover one such call fails to load.
+
+[open_readback]
+enabled = true
+model_id = "meta-models/muse-spark-open-1026"
+endpoint = "https://inference.baseten.co/v1/chat/completions"
+temperature = 0                      # probe ran at 0
+effort = "low"                       # reasoning_effort; without it the model reasons until max_tokens (probe)
+image_max_px = 640                   # long edge of the JPEG sent; full frames time out (probe)
+jpeg_quality = 85
+max_tokens = 300                     # output ceiling, reasoning included
+label_max_chars = 80                 # a longer label is not sent
+prompt_overhead_tokens = 100         # chat template around the one user message
+image_token_ceiling = 2500           # 640x640 at 14 px patches is 2116; the probe's whole input was 470
+timeout_s = 60.0                     # probe calls took 3.9 to 32 s; one attempt, no retries
+cancel_wait_s = 65.0                 # a deletion waits this long for an in-flight call; at least timeout_s
+max_calls_per_job = 4                # per-job call cap
+max_cost_usd_per_job = 0.02          # per-job cost cap; a call is never started past it
+input_usd_per_mtok = 1.25            # Baseten Model APIs list price
+output_usd_per_mtok = 4.25
+concurrency = 2                      # workers shared by all jobs
+flag_text = "Another AI check disagrees with this label. Review the highlighted part."   # shown on the guide only when it disagrees; never says the label is wrong
+flag_confirm_label = "I checked: label is correct."   # records the person's own confirmation, not a verification
+flag_aria_label = "Label review suggestion"
+flag_confirmed_text = "You confirmed this label."
+flag_undo_label = "Undo"
+flag_unavailable_text = "The other AI check could not run for this label after your edit."   # shown only when a recheck after a rename could not run

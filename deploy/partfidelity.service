@@ -1,0 +1,20 @@
+[Unit]
+Description=PartFidelity single-VM service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=partfidelity
+WorkingDirectory=/srv/partfidelity
+# META_API_KEY must be present in the service environment at deploy time;
+# production mode refuses to start without it. BASETEN_API_KEY feeds the
+# second check (missing: it shows "not available"). No secret is stored here.
+Environment=PARTFIDELITY_PRODUCTION=1
+Environment=PARTFIDELITY_DATA_ROOT=/srv/partfidelity/var
+ExecStart=/srv/partfidelity/.venv/bin/python -m uvicorn --factory app.main:create_app --host 127.0.0.1 --port 8000 --workers 2
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

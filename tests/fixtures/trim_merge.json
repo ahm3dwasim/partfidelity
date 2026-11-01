@@ -1,0 +1,799 @@
+{
+ "sample_cuts": [
+  9.4,
+  11.433333,
+  17.3,
+  18.833333,
+  23.066667,
+  30.1,
+  31.2,
+  36.766667,
+  46.466667,
+  49.4,
+  51.333333,
+  59.566667,
+  63.866667,
+  65.666667,
+  68.133333,
+  69.533333,
+  71.0,
+  79.4,
+  86.833333,
+  94.733333,
+  98.9,
+  103.5,
+  106.166667,
+  111.533333,
+  125.166667,
+  126.833333,
+  131.0,
+  134.8,
+  144.5,
+  148.866667,
+  149.5,
+  149.966667,
+  150.3,
+  150.766667,
+  155.766667,
+  160.733333,
+  163.133333,
+  164.633333,
+  170.433333,
+  179.1,
+  183.4,
+  189.233333
+ ],
+ "note": "Steps-only payloads copied from the saved evidence (raw runs and cuts; read-only). No footage. Raws carry no kind tags: replay tests the merge alone on these and the drop with kinds assigned in-test.",
+ "raw_R1": {
+  "confidence": 0.95,
+  "device_guess": "Lenovo ThinkPad T480",
+  "steps": [
+   {
+    "action": "Show laptop intro",
+    "end_s": 9.4,
+    "hazards": [],
+    "number": 1,
+    "parts": [
+     {
+      "phrase": "laptop lid",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 0,
+    "tools": []
+   },
+   {
+    "action": "Flip device over",
+    "end_s": 11.4,
+    "hazards": [],
+    "number": 2,
+    "parts": [
+     {
+      "phrase": "laptop lid",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 9.4,
+    "tools": []
+   },
+   {
+    "action": "Remove external battery",
+    "end_s": 17.3,
+    "hazards": [
+     "battery"
+    ],
+    "number": 3,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "bottom edge"
+     }
+    ],
+    "start_s": 11.4,
+    "tools": []
+   },
+   {
+    "action": "Flip open laptop lid",
+    "end_s": 18.8,
+    "hazards": [
+     "display"
+    ],
+    "number": 4,
+    "parts": [
+     {
+      "phrase": "keyboard",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 17.3,
+    "tools": []
+   },
+   {
+    "action": "Disable internal battery in BIOS",
+    "end_s": 36.8,
+    "hazards": [
+     "battery",
+     "data"
+    ],
+    "number": 5,
+    "parts": [
+     {
+      "phrase": "keyboard",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 18.8,
+    "tools": []
+   },
+   {
+    "action": "Remove bottom screws",
+    "end_s": 59.6,
+    "hazards": [
+     "sharp",
+     "esd"
+    ],
+    "number": 6,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 36.8,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Pry off bottom cover",
+    "end_s": 86.8,
+    "hazards": [
+     "sharp",
+     "esd"
+    ],
+    "number": 7,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 59.6,
+    "tools": []
+   },
+   {
+    "action": "Disconnect and remove internal battery",
+    "end_s": 111.5,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 8,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "lower left"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 86.8,
+    "tools": []
+   },
+   {
+    "action": "Install internal battery",
+    "end_s": 134.8,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 9,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "lower left"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 111.5,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Refit cover and external battery",
+    "end_s": 170.4,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 10,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "battery",
+      "position_hint": "top edge"
+     }
+    ],
+    "start_s": 134.8,
+    "tools": []
+   },
+   {
+    "action": "Power on and verify in OS",
+    "end_s": 189.2,
+    "hazards": [
+     "battery",
+     "display",
+     "data"
+    ],
+    "number": 11,
+    "parts": [
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 170.4,
+    "tools": [
+     "charger"
+    ]
+   },
+   {
+    "action": "Show memory upgrade parts",
+    "end_s": 214.167,
+    "hazards": [
+     "esd",
+     "data"
+    ],
+    "number": 12,
+    "parts": [
+     {
+      "phrase": "memory module",
+      "position_hint": "lower center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 189.2,
+    "tools": []
+   }
+  ]
+ },
+ "raw_R2": {
+  "confidence": 0.95,
+  "device_guess": "Lenovo ThinkPad T480",
+  "steps": [
+   {
+    "action": "Intro show closed laptop",
+    "end_s": 9.4,
+    "hazards": [],
+    "number": 1,
+    "parts": [
+     {
+      "phrase": "laptop lid",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 0,
+    "tools": []
+   },
+   {
+    "action": "Flip over and remove external battery",
+    "end_s": 17.3,
+    "hazards": [
+     "battery"
+    ],
+    "number": 2,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "right side"
+     },
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 9.4,
+    "tools": []
+   },
+   {
+    "action": "Boot to BIOS and disable built-in battery",
+    "end_s": 31.2,
+    "hazards": [
+     "battery",
+     "data"
+    ],
+    "number": 3,
+    "parts": [
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "bottom center"
+     }
+    ],
+    "start_s": 17.3,
+    "tools": []
+   },
+   {
+    "action": "Power down and remove bottom screws",
+    "end_s": 59.6,
+    "hazards": [
+     "esd"
+    ],
+    "number": 4,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "case screw",
+      "position_hint": "bottom center"
+     }
+    ],
+    "start_s": 31.2,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Pry open and remove bottom cover",
+    "end_s": 86.8,
+    "hazards": [
+     "sharp",
+     "esd"
+    ],
+    "number": 5,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "side port",
+      "position_hint": "left side"
+     }
+    ],
+    "start_s": 59.6,
+    "tools": []
+   },
+   {
+    "action": "Disconnect and replace internal battery",
+    "end_s": 125.2,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 6,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "left center"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "right center"
+     },
+     {
+      "phrase": "motherboard",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 86.8,
+    "tools": []
+   },
+   {
+    "action": "Secure and reconnect new battery",
+    "end_s": 134.8,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 7,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "left center"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "right center"
+     },
+     {
+      "phrase": "battery cable",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 125.2,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Refit bottom cover",
+    "end_s": 155.8,
+    "hazards": [
+     "esd"
+    ],
+    "number": 8,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 134.8,
+    "tools": []
+   },
+   {
+    "action": "Fasten screws and refit external battery",
+    "end_s": 170.4,
+    "hazards": [
+     "battery"
+    ],
+    "number": 9,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "battery",
+      "position_hint": "top edge"
+     },
+     {
+      "phrase": "case screw",
+      "position_hint": "bottom edge"
+     }
+    ],
+    "start_s": 155.8,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Flip over and plug in charger",
+    "end_s": 179.1,
+    "hazards": [
+     "battery",
+     "display"
+    ],
+    "number": 10,
+    "parts": [
+     {
+      "phrase": "laptop lid",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "charging port",
+      "position_hint": "left side"
+     }
+    ],
+    "start_s": 170.4,
+    "tools": [
+     "charger"
+    ]
+   },
+   {
+    "action": "Power on and verify in OS",
+    "end_s": 189.2,
+    "hazards": [
+     "data",
+     "display"
+    ],
+    "number": 11,
+    "parts": [
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "bottom center"
+     }
+    ],
+    "start_s": 179.1,
+    "tools": []
+   },
+   {
+    "action": "Present memory upgrade parts",
+    "end_s": 214.167,
+    "hazards": [
+     "esd",
+     "data"
+    ],
+    "number": 12,
+    "parts": [
+     {
+      "phrase": "memory module",
+      "position_hint": "bottom center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "top center"
+     },
+     {
+      "phrase": "packaging box",
+      "position_hint": "left side"
+     }
+    ],
+    "start_s": 189.2,
+    "tools": []
+   }
+  ]
+ },
+ "raw_R3": {
+  "confidence": 0.92,
+  "device_guess": "Lenovo ThinkPad T480",
+  "steps": [
+   {
+    "action": "Intro show closed laptop",
+    "end_s": 9.4,
+    "hazards": [],
+    "number": 1,
+    "parts": [
+     {
+      "phrase": "lid",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 0,
+    "tools": []
+   },
+   {
+    "action": "Flip over and remove external battery",
+    "end_s": 17.3,
+    "hazards": [
+     "battery"
+    ],
+    "number": 2,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "bottom center then right side"
+     },
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 9.4,
+    "tools": []
+   },
+   {
+    "action": "Boot to BIOS and disable built-in battery",
+    "end_s": 31.2,
+    "hazards": [
+     "battery",
+     "data"
+    ],
+    "number": 3,
+    "parts": [
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "bottom center"
+     }
+    ],
+    "start_s": 17.3,
+    "tools": []
+   },
+   {
+    "action": "Power down and flip to back",
+    "end_s": 36.8,
+    "hazards": [
+     "battery"
+    ],
+    "number": 4,
+    "parts": [
+     {
+      "phrase": "power button",
+      "position_hint": "right side"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 31.2,
+    "tools": []
+   },
+   {
+    "action": "Unscrew and pry off bottom cover",
+    "end_s": 86.8,
+    "hazards": [
+     "esd",
+     "sharp"
+    ],
+    "number": 5,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "screw",
+      "position_hint": "center on screwdriver tip"
+     },
+     {
+      "phrase": "side ports",
+      "position_hint": "left edge"
+     }
+    ],
+    "start_s": 36.8,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Disconnect and remove internal battery",
+    "end_s": 111.5,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 6,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "bottom center"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "center right"
+     },
+     {
+      "phrase": "motherboard",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 86.8,
+    "tools": []
+   },
+   {
+    "action": "Install replacement internal battery",
+    "end_s": 134.8,
+    "hazards": [
+     "battery",
+     "esd"
+    ],
+    "number": 7,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "bottom center"
+     },
+     {
+      "phrase": "fan",
+      "position_hint": "center right"
+     },
+     {
+      "phrase": "battery cable",
+      "position_hint": "center"
+     }
+    ],
+    "start_s": 111.5,
+    "tools": [
+     "screwdriver"
+    ]
+   },
+   {
+    "action": "Close bottom cover and refit",
+    "end_s": 170.4,
+    "hazards": [
+     "esd",
+     "battery"
+    ],
+    "number": 8,
+    "parts": [
+     {
+      "phrase": "bottom cover",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "battery",
+      "position_hint": "top edge bay"
+     }
+    ],
+    "start_s": 134.8,
+    "tools": []
+   },
+   {
+    "action": "Refit external battery and connect charger",
+    "end_s": 179.1,
+    "hazards": [
+     "battery"
+    ],
+    "number": 9,
+    "parts": [
+     {
+      "phrase": "battery",
+      "position_hint": "top center"
+     },
+     {
+      "phrase": "lid",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "charger cable",
+      "position_hint": "left side"
+     }
+    ],
+    "start_s": 170.4,
+    "tools": []
+   },
+   {
+    "action": "Power on and verify in Windows",
+    "end_s": 189.2,
+    "hazards": [
+     "battery",
+     "display",
+     "data"
+    ],
+    "number": 10,
+    "parts": [
+     {
+      "phrase": "display",
+      "position_hint": "center"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "bottom center"
+     }
+    ],
+    "start_s": 179.1,
+    "tools": []
+   },
+   {
+    "action": "Show new RAM parts overview",
+    "end_s": 214.167,
+    "hazards": [
+     "esd",
+     "data"
+    ],
+    "number": 11,
+    "parts": [
+     {
+      "phrase": "memory module",
+      "position_hint": "bottom center"
+     },
+     {
+      "phrase": "packaging box",
+      "position_hint": "bottom left"
+     },
+     {
+      "phrase": "keyboard",
+      "position_hint": "top center"
+     }
+    ],
+    "start_s": 189.2,
+    "tools": []
+   }
+  ]
+ }
+}

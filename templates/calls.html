@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{PAGE_TITLE}} — PartFidelity</title>
+<link rel="stylesheet" href="/static/calls.css">
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/loading.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+</head>
+<body class="pf-theme-guide">
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="skip" href="#main">Skip to content</a>
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+<main id="main" class="page" data-pf-fade>
+<p class="crumb"><a href="/">PartFidelity</a> / Calls</p>
+<h1>What the models did</h1>
+<p class="sub">Model call receipts for job <code>{{JOB_ID}}</code>. Observed numbers only.</p>
+{{SUMMARY}}
+{{READBACK}}
+{{TABLE}}
+</main>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">Observed numbers only.</p>
+<p data-copy="footer.shell"><a href="/built">How this was built</a> · PartFidelity · guides from your own footage</p>
+</div></footer>
+<script src="/static/ui/vendor/gsap.min.js" defer></script>
+<script src="/static/ui/loading.js" defer></script>
+</body>
+</html>

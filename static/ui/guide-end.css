@@ -1,0 +1,307 @@
+/* PartFidelity guide end: title block, sample notice,
+   verdict note, tools checklist, share section, guide footer. Manual look
+   on warm paper, Fraunces display, ONE amber accent.
+
+   Token names come from static/ui/tokens.css;
+   every var() below carries the shared token value as a fallback so this
+   component renders standalone until the shell merges. This file only
+   styles the guide-top and guide-end regions: step cards, stops, and the
+   view switch belong to sibling components and are never touched here. */
+
+main#main > h1,
+.ge-title-text > h1 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.04;
+  font-size: clamp(2.1rem, 7vw, 3.5rem);
+  margin: 0 0 1rem;
+  text-wrap: balance;
+}
+
+/* Title block: 4 columns on phones, 12 on desktop. Text takes the full
+   row on phones; on desktop the first frame returns as a side plate. */
+.ge-title {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0 0;
+}
+.ge-title-text { grid-column: 1 / -1; min-width: 0; }
+.ge-plate { display: none; }
+@media (min-width: 60rem) {
+  .ge-title { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+  .ge-title-text { grid-column: 1 / span 7; }
+  /* No plate (no step frames on the page): text takes the full row. */
+  .ge-title-text:last-child { grid-column: 1 / -1; }
+  .ge-plate {
+    display: block;
+    grid-column: 8 / span 5;
+    margin: 0;
+    align-self: start;
+  }
+  .ge-plate img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+  }
+  .ge-plate figcaption {
+    color: var(--pf-on-paper-muted, #5d5f58);
+    font-size: 1rem;
+    margin-top: 0.5rem;
+  }
+}
+
+/* Difficulty pill + verdict: the "should you try this" note. The pill is
+   ink-filled so its text contrast never depends on the difficulty hue;
+   the hue survives as a small marker chip beside the label. */
+main#main > .badges,
+.ge-title-text > .badges {
+  margin: 0 0 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+}
+main#main .badges [class^="badge-"],
+.ge-title-text .badges [class^="badge-"] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--pf-on-paper, #1b1d1a);
+  color: var(--pf-paper-2, #faf9f5);
+  font-weight: 700;
+  padding: 0.2rem 0.8rem 0.2rem 0.55rem;
+  border-radius: 999px;
+  margin-right: 0;
+}
+main#main .badges [class^="badge-"]::before,
+.ge-title-text .badges [class^="badge-"]::before {
+  content: "";
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--pf-on-paper-muted, #5d5f58);
+}
+/* Difficulty markers are amber/neutral only: no green/red. */
+main#main .badges .badge-easy::before,
+.ge-title-text .badges .badge-easy::before { background: var(--pf-paper-line, #dcd8cf); }
+main#main .badges .badge-medium::before,
+.ge-title-text .badges .badge-medium::before { background: var(--pf-amber, #f0a400); }
+main#main .badges .badge-hard::before,
+.ge-title-text .badges .badge-hard::before { background: var(--pf-on-paper-muted, #5d5f58); }
+main#main .verdict-line,
+.ge-title-text .verdict-line {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: block;
+  width: 100%;
+}
+
+/* Steps/time/difficulty summary, rendered by the server (JS fills it in
+   only on unknown pages that lack one). */
+.ge-meta {
+  color: var(--pf-on-paper-muted, #5d5f58);
+  font-size: 1.0625rem;
+  margin: 0 0 1.5rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sample-guide and fixture notices become the Manual ink banner. */
+main#main > .provenance,
+main#main > .fixture-note {
+  background: var(--pf-on-paper, #1b1d1a);
+  color: var(--pf-paper-2, #faf9f5);
+  padding: 1rem 1.25rem;
+  border-radius: 10px;
+  margin: 1.5rem 0 0;
+}
+main#main > .provenance a,
+main#main > .fixture-note a {
+  color: var(--pf-amber, #f0a400);
+  text-underline-offset: 0.2em;
+}
+main#main > .provenance .replay-badge {
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+  border-radius: 999px;
+}
+
+/* Tools checklist: the server renders working checkboxes; JS only adds
+   per-guide persistence of the ticks. */
+main#main > .tools {
+  background: var(--pf-paper-2, #faf9f5);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-top: 1.5rem;
+}
+main#main > .tools h2 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.25rem;
+}
+main#main > .tools .tool-list.ge-checklist {
+  list-style: none;
+  margin: 1rem 0 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+.ge-check {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  cursor: pointer;
+}
+.ge-check input {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: none;
+  accent-color: var(--pf-amber, #f0a400);
+}
+.ge-check input:checked + span {
+  color: var(--pf-on-paper-muted, #5d5f58);
+  text-decoration: line-through;
+  text-decoration-thickness: 0.08em;
+}
+
+/* Share section: pages with a server-issued URL get the consent-gated
+   copy row; pages without one fail closed to download + note. */
+.ge-share {
+  background: var(--pf-paper-2, #faf9f5);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-top: 2.5rem;
+  display: grid;
+  gap: 1rem;
+}
+.ge-share h2 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+.ge-consent {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  cursor: pointer;
+  max-width: 36rem;
+}
+.ge-consent input {
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.15rem;
+  flex: none;
+  accent-color: var(--pf-amber, #f0a400);
+}
+.ge-share-row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: center;
+}
+.ge-share-link {
+  grid-column: 1 / -1;
+  min-width: 0;
+  font-family: var(--pf-font-mono, ui-monospace), ui-monospace, monospace;
+  font-size: 0.9375rem;
+  background: var(--pf-paper, #f0eee8);
+  color: var(--pf-on-paper, #1b1d1a);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 999px;
+  padding: 0.6rem 1rem;
+  width: 100%;
+}
+.ge-share-row .ge-btn { grid-column: 1 / -1; }
+@media (min-width: 60rem) {
+  /* Link takes the slack; buttons size to their copy, never overlap. */
+  .ge-share-row { grid-template-columns: minmax(0, 1fr) auto auto; }
+  .ge-share-link { grid-column: 1; }
+  .ge-share-row .ge-btn { grid-column: auto; white-space: nowrap; }
+}
+.ge-fine {
+  color: var(--pf-on-paper-muted, #5d5f58);
+  font-size: 0.9375rem;
+  margin: 0;
+  max-width: 36rem;
+}
+.ge-status {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  margin: 0;
+  min-height: 1.5em;
+}
+.ge-status:empty { display: none; }
+
+/* Manual buttons: amber primary, ink ghost, calm press. */
+.ge-btn {
+  display: inline-block;
+  border: 0;
+  border-radius: 999px;
+  cursor: pointer;
+  padding: 0.6rem 1.15rem;
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  text-decoration: none;
+  text-align: center;
+}
+.ge-btn:active { transform: scale(0.97); }
+.ge-btn.primary {
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+}
+.ge-btn.ghost {
+  background: var(--pf-on-paper, #1b1d1a);
+  color: var(--pf-paper-2, #faf9f5);
+}
+.ge-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.ge-btn:active:disabled { transform: none; }
+@media (hover: hover) and (pointer: fine) {
+  .ge-btn.primary:hover:not(:disabled) { background: #ffb61a; }
+  .ge-btn.ghost:hover:not(:disabled) { background: #000; }
+}
+
+/* Guide footer: evidence links, then a ruled colophon close. */
+main#main > nav.guide-foot {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--pf-paper-line, #dcd8cf);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+main#main > nav.guide-foot a {
+  color: var(--pf-on-paper, #1b1d1a);
+  text-underline-offset: 0.2em;
+}
+footer.foot {
+  border-top: 1px solid var(--pf-paper-line, #dcd8cf);
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  color: var(--pf-on-paper-muted, #5d5f58);
+}
+
+/* Guide pages read on warm paper with the body face. */
+body {
+  background: var(--pf-paper, #f0eee8);
+  color: var(--pf-on-paper, #1b1d1a);
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+}
+
+/* No :focus-visible override: the base blue ring keeps 3:1 against both
+   paper and amber, while an amber ring on paper only reaches ~1.8:1. */
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .ge-btn:active { transform: none; }
+}

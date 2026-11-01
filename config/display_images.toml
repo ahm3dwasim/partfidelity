@@ -1,0 +1,11 @@
+# Display copies of the guide stills Loaded strictly by app/display_images.py
+# (a missing, misspelled or mistyped key fails). The authoritative PNGs stay as they are for images.zip, the offline
+# export and pixel comparisons; these are resized, compressed copies made from those same already-redacted files.
+widths = [480, 800, 1280]   # copy widths in px, rising; a copy is never wider than its source (no upscaling)
+format = "webp"             # "webp" or "jpeg"
+quality = 78                # encoder quality, 1-100
+cache_dir = "display"       # folder beside each source still (so it goes when the guide's folder goes); plain name
+stage_width = 800           # width of the copy the stage frame and the original/labelled toggle start from; one of widths
+poster_width = 800          # width of the copy used as the clip's poster; one of widths
+poster_quality = 80         # the poster is always a JPEG (renders in every browser), at this encoder quality, 1-100
+sizes = "(min-width: 900px) 800px, 100vw"   # the page's own layout width for a card image

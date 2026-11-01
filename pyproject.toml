@@ -1,0 +1,34 @@
+[project]
+name = "partfidelity"
+version = "0.1.0"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.12"
+dependencies = ["fastapi>=0.115", "uvicorn>=0.30", "opencv-python-headless>=4.10", "numpy>=1.26", "jinja2>=3.1", "python-multipart>=0.0.18", "pillow>=10"]
+
+[project.optional-dependencies]
+test = [
+  "pytest>=8",
+  "httpx>=0.27",
+  "jinja2>=3.1",
+  "playwright>=1.64,<2",
+  "pillow>=10",
+]
+
+[project.scripts]
+partfidelity = "app.main:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"config/retention.toml" = "config/retention.toml"
+"config/exports.toml" = "config/exports.toml"
+"config/display_images.toml" = "config/display_images.toml"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

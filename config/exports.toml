@@ -1,0 +1,3 @@
+# Fixed member time for images.zip and export.zip (zip cannot store dates before 1980).
+[zip]
+date_time = [2026, 1, 1, 0, 0, 0]

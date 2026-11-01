@@ -1,0 +1,88 @@
+/* PartFidelity shared design tokens.
+   Fog-to-ink palette, ONE orange accent #e87032, David Libre (display, step
+   numbers) + Roboto (body). Fonts are vendored latin woff2 under fonts/
+   (SIL Open Font License 1.1, see fonts/OFL.txt), no CDN.
+   Colours live only here; every other stylesheet uses these names. The
+   older paper/amber names stay as aliases so earlier component CSS follows
+   the D palette without a rewrite. */
+@font-face {
+  font-family: "David Libre"; font-weight: 400; font-style: normal; font-display: swap;
+  src: url("fonts/DavidLibre-400-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "David Libre"; font-weight: 500; font-style: normal; font-display: swap;
+  src: url("fonts/DavidLibre-500-normal.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Roboto"; font-weight: 100 900; font-style: normal; font-display: swap;
+  src: url("fonts/Roboto-variable-normal.woff2") format("woff2");
+}
+
+:root {
+  /* Ink: the dark ground every page sits on. */
+  --pf-ink: #0f0f0f;
+  --pf-ink-2: #171717;
+  --pf-ink-3: #1d1d1d;
+  --pf-ink-line: #2c2c2c;
+  --pf-ink-line-strong: #4a4a4a;
+  --pf-on-ink: #ecece9;
+  --pf-on-ink-muted: #b9b9b4;
+  --pf-on-ink-dim: #9a9a96;
+  /* Fog: the light end of the home film. */
+  --pf-fog: #f4f4f2;
+  --pf-on-fog: #161616;
+  --pf-on-fog-muted: #55554f;
+  /* The one accent. Text on it is near-black (6.1:1); it reads as text on
+     ink at 6.2:1. */
+  --pf-accent: #e87032;
+  --pf-accent-hover: #f08850;
+  --pf-accent-ink: #111111;
+  /* Safety and state, tuned for ink. */
+  --pf-warn-bg: #1c1511;
+  --pf-warn-line: #5b4030;
+  --pf-warn-title: #ffc8a8;
+  --pf-warn-text: #d9cfc8;
+  --pf-nudge-bg: #16150f;
+  --pf-nudge-line: #3d3a2c;
+  --pf-nudge-text: #e6dcb0;
+  --pf-danger: #ff8a70;
+  --pf-ok: #7ed39a;
+  --pf-bar-bg: rgba(15, 15, 15, 0.86);
+  --pf-scrim: rgba(0, 0, 0, 0.55);
+
+  /* Older names, mapped onto D (every page is ink now). */
+  --pf-paper: var(--pf-ink);
+  --pf-paper-2: var(--pf-ink-2);
+  --pf-paper-line: var(--pf-ink-line);
+  --pf-on-paper: var(--pf-on-ink);
+  --pf-on-paper-muted: var(--pf-on-ink-muted);
+  --pf-amber: var(--pf-accent);
+  --pf-amber-ink: var(--pf-accent-ink);
+  --pf-amber-deep: var(--pf-accent);
+  /* Shared keyboard-focus token: the accent outline on ink (6.2:1). */
+  --pf-focus: var(--pf-accent);
+
+  --pf-font-display: "David Libre", Georgia, "Times New Roman", serif;
+  --pf-font-display-start: var(--pf-font-display);
+  --pf-font-display-guide: var(--pf-font-display);
+  --pf-font-body: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --pf-font-mono: ui-monospace, "SF Mono", Menlo, monospace;
+  --pf-space-4: 4px;
+  --pf-space-8: 8px;
+  --pf-space-12: 12px;
+  --pf-space-16: 16px;
+  --pf-space-24: 24px;
+  --pf-space-32: 32px;
+  --pf-space-48: 48px;
+  --pf-space-64: 64px;
+  --pf-space-96: 96px;
+  --pf-gutter: clamp(20px, 5vw, 72px);
+  --pf-bar: 64px;
+  --pf-radius-workshop: 2px;
+  --pf-radius-manual: 10px;
+  --pf-radius-panel: 16px;
+  --pf-radius-pill: 999px;
+  --pf-motion-ui: 180ms;
+  --pf-motion-reveal: 600ms;
+  --pf-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}

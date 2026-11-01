@@ -1,0 +1,17 @@
+{
+  "_note": "Synthetic SAM 3.1 still-response shapes for the SAM module tests. Boxes and confidences are invented; no owned footage, raw API text, or identifiers.",
+  "fan_single_above": {"masks": [{"box_xyxy": [12, 30, 140, 150], "c": 0.72}]},
+  "fan_below": {"masks": [{"box_xyxy": [12, 30, 140, 150], "c": 0.55}]},
+  "battery_single_above": {"masks": [{"box_xyxy": [200, 90, 300, 210], "c": 0.61}]},
+  "battery_below": {"masks": [{"box_xyxy": [200, 90, 300, 210], "c": 0.49}]},
+  "empty": {"masks": []},
+  "missing_c": {"masks": [{"box_xyxy": [12, 30, 140, 150], "c": null}]},
+  "ambiguous_pair": {"masks": [
+    {"box_xyxy": [10, 10, 50, 50], "c": 0.75},
+    {"box_xyxy": [200, 180, 260, 240], "c": 0.73}
+  ]},
+  "clear_winner": {"masks": [
+    {"box_xyxy": [10, 10, 50, 50], "c": 0.84},
+    {"box_xyxy": [200, 180, 260, 240], "c": 0.62}
+  ]}
+}

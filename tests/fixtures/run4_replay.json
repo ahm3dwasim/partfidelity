@@ -1,0 +1,2038 @@
+{
+ "chunk_s": 60.0,
+ "chunks": [
+  {
+   "expected_consensus": {
+    "confidence": 0.92,
+    "device_guess": "Lenovo ThinkPad T480",
+    "source_runs": 3,
+    "steps": [
+     {
+      "action": "Flip over and remove external battery",
+      "end_s": 17.0,
+      "hazards": [
+       "battery",
+       "esd"
+      ],
+      "kind": "repair",
+      "number": 1,
+      "parts": [
+       {
+        "phrase": "battery",
+        "position_hint": "bottom edge"
+       },
+       {
+        "phrase": "bottom cover",
+        "position_hint": "center"
+       }
+      ],
+      "start_s": 11.5,
+      "time_needs_check": false,
+      "time_spread_s": 3.0,
+      "tools": []
+     },
+     {
+      "action": "Disable internal battery in BIOS",
+      "end_s": 31.0,
+      "hazards": [
+       "battery",
+       "data"
+      ],
+      "kind": "repair",
+      "number": 2,
+      "parts": [
+       {
+        "phrase": "keyboard",
+        "position_hint": "bottom center"
+       },
+       {
+        "phrase": "display",
+        "position_hint": "top center"
+       }
+      ],
+      "start_s": 17.0,
+      "time_needs_check": false,
+      "time_spread_s": 2.0,
+      "tools": []
+     }
+    ],
+    "timestamps_approximate": true,
+    "excluded_spans": [],
+    "boundaries": []
+   },
+   "runs": [
+    {
+     "confidence": 0.92,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Introduce laptop on table",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Show screwdriver tool",
+       "end_s": 13,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "screwdriver",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 9,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 13,
+       "tools": []
+      },
+      {
+       "action": "Disable internal battery in BIOS",
+       "end_s": 32,
+       "hazards": [
+        "battery",
+        "data"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "display",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Remove bottom cover screws",
+       "end_s": 52,
+       "hazards": [
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 32,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Inspect screw and pry cover",
+       "end_s": 60,
+       "hazards": [
+        "sharp",
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "cover screw",
+         "position_hint": "center foreground"
+        }
+       ],
+       "start_s": 52,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Introduce closed laptop",
+       "end_s": 3,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Show screwdriver tool",
+       "end_s": 10,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screwdriver",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 3,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Disable internal battery in BIOS",
+       "end_s": 30,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "display",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Power down and turn over",
+       "end_s": 37,
+       "hazards": [
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 30,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 51,
+       "hazards": [
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screw",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 37,
+       "tools": []
+      },
+      {
+       "action": "Inspect screw and open cover",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "screw",
+         "position_hint": "center foreground"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center background"
+        }
+       ],
+       "start_s": 51,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.92,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show laptop overview",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "table",
+         "position_hint": "background"
+        }
+       ],
+       "start_s": 0,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Disable internal battery in BIOS",
+       "end_s": 30,
+       "hazards": [
+        "battery",
+        "data",
+        "display"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Power off laptop",
+       "end_s": 36,
+       "hazards": [],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "power button",
+         "position_hint": "top right"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 30,
+       "tools": []
+      },
+      {
+       "action": "Locate bottom cover screws",
+       "end_s": 51,
+       "hazards": [
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screw holes",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 36,
+       "tools": []
+      },
+      {
+       "action": "Show captive screw detail",
+       "end_s": 59,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "screw",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "background"
+        }
+       ],
+       "start_s": 51,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry off bottom cover",
+       "end_s": 66,
+       "hazards": [
+        "sharp",
+        "esd"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "side ports",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 59,
+       "tools": []
+      }
+     ]
+    }
+   ],
+   "window": [
+    0.0,
+    60.0
+   ]
+  },
+  {
+   "expected_consensus": {
+    "confidence": 0.85,
+    "device_guess": "Lenovo ThinkPad T480",
+    "source_runs": 3,
+    "steps": [
+     {
+      "action": "Remove bottom screws",
+      "end_s": 9.0,
+      "hazards": [],
+      "kind": "repair",
+      "number": 1,
+      "parts": [
+       {
+        "phrase": "screw",
+        "position_hint": "on screwdriver tip"
+       },
+       {
+        "phrase": "bottom cover",
+        "position_hint": "center"
+       }
+      ],
+      "start_s": 6.0,
+      "time_needs_check": false,
+      "time_spread_s": 2.0,
+      "tools": [
+       "screwdriver"
+      ]
+     }
+    ],
+    "timestamps_approximate": true,
+    "excluded_spans": [],
+    "boundaries": []
+   },
+   "runs": [
+    {
+     "confidence": 0.85,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Opening intro overview",
+       "end_s": 7,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Remove bottom screws",
+       "end_s": 10,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "screw",
+         "position_hint": "on screwdriver tip"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 7,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry open bottom cover",
+       "end_s": 28,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "side ports",
+         "position_hint": "left edge"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Lift off bottom cover",
+       "end_s": 34,
+       "hazards": [
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "fan",
+         "position_hint": "left side"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 28,
+       "tools": []
+      },
+      {
+       "action": "Disconnect battery cable",
+       "end_s": 48,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center left"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "center right"
+        },
+        {
+         "phrase": "battery connector",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 34,
+       "tools": []
+      },
+      {
+       "action": "Remove internal battery",
+       "end_s": 66,
+       "hazards": [
+        "battery"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "top right"
+        }
+       ],
+       "start_s": 48,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.85,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro overview",
+       "end_s": 7,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "bottom chassis",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Remove bottom screws",
+       "end_s": 9,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "retention screw",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom chassis",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 7,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry off bottom cover",
+       "end_s": 28,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "side ports",
+         "position_hint": "left side"
+        },
+        {
+         "phrase": "vent grille",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom chassis",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Lift cover to expose internals",
+       "end_s": 35,
+       "hazards": [
+        "esd",
+        "battery"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "motherboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "center left"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "center left"
+        }
+       ],
+       "start_s": 28,
+       "tools": []
+      },
+      {
+       "action": "Disconnect battery cable",
+       "end_s": 47,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom left"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "center right"
+        },
+        {
+         "phrase": "cable connector",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 35,
+       "tools": []
+      },
+      {
+       "action": "Unscrew internal battery",
+       "end_s": 55,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "top right"
+        }
+       ],
+       "start_s": 47,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Lift out battery",
+       "end_s": 60,
+       "hazards": [
+        "battery"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "drive bay",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 55,
+       "tools": []
+      },
+      {
+       "action": "Inspect replacement battery",
+       "end_s": 66,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 8,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 60,
+       "tools": []
+      }
+     ]
+    },
+    {
+     "confidence": 0.85,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Opening intro",
+       "end_s": 5,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Remove bottom screws",
+       "end_s": 8,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screw",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 5,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry open bottom cover",
+       "end_s": 28,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "side vent",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 8,
+       "tools": [
+        "fingers"
+       ]
+      },
+      {
+       "action": "Lift off bottom cover",
+       "end_s": 35,
+       "hazards": [
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "middle right"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "lower center"
+        }
+       ],
+       "start_s": 28,
+       "tools": [
+        "fingers"
+       ]
+      },
+      {
+       "action": "Disconnect internal battery",
+       "end_s": 48,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "middle right"
+        },
+        {
+         "phrase": "battery connector",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 35,
+       "tools": [
+        "fingers"
+       ]
+      },
+      {
+       "action": "Unscrew and remove battery",
+       "end_s": 60,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 48,
+       "tools": [
+        "screwdriver",
+        "fingers"
+       ]
+      },
+      {
+       "action": "Inspect replacement battery",
+       "end_s": 67,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "lower center"
+        }
+       ],
+       "start_s": 60,
+       "tools": [
+        "fingers"
+       ]
+      }
+     ]
+    }
+   ],
+   "window": [
+    58.0,
+    118.0
+   ]
+  },
+  {
+   "expected_consensus": {
+    "confidence": 0.88,
+    "device_guess": "Lenovo ThinkPad T470",
+    "source_runs": 3,
+    "steps": [
+     {
+      "action": "Screw down and connect battery",
+      "end_s": 19.5,
+      "hazards": [
+       "battery",
+       "esd"
+      ],
+      "kind": "repair",
+      "number": 1,
+      "parts": [
+       {
+        "phrase": "battery",
+        "position_hint": "center"
+       },
+       {
+        "phrase": "battery cable",
+        "position_hint": "center"
+       },
+       {
+        "phrase": "fan",
+        "position_hint": "upper right"
+       }
+      ],
+      "start_s": 10.0,
+      "time_needs_check": false,
+      "time_spread_s": 1.0,
+      "tools": [
+       "screwdriver"
+      ]
+     },
+     {
+      "action": "Refit bottom cover",
+      "end_s": 44.5,
+      "hazards": [
+       "sharp"
+      ],
+      "kind": "repair",
+      "number": 2,
+      "parts": [
+       {
+        "phrase": "bottom cover",
+        "position_hint": "center"
+       },
+       {
+        "phrase": "vent grille",
+        "position_hint": "center"
+       }
+      ],
+      "start_s": 25.5,
+      "time_needs_check": false,
+      "time_spread_s": 1.0,
+      "tools": []
+     }
+    ],
+    "timestamps_approximate": true,
+    "excluded_spans": [],
+    "boundaries": []
+   },
+   "runs": [
+    {
+     "confidence": 0.88,
+     "device_guess": "Lenovo ThinkPad T470",
+     "steps": [
+      {
+       "action": "Opening intro",
+       "end_s": 4,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Position internal battery",
+       "end_s": 10,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "left"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        }
+       ],
+       "start_s": 4,
+       "tools": []
+      },
+      {
+       "action": "Screw down and connect battery",
+       "end_s": 19,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery cable",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        }
+       ],
+       "start_s": 10,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Seat cooling assembly",
+       "end_s": 25,
+       "hazards": [
+        "esd",
+        "heat"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "fan",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "heat pipe",
+         "position_hint": "upper center"
+        }
+       ],
+       "start_s": 19,
+       "tools": []
+      },
+      {
+       "action": "Refit bottom cover",
+       "end_s": 44,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "vent grille",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 25,
+       "tools": []
+      },
+      {
+       "action": "Secure cover and fit external battery",
+       "end_s": 58,
+       "hazards": [
+        "battery"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 44,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Close lid and test charging",
+       "end_s": 64,
+       "hazards": [
+        "battery"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charging cable",
+         "position_hint": "left"
+        }
+       ],
+       "start_s": 58,
+       "tools": [
+        "charger"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.85,
+     "device_guess": "Lenovo ThinkPad T570",
+     "steps": [
+      {
+       "action": "Opening intro",
+       "end_s": 4,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Seat internal battery",
+       "end_s": 10,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center left"
+        }
+       ],
+       "start_s": 4,
+       "tools": []
+      },
+      {
+       "action": "Screw down and connect battery",
+       "end_s": 20,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        },
+        {
+         "phrase": "battery cable",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Inspect cooling assembly",
+       "end_s": 26,
+       "hazards": [
+        "esd",
+        "heat"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "fan",
+         "position_hint": "center right"
+        },
+        {
+         "phrase": "heat pipe",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center left"
+        }
+       ],
+       "start_s": 20,
+       "tools": []
+      },
+      {
+       "action": "Refit bottom cover",
+       "end_s": 45,
+       "hazards": [
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "vent grille",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 26,
+       "tools": []
+      },
+      {
+       "action": "Secure cover and fit external battery",
+       "end_s": 59,
+       "hazards": [
+        "battery"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "top edge"
+        },
+        {
+         "phrase": "screw holes",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 45,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and plug in charger",
+       "end_s": 64,
+       "hazards": [
+        "battery"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charging port",
+         "position_hint": "left edge"
+        }
+       ],
+       "start_s": 59,
+       "tools": [
+        "charger"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad",
+     "steps": [
+      {
+       "action": "Opening intro overview",
+       "end_s": 4,
+       "hazards": [
+        "esd"
+       ],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop chassis",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Seat internal battery",
+       "end_s": 10,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "fan",
+         "position_hint": "upper right"
+        }
+       ],
+       "start_s": 4,
+       "tools": [
+        "hands"
+       ]
+      },
+      {
+       "action": "Secure and connect battery",
+       "end_s": 20,
+       "hazards": [
+        "battery",
+        "esd",
+        "sharp"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "middle"
+        }
+       ],
+       "start_s": 10,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Check cooling assembly",
+       "end_s": 24,
+       "hazards": [
+        "heat",
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "fan",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "heat pipe",
+         "position_hint": "middle"
+        }
+       ],
+       "start_s": 20,
+       "tools": [
+        "hands"
+       ]
+      },
+      {
+       "action": "Reattach bottom cover",
+       "end_s": 45,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 24,
+       "tools": [
+        "hands"
+       ]
+      },
+      {
+       "action": "Install external battery",
+       "end_s": 58,
+       "hazards": [
+        "battery"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "top edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 45,
+       "tools": [
+        "hands"
+       ]
+      },
+      {
+       "action": "Close lid and charge",
+       "end_s": 64,
+       "hazards": [
+        "battery",
+        "display"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charging port",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 58,
+       "tools": [
+        "charging cable"
+       ]
+      }
+     ]
+    }
+   ],
+   "window": [
+    116.0,
+    176.0
+   ]
+  },
+  {
+   "expected_consensus": {
+    "confidence": 0.9,
+    "device_guess": "Lenovo ThinkPad T480",
+    "source_runs": 3,
+    "steps": [
+     {
+      "action": "Check Device Manager",
+      "end_s": 18.5,
+      "hazards": [
+       "display",
+       "data"
+      ],
+      "kind": "repair",
+      "number": 1,
+      "parts": [
+       {
+        "phrase": "display",
+        "position_hint": "center"
+       },
+       {
+        "phrase": "keyboard",
+        "position_hint": "bottom"
+       }
+      ],
+      "start_s": 9.5,
+      "time_needs_check": false,
+      "time_spread_s": 3.0,
+      "tools": []
+     }
+    ],
+    "timestamps_approximate": true,
+    "excluded_spans": [],
+    "boundaries": []
+   },
+   "runs": [
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show closed laptop intro",
+       "end_s": 8,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charging cable",
+         "position_hint": "left"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Check Device Manager",
+       "end_s": 18,
+       "hazards": [
+        "display",
+        "data"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom"
+        }
+       ],
+       "start_s": 8,
+       "tools": []
+      },
+      {
+       "action": "Power down and inspect keyboard",
+       "end_s": 29,
+       "hazards": [],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "touchpad",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 18,
+       "tools": []
+      },
+      {
+       "action": "Present RAM upgrade kit",
+       "end_s": 43,
+       "hazards": [
+        "esd",
+        "data"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "RAM stick",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "memory box",
+         "position_hint": "bottom left"
+        },
+        {
+         "phrase": "screwdriver",
+         "position_hint": "right"
+        }
+       ],
+       "start_s": 29,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show closed laptop intro",
+       "end_s": 4,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charger cable",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Disconnect charger cable",
+       "end_s": 8,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "charger cable",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 4,
+       "tools": []
+      },
+      {
+       "action": "Check Device Manager specs",
+       "end_s": 19,
+       "hazards": [
+        "display",
+        "data"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display screen",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 8,
+       "tools": []
+      },
+      {
+       "action": "Display upgrade RAM kits",
+       "end_s": 32,
+       "hazards": [
+        "esd",
+        "battery"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "RAM sticks",
+         "position_hint": "center bottom"
+        },
+        {
+         "phrase": "packaging box",
+         "position_hint": "left bottom"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 19,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Prepare workspace overview",
+       "end_s": 43,
+       "hazards": [
+        "esd",
+        "battery"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "RAM sticks",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "packaging box",
+         "position_hint": "left center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 32,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.93,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show closed laptop",
+       "end_s": 8,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Disconnect cable",
+       "end_s": 11,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "charging cable",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 8,
+       "tools": []
+      },
+      {
+       "action": "Check Device Manager",
+       "end_s": 19,
+       "hazards": [
+        "data"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 11,
+       "tools": []
+      },
+      {
+       "action": "Present new RAM",
+       "end_s": 43,
+       "hazards": [
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "RAM stick",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "memory box",
+         "position_hint": "bottom left"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 19,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    }
+   ],
+   "window": [
+    174.0,
+    214.167
+   ]
+  }
+ ],
+ "expected_guide": [
+  {
+   "action": "Flip over and remove external battery",
+   "end_s": 17.0,
+   "hazards": [
+    "battery",
+    "esd"
+   ],
+   "number": 1,
+   "parts": [
+    {
+     "phrase": "battery",
+     "position_hint": "bottom edge"
+    },
+    {
+     "phrase": "bottom cover",
+     "position_hint": "center"
+    }
+   ],
+   "start_s": 11.5,
+   "time_needs_check": false,
+   "time_spread_s": 3.0,
+   "tools": []
+  },
+  {
+   "action": "Disable internal battery in BIOS",
+   "end_s": 31.0,
+   "hazards": [
+    "battery",
+    "data"
+   ],
+   "number": 2,
+   "parts": [
+    {
+     "phrase": "keyboard",
+     "position_hint": "bottom center"
+    },
+    {
+     "phrase": "display",
+     "position_hint": "top center"
+    }
+   ],
+   "start_s": 17.0,
+   "time_needs_check": false,
+   "time_spread_s": 2.0,
+   "tools": []
+  },
+  {
+   "action": "Remove bottom screws",
+   "end_s": 67.0,
+   "hazards": [],
+   "number": 3,
+   "parts": [
+    {
+     "phrase": "screw",
+     "position_hint": "on screwdriver tip"
+    },
+    {
+     "phrase": "bottom cover",
+     "position_hint": "center"
+    }
+   ],
+   "start_s": 64.0,
+   "time_needs_check": false,
+   "time_spread_s": 2.0,
+   "tools": [
+    "screwdriver"
+   ]
+  },
+  {
+   "action": "Screw down and connect battery",
+   "end_s": 135.5,
+   "hazards": [
+    "battery",
+    "esd"
+   ],
+   "number": 4,
+   "parts": [
+    {
+     "phrase": "battery",
+     "position_hint": "center"
+    },
+    {
+     "phrase": "battery cable",
+     "position_hint": "center"
+    },
+    {
+     "phrase": "fan",
+     "position_hint": "upper right"
+    }
+   ],
+   "start_s": 126.0,
+   "time_needs_check": false,
+   "time_spread_s": 1.0,
+   "tools": [
+    "screwdriver"
+   ]
+  },
+  {
+   "action": "Refit bottom cover",
+   "end_s": 160.5,
+   "hazards": [
+    "sharp"
+   ],
+   "number": 5,
+   "parts": [
+    {
+     "phrase": "bottom cover",
+     "position_hint": "center"
+    },
+    {
+     "phrase": "vent grille",
+     "position_hint": "center"
+    }
+   ],
+   "start_s": 141.5,
+   "time_needs_check": false,
+   "time_spread_s": 1.0,
+   "tools": []
+  },
+  {
+   "action": "Check Device Manager",
+   "end_s": 192.5,
+   "hazards": [
+    "display",
+    "data"
+   ],
+   "number": 6,
+   "parts": [
+    {
+     "phrase": "display",
+     "position_hint": "center"
+    },
+    {
+     "phrase": "keyboard",
+     "position_hint": "bottom"
+    }
+   ],
+   "start_s": 183.5,
+   "time_needs_check": false,
+   "time_spread_s": 3.0,
+   "tools": []
+  }
+ ],
+ "overlap_s": 2.0,
+ "provenance": "Redacted replay fixture: 12 successful run-4 raw Spark step payloads (4 chunks x 3 runs). Step payload JSON only; no job ids, file ids, paths, footage, frames, credentials, or headers. Windows are nominal chunk starts.",
+ "video_duration_s": 214.167
+}

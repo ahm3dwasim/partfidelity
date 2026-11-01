@@ -1,0 +1,55 @@
+{# Waiting screen: the person's own video, parts outlined live.
+   Include: {% include "partials/ui/wait-video.html" %} with job_status_url,
+   job_cancel_url, job_id set. JS: static/ui/wait-video.js needs
+   static/ui/vendor/gsap.min.js loaded before it (vendored, offline).
+   Cancel: POST job_cancel_url -> 200 {"state": "cancelled"}. Only that
+   terminal response shows the deleted-footage copy; without a cancel
+   URL the cancel control stays hidden.
+   Status JSON contract (polled every 1.5 s):
+     {"state": "active|done|failed|cancelled",
+      "revision": 7,
+      "stages": [{"id": "reading", "label": "Reading video",
+                  "state": "done|active|pending"}],
+      "frame": {"id": "s12", "src": "/jobs/<id>/frames/s12.jpg",
+                "alt": "Frame from your clip"},
+      "outlines": [{"part": "Battery", "frame_id": "s12",
+                    "polygon": [[x, y], ...], "label": [x, y]}],
+      "steps": [{"n": 1, "title": "Remove the back cover", "at": "1:01",
+                 "thumb": "/jobs/<id>/frames/s12.jpg"}],
+      "guide_url": "/guides/<id>"}
+   revision is a monotonic integer per job: the client ignores any payload
+   older than the last applied one (a newer request can still carry an older
+   snapshot). Missing revision means 0.
+   Polygon points are pixels in a 1280x720 frame. No waiting page or
+   status endpoint exists in the repo yet (2026-10-27); this partial
+   documents the shape the integration code must serve. #}
+<section class="wv" id="wait-video"
+         data-status-url="{{ job_status_url | default('', true) }}"
+         data-cancel-url="{{ job_cancel_url | default('', true) }}"
+         data-job-id="{{ job_id | default('', true) }}"
+         aria-label="Guide progress">
+  <div class="wv-grid">
+    <div class="wv-viewer">
+      <div class="wv-frame" id="wv-frame">
+        <img class="wv-img is-on" id="wv-img-a" alt="">
+        <img class="wv-img" id="wv-img-b" alt="" aria-hidden="true">
+        <svg class="wv-overlay" id="wv-overlay" viewBox="0 0 1280 720"
+             preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+        <p class="wv-loading" id="wv-loading" data-copy="wait.loading">Loading your frames…</p>
+      </div>
+      <div class="wv-viewbar">
+        <p class="wv-clock" data-copy="wait.elapsed">Elapsed <span id="wv-clock" role="timer">0:00</span></p>
+        <ol class="wv-stages" id="wv-stages" aria-live="polite"></ol>
+      </div>
+    </div>
+    <aside class="wv-rail" aria-label="Finished steps">
+      <div class="wv-actions">
+        <button class="wv-cancel" id="wv-cancel" type="button" data-copy="wait.cancel">Cancel and delete</button>
+        <a class="wv-guide is-hidden" id="wv-guide" href="#" data-copy="wait.open">Open your guide</a>
+      </div>
+      <p class="wv-note" id="wv-note" role="status" data-copy="wait.note"></p>
+      <ol class="wv-steps" id="wv-steps"></ol>
+      <button class="wv-replay is-hidden" id="wv-replay" type="button" data-copy="wait.replay">Replay demo</button>
+    </aside>
+  </div>
+</section>

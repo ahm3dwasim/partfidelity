@@ -1,0 +1,29 @@
+# The PF mark in two renderings: a flat one, and a rendered wrench that looks like a real tool, kept readable at
+# small sizes with subtle depth. Read by app/brand_config.py, which fails
+# loudly on a missing, misspelled or mistyped key.
+#
+# The flat mark is the one that stays readable small; the real mark (satin
+# steel wrench, soft shadow) is used wherever the mark is drawn at
+# `real_min_px` or larger (64, not 48: in the sizes shot the steel wrench goes
+# muddy at 48 while the flat orange one still reads). tests/test_brand.py holds every template to this.
+
+real_min_px = 64
+flat = "/static/ui/icon.svg#pf-mark"
+real = "/static/ui/icon-real.svg#pf-mark-real"
+# Browser-tab icon: the flat mark on a dark tile, linked from every page head.
+favicon = "/static/ui/favicon.svg"
+# Home-screen icon (apple-touch-icon): the real mark on the dark tile, resized from the approved render by
+# tools/brand_touch_icon.py (no Blender run). Linked from every page head and shipped in the image.
+touch_icon = "/static/ui/apple-touch-icon.png"
+touch_icon_px = 180
+touch_icon_pad = 0.14        # tile padding, as a fraction of touch_icon_px
+touch_icon_bg = "#0f0f0f"    # tile colour
+
+# Complete mark markup uses these placement sizes and classes.
+header_px = 24
+inline_margin_px = 8
+footer_px = 96
+gallery_sizes = [16, 24, 32, 48]
+mark_view_box = "0 0 32 32"
+header_class = "pf-brand-icon"
+footer_class = "end-mark"

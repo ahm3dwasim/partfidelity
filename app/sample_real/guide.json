@@ -1,0 +1,362 @@
+{
+ "difficulty": "Hard",
+ "draft_reasons": [
+  "DRAFT: battery disconnect not shown in your video"
+ ],
+ "excluded_spans": [
+  {
+   "end_s": 200.0,
+   "kind": "outro_or_unrelated",
+   "start_s": 192.0
+  }
+ ],
+ "frame_paths": [
+  "frames/step-01.png",
+  "frames/step-02.png",
+  "frames/step-03.png",
+  "frames/step-04.png",
+  "frames/step-05.png",
+  "frames/step-06.png",
+  "frames/step-07.png",
+  "frames/step-08.png",
+  "frames/step-09.png"
+ ],
+ "job_id": "b3f79c933e2043afc3906a159f473a2b",
+ "labels": [
+  {
+   "checked": true,
+   "detection": {
+    "box_xyxy": [
+     209,
+     75,
+     810,
+     674
+    ],
+    "mask_path": "labels/step-06-part-1.mask.png",
+    "phrase": "battery",
+    "score": 0.7968254089355469
+   },
+   "provisional": {
+    "artifact_id": "969c80db2c8f066af2e37d1362c18ec6",
+    "position_hint": "",
+    "rendered_image_path": "labels/step-06-part-1.png"
+   },
+   "readback": "yes",
+   "slot": {
+    "part": {
+     "phrase": "battery",
+     "position_hint": ""
+    },
+    "part_index": 0,
+    "step_index": 5
+   },
+   "status": "part_pixels_unchanged"
+  },
+  {
+   "checked": true,
+   "detection": {
+    "box_xyxy": [
+     702,
+     223,
+     1100,
+     537
+    ],
+    "mask_path": "labels/step-06-part-2.mask.png",
+    "phrase": "fan",
+    "score": 0.7575758099555969
+   },
+   "provisional": {
+    "artifact_id": "3c9a72d5d742330ef913db8a69ba11c7",
+    "position_hint": "",
+    "rendered_image_path": "labels/step-06-part-2.png"
+   },
+   "readback": "yes",
+   "slot": {
+    "part": {
+     "phrase": "fan",
+     "position_hint": ""
+    },
+    "part_index": 1,
+    "step_index": 5
+   },
+   "status": "part_pixels_unchanged"
+  },
+  {
+   "checked": true,
+   "detection": {
+    "box_xyxy": [
+     683,
+     105,
+     957,
+     288
+    ],
+    "mask_path": "labels/step-07-part-2.mask.png",
+    "phrase": "fan",
+    "score": 0.7968254089355469
+   },
+   "provisional": {
+    "artifact_id": "96a904856a79d22ddb256ac986efb957",
+    "position_hint": "",
+    "rendered_image_path": "labels/step-07-part-2.png"
+   },
+   "readback": "yes",
+   "slot": {
+    "part": {
+     "phrase": "fan",
+     "position_hint": ""
+    },
+    "part_index": 1,
+    "step_index": 6
+   },
+   "status": "part_pixels_unchanged"
+  },
+  {
+   "checked": true,
+   "detection": {
+    "box_xyxy": [
+     574,
+     408,
+     943,
+     577
+    ],
+    "mask_path": "labels/step-08-part-2.mask.png",
+    "phrase": "battery",
+    "score": 0.604938268661499
+   },
+   "provisional": {
+    "artifact_id": "1d4e50f93d14a768e91b4f5112585761",
+    "position_hint": "",
+    "rendered_image_path": "labels/step-08-part-2.png"
+   },
+   "readback": "yes",
+   "slot": {
+    "part": {
+     "phrase": "battery",
+     "position_hint": ""
+    },
+    "part_index": 1,
+    "step_index": 7
+   },
+   "status": "part_pixels_unchanged"
+  }
+ ],
+ "steps": [
+  {
+   "action": "Intro showcase laptop",
+   "end_s": 9.4,
+   "hazards": [],
+   "kind": "intro",
+   "number": 0,
+   "parts": [
+    {
+     "phrase": "laptop lid",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 0.0,
+   "time_needs_check": false,
+   "time_spread_s": 1.0,
+   "tools": []
+  },
+  {
+   "action": "Flip over and remove external battery",
+   "end_s": 17.3,
+   "hazards": [
+    "battery"
+   ],
+   "kind": "repair",
+   "number": 1,
+   "parts": [
+    {
+     "phrase": "bottom cover",
+     "position_hint": ""
+    },
+    {
+     "phrase": "battery",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 9.4,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": []
+  },
+  {
+   "action": "Disable built-in battery in BIOS",
+   "end_s": 31.2,
+   "hazards": [
+    "battery",
+    "data"
+   ],
+   "kind": "repair",
+   "number": 2,
+   "parts": [
+    {
+     "phrase": "keyboard",
+     "position_hint": ""
+    },
+    {
+     "phrase": "display",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 17.3,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": []
+  },
+  {
+   "action": "Power down and flip to bottom",
+   "end_s": 36.7667,
+   "hazards": [],
+   "kind": "repair",
+   "number": 3,
+   "parts": [
+    {
+     "phrase": "keyboard",
+     "position_hint": ""
+    },
+    {
+     "phrase": "power button",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 31.2,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": []
+  },
+  {
+   "action": "Remove bottom cover",
+   "end_s": 86.8333,
+   "hazards": [
+    "esd",
+    "sharp"
+   ],
+   "kind": "repair",
+   "number": 4,
+   "parts": [
+    {
+     "phrase": "bottom cover",
+     "position_hint": ""
+    },
+    {
+     "phrase": "screw",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 36.7667,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": [
+    "screwdriver"
+   ]
+  },
+  {
+   "action": "Not shown in the video: the battery disconnect. Check your service manual before continuing.",
+   "end_s": 111.533,
+   "hazards": [
+    "battery",
+    "esd"
+   ],
+   "kind": "repair",
+   "number": 5,
+   "parts": [
+    {
+     "phrase": "battery",
+     "position_hint": ""
+    },
+    {
+     "phrase": "fan",
+     "position_hint": ""
+    },
+    {
+     "phrase": "motherboard",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 86.8333,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": []
+  },
+  {
+   "action": "Install replacement internal battery",
+   "end_s": 134.8,
+   "hazards": [
+    "battery",
+    "esd"
+   ],
+   "kind": "repair",
+   "number": 6,
+   "parts": [
+    {
+     "phrase": "battery",
+     "position_hint": ""
+    },
+    {
+     "phrase": "fan",
+     "position_hint": ""
+    },
+    {
+     "phrase": "motherboard",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 111.533,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": [
+    "screwdriver"
+   ]
+  },
+  {
+   "action": "Close cover and reinstall external battery",
+   "end_s": 170.433,
+   "hazards": [
+    "battery",
+    "esd"
+   ],
+   "kind": "repair",
+   "number": 7,
+   "parts": [
+    {
+     "phrase": "bottom cover",
+     "position_hint": ""
+    },
+    {
+     "phrase": "battery",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 134.8,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": [
+    "screwdriver"
+   ]
+  },
+  {
+   "action": "Power on and verify in Windows",
+   "end_s": 189.233,
+   "hazards": [],
+   "kind": "repair",
+   "number": 8,
+   "parts": [
+    {
+     "phrase": "display",
+     "position_hint": ""
+    },
+    {
+     "phrase": "keyboard",
+     "position_hint": ""
+    }
+   ],
+   "start_s": 170.433,
+   "time_needs_check": true,
+   "time_spread_s": 6.0,
+   "tools": []
+  }
+ ],
+ "verdict": "DRAFT"
+}

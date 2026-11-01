@@ -1,0 +1,30 @@
+# Words that decide whether a model's device_guess names one supported
+# device class (app/hazards.py). Lower case, letters only. A guess is split
+# into letters-and-digits tokens and admitted only when every token is a word
+# listed here, a model number (any token with a digit, like t480 or 13) and
+# exactly one of the phone or laptop families is named. The six lists must
+# not overlap (the loader fails loudly if they do).
+[device_scope]
+# A guess is supported when it hits exactly one of these two families.
+phone_words = ["phone", "phones", "smartphone", "cellphone", "iphone"]
+laptop_words = ["laptop", "notebook", "ultrabook", "chromebook", "thinkpad", "macbook"]
+# Any of these makes the guess a negation, a choice or not a device name.
+reject_words = [
+  "not", "no", "non", "never", "without", "isn", "neither", "either", "nor",
+  "or", "and", "repair", "repairs", "case", "charger", "accessory",
+]
+# Brand names that may sit around a family word ("Lenovo ThinkPad laptop").
+brand_words = [
+  "apple", "samsung", "google", "lenovo", "dell", "hp", "asus", "acer",
+  "microsoft", "huawei", "xiaomi", "oneplus", "motorola", "sony", "lg",
+  "nokia", "razer", "msi", "toshiba", "fujitsu", "framework",
+]
+# Product-line words that may sit around a family word. MacBook and ThinkPad
+# are in laptop_words above, so each alone names a laptop.
+model_words = [
+  "galaxy", "pixel", "xps", "pro", "air", "max", "mini", "plus", "ultra",
+  "ideapad", "latitude", "inspiron", "pavilion", "zenbook", "vivobook",
+  "surface", "spectre", "envy", "elitebook", "probook", "aspire", "swift",
+  "redmi", "note", "edge", "moto", "xperia", "lumia", "series", "book",
+]
+article_words = ["a", "an", "the"]

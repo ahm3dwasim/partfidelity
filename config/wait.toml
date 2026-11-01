@@ -1,0 +1,55 @@
+# The waiting screen (GET /jobs/<id> in a browser): calm
+# waiting content. Read by app/wait_config.py, which fails loudly on a
+# missing, misspelled or mistyped key.
+
+[page]
+title = "Piecing it together."
+done_title = "Your guide is ready."
+stopped_title = "This guide stopped."
+lede = "Your recording becomes a sequence of moments, instructions and outlined parts."
+# Lines of the run log shown under the stages (newest last).
+log_lines = 4
+
+# The named stages, in order. `receipts` are the model-call receipt stages
+# (app/contracts.py RECEIPT_STAGE_*) that belong to a stage: their times
+# give the stage its finish time and its run-log lines. `marker` is the
+# pipeline's stage.txt value that means this stage has started ("" = none).
+[[stages]]
+id = "upload"
+label = "Upload your clip"
+detail = "Your confirmed clip goes to the models."
+receipts = ["upload"]
+marker = ""
+log_done = "Clip received"
+
+[[stages]]
+id = "steps"
+label = "Find the steps"
+detail = "Muse Spark follows the repair and finds the steps."
+receipts = ["extract"]
+marker = "extract"
+log_done = "Steps found"
+
+[[stages]]
+id = "outline"
+label = "Outline the parts"
+detail = "SAM 3.1 finds the part that matters in each frame and scores it; the guide draws the outline."
+receipts = ["locate", "segment"]
+marker = "segment"
+log_done = "Parts outlined"
+
+[[stages]]
+id = "check"
+label = "Check each outline"
+detail = "Every label is read back against its frame."
+receipts = ["readback"]
+marker = "readback"
+log_done = "Outlines checked"
+
+[[stages]]
+id = "guide"
+label = "Bring the guide together"
+detail = "Steps, frames and labels in one place."
+receipts = []
+marker = ""
+log_done = "Guide ready"

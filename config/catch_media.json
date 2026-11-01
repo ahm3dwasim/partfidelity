@@ -1,0 +1,63 @@
+{
+  "_comment": "Crops of the frozen catch images (fan, heatsink and battery area only: no label, serial, barcode, screen or face). crop = [x0, y0, x1, y1] as fractions of the source image. Built into var/catch-media.zip by tools/catch_media.py; never committed as images. The V3 recipe corruptions act on the battery label, so they ship as data rows only, no images.",
+  "width_px": 320,
+  "quality": 72,
+  "images": [
+    {
+      "name": "f3-original",
+      "from": "h1/src/f3_t112s.png",
+      "crop": [
+        0.52,
+        0.0,
+        0.9,
+        0.5
+      ]
+    },
+    {
+      "name": "f3-edit",
+      "from": "h1/edits/f3_loose.jpg",
+      "crop": [
+        0.52,
+        0.1,
+        0.9,
+        0.52
+      ]
+    },
+    {
+      "name": "f1-original",
+      "from": "h1/src/f1_t89s.png",
+      "crop": [
+        0.66,
+        0.28,
+        0.98,
+        0.8
+      ]
+    },
+    {
+      "name": "f1-edit",
+      "from": "h1/edits/f1_loose.jpg",
+      "crop": [
+        0.66,
+        0.3,
+        0.98,
+        0.8
+      ]
+    }
+  ],
+  "cases": [
+    {
+      "key": "altered_edit",
+      "candidate": "edits/f3_loose.jpg",
+      "clip": "H1",
+      "original": "f3-original",
+      "edited": "f3-edit"
+    },
+    {
+      "key": "accepted_edit",
+      "candidate": "edits/f1_loose.jpg",
+      "clip": "H1",
+      "original": "f1-original",
+      "edited": "f1-edit"
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+# Home-page scroll film. Every tunable of the film lives here;
+# loaded strictly by app/film_config.py (a missing or misspelled key fails). No credentials here.
+# Frames are our own Blender renders of the laptop teardown (config/teardown.toml has the timeline).
+
+[film]
+frames = 250                         # 0001.webp .. 0250.webp
+height_vh = 380                      # scroll length of the pinned stage (longer = calmer; v10 is 250 frames at 380 vh, 280 vh of travel)
+smoothing = 0.14                     # share of the gap to the target frame closed per animation frame
+media_url = "/static/ui/media/teardown"
+version = "v10"                       # appended as ?v= so the long cache header can say immutable
+poster = "poster.webp"
+frame_pattern = "{n:04d}.webp"       # frame names inside the archives: one {n} or {n:0Kd} (K = 1-9); rest letters, digits . _ -
+passes = [8, 4, 1]                   # load every 8th frame, then every 4th, then all (strictly falling, ending at 1)
+# Frames are served as a few bundle files per set, not one request each: at about 1 s per request from India,
+# 260 single frames took 46 s. A bundle holds the frames of one pass in load order, at most bundle_frames.
+bundle_frames = 40
+bundle_name = "bundle-{i}.bin"       # one {i} = bundle index from 0; rest letters, digits . _ -
+parallel_loads = 3                   # bundles in flight at once
+load_retries = 3                     # a failed bundle or the anchors file is tried again this many times; then the page reverts to the static layout
+load_backoff_ms = 800                # wait before try k (from 0) is this x 2^k
+bitmap_window = 12                   # decoded frames held each side of the current one (a 1600 px frame is 5.8 MB decoded)
+max_pending_decodes = 4              # decodes running at once; a fling starts no work for positions it has left
+max_frame_bytes = 4194304            # a bundle record claiming more than this fails the bundle (largest shipped frame is about 70 KB)
+opening_fade = [20, 40]              # frames over which the opening copy fades out; chapter 1 starts by its midpoint
+caption_fade_ms = 260                # a chapter caption fades in over this long when its stage starts (the old one goes at once)
+# Part labels (physical layers, not floating paper-like ones): each [[parts]] row's name, on a thin leader line to that part. Where a part sits in each frame comes from the
+# render itself (tools/teardown_render.py --mode anchors), shipped beside the bundles as `anchors`.
+anchors = "anchors.json"             # served next to the frame sets: {frame: {part id: [rx, ry, lx, ly]}} (fractions of the frame)
+label_land = 0.75                    # a label shows once its part is this far (share of part_rise) through its rise
+label_gap_px = 14                    # from the stack's outer corner to the label column
+label_spacing_px = 22                # least distance between two labels on one side
+label_edge_px = 16                   # labels keep this far from the viewport edge (they wrap rather than run off)
+cache_max_age_s = 31536000
+static_cache_control = "no-cache"    # every other /static file and every HTML page: the browser revalidates by ETag, so a deploy shows at once
+phone_art_width_vw = 108             # phone: render width as a share of the viewport
+phone_feather_y_pct = 2              # phone: top/bottom feather of the render mask (desktop keeps 7)
+part_rise = 28                       # frames a layer takes to rise (config/teardown.toml rise_frames)
+opening_lift_px = 32                 # desktop: opening copy sits this far up while the header is still on screen
+sample_cta = "Explore the sample"
+make_cta = "Make a guide"
+teaser_steps = 3
+toast_ms = 2200
+observer_top_pct = 30
+observer_bottom_pct = 55
+observer_hold_ms = 300               # after reader.js marks a step, scroll-into-view may not move the stage for this long
+
+# Frames ship as one plain tar per set (keeps each file under the repository's file size limit); at build time tools/film_frames.py
+# packs them into the bundles in the served folder. {dir} is a set's dir below; members are "<dir>/NNNN.webp".
+[archives]
+source = "assets/film/teardown-{dir}.tar"
+anchors = "assets/film/teardown-anchors.json"   # every part, every frame, as the render wrote it; unpack keeps the [[parts]] ids
+target = "static/ui/media/teardown"
+
+# Frame set by viewport: first set where css width <= max_css_width or css width x dpr <= max_device_width.
+# 0 = no limit, so the last set is the fallback. Chosen once at load. Earlier sets have both limits, rising set by set.
+# layout is the stage composition (static/site.css: "phone" or "wide") of the first set whose max_css_width covers
+# the css width (density does not count), set once by film.js; so a phone layout always comes with the phone frames.
+# labels: "right" = every label to the right of the stack; "alternate" = right and left in turn (narrow screens).
+[[sets]]
+name = "phone"
+dir = "webp-900"
+max_css_width = 820
+max_device_width = 1000
+layout = "phone"
+labels = "alternate"
+
+[[sets]]
+name = "wide"
+dir = "webp-1600"
+max_css_width = 0
+max_device_width = 0
+layout = "wide"
+labels = "right"
+
+# Chapters match the parts on screen (rise order of config/teardown.toml, 8 frames apart from frame 44):
+# 1 the lid back and the display module (frames 44-80); 2 keyboard, top case and cooling (60-104); 3 logic board, battery,
+# speakers (84-128), the exploded hold, the parts going back (150-200) and the complete laptop held to 250 with this
+# chapter's caption on screen to the last frame (about one screen of scroll).
+# Stages (captions change exactly with the stage): chapter 2 and 3 start on the frame the first
+# part of that chapter starts to rise ([[parts]] below); chapter 1 starts while the opening copy is still at least
+# half visible (they sit apart on screen), so the lid closing and the closed laptop always carry a caption; each chapter ends where the next starts. app/film_config.py checks this.
+# name is the label ("01 / <name>"); title, body and the optional link (cta_text "" = none) are the chapter copy.
+[[chapters]]
+start = 30
+end = 60
+name = "The screen"
+title = "Start with what you see."
+body = "Record the work on your phone. Each movement becomes a place to begin."
+cta_text = ""
+cta_url = ""
+
+[[chapters]]
+start = 60
+end = 84
+name = "The keyboard"
+title = "Find the right part."
+body = "Meta’s SAM 3.1 finds the part in a frame, and the guide outlines it, so the next person knows where to look."
+cta_text = ""
+cta_url = ""
+
+[[chapters]]
+start = 84
+end = 250
+name = "Inside"
+title = "Keep the context."
+body = "Muse Spark turns the sequence into short instructions linked to moments in the clip."
+cta_text = "Explore the sample"
+cta_url = "/guide/sample"
+
+# (the parts return and the laptop reassembles): `leave` is the frame the part starts to go back
+# (config/teardown.toml [reassemble]: start + slot x stagger), when its label goes. tests/test_film_config.py checks it.
+# parts rise 8 frames apart from frame 44; the display is one module (cover glass bonded on). `id` is the part's name in
+# config/teardown.toml [explode]; `chapter` is the chapter (1-3) it belongs to; the bottom case stays down (its frame is when its screws are out).
+[[parts]]
+frame = 44
+id = "lid_back"
+name = "Lid back"
+chapter = 1
+leave = 178
+[[parts]]
+frame = 52
+id = "display_panel"
+name = "Display"
+chapter = 1
+leave = 174
+[[parts]]
+frame = 60
+id = "keyboard"
+name = "Keyboard"
+chapter = 2
+leave = 170
+[[parts]]
+frame = 68
+id = "top_case"
+name = "Top case"
+chapter = 2
+leave = 166
+[[parts]]
+frame = 76
+id = "cooling"
+name = "Cooling"
+chapter = 2
+leave = 162
+[[parts]]
+frame = 84
+id = "logic_board"
+name = "Logic board"
+chapter = 3
+leave = 158
+[[parts]]
+frame = 92
+id = "battery"
+name = "Battery"
+chapter = 3
+leave = 154
+[[parts]]
+frame = 100
+id = "speakers"
+name = "Speakers"
+chapter = 3
+leave = 150
+[[parts]]
+frame = 108
+id = "bottom_cover"
+name = "Bottom case"
+chapter = 3
+leave = 150

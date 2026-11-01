@@ -1,0 +1,51 @@
+<!doctype html>
+<!-- Test-only harness for the wait-video live paths (never shipped as a page):
+     mounts static/ui/wait-video.js with status/cancel URLs taken from the
+     ?status= and ?cancel= query params, so browser tests can drive the real
+     cancel POST against a stub endpoint. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>wait-video cancel harness (test only)</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="/static/ui/wait-video.css">
+</head>
+<body style="margin:0;background:#131313">
+<section class="wv" id="wait-video" data-status-url="" data-cancel-url=""
+         aria-label="Guide progress">
+  <div class="wv-grid">
+    <div class="wv-viewer">
+      <div class="wv-frame" id="wv-frame">
+        <img class="wv-img is-on" id="wv-img-a" alt="">
+        <img class="wv-img" id="wv-img-b" alt="" aria-hidden="true">
+        <svg class="wv-overlay" id="wv-overlay" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+        <p class="wv-loading" id="wv-loading">Loading your frames…</p>
+      </div>
+      <div class="wv-viewbar">
+        <p class="wv-clock">Elapsed <span id="wv-clock" role="timer">0:00</span></p>
+        <ol class="wv-stages" id="wv-stages" aria-live="polite"></ol>
+      </div>
+    </div>
+    <aside class="wv-rail" aria-label="Finished steps">
+      <div class="wv-actions">
+        <button class="wv-cancel" id="wv-cancel" type="button">Cancel and delete</button>
+        <a class="wv-guide is-hidden" id="wv-guide" href="#">Open your guide</a>
+      </div>
+      <p class="wv-note" id="wv-note" role="status"></p>
+      <ol class="wv-steps" id="wv-steps"></ol>
+    </aside>
+  </div>
+</section>
+<script>
+(function () {
+  "use strict";
+  var q = new URLSearchParams(window.location.search);
+  var root = document.getElementById("wait-video");
+  root.setAttribute("data-status-url", q.get("status") || "");
+  root.setAttribute("data-cancel-url", q.get("cancel") || "");
+})();
+</script>
+<script src="/static/ui/wait-video.js"></script>
+</body>
+</html>

@@ -1,0 +1,412 @@
+/* Guide page.
+   The layout on the app's real guide: the active step's outlined frame
+   pinned left, the steps on the right with serif numbers, an outline
+   toggle, Play, Done, the safety notice and "Ready to pass it on?".
+   Loaded after guide.css and guide_step.css, before shell.css. Colours
+   only through tokens.css. */
+.pf-theme-guide .guide {
+  max-width: 1760px;
+  margin: 0 auto;
+  padding: clamp(28px, 5vw, 64px) var(--pf-gutter) 0;
+}
+
+/* Head */
+.pf-theme-guide .gd-head-row {
+  display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+  gap: var(--pf-space-24);
+}
+.pf-theme-guide .guide-head .kicker {
+  margin: 0;
+  font: 500 0.75rem/1 var(--pf-font-body);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .guide-head h1 {
+  margin: 14px 0 10px;
+  font-size: clamp(2.125rem, 4.4vw, 4rem);
+  line-height: 1.04;
+}
+.pf-theme-guide .guide-head .meta { margin: 0; color: var(--pf-on-ink-muted); font-size: 0.9375rem; }
+.pf-theme-guide .guide-head .pf-view-row { margin: 0; }
+.pf-theme-guide .draft-notes ul {
+  margin: var(--pf-space-16) 0 0; padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: var(--pf-space-8);
+}
+.pf-theme-guide .draft-notes li {
+  padding: 6px 12px; border: 1px solid var(--pf-nudge-line); border-radius: var(--pf-radius-pill);
+  background: var(--pf-nudge-bg); color: var(--pf-nudge-text); font-size: 0.8125rem;
+}
+
+/* Safety notice: D's "Before you start" panel. */
+.pf-theme-guide .gd-safety {
+  margin: 26px 0 0; padding: 18px 20px;
+  display: grid; gap: 10px;
+  border: 1px solid var(--pf-warn-line); border-radius: 12px;
+  background: var(--pf-warn-bg); color: var(--pf-warn-text);
+  font-size: 0.9375rem;
+}
+.pf-theme-guide .gd-safety p { margin: 0; max-width: 70ch; }
+.pf-theme-guide .gd-safety-title { font: 400 1.25rem/1.2 var(--pf-font-display); color: var(--pf-warn-title); }
+.pf-theme-guide .gd-safety ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pf-theme-guide .gd-safety li a { color: var(--pf-warn-title); }
+.pf-theme-guide .gd-safety-ack {
+  display: flex; gap: 12px; align-items: center; min-height: 44px;
+  color: var(--pf-on-ink); cursor: pointer;
+}
+.pf-theme-guide .gd-safety-ack input { width: 22px; height: 22px; margin: 0; accent-color: var(--pf-accent); flex: none; }
+
+/* Two columns: the stage pinned left, steps right. */
+.pf-theme-guide .guide-cols,
+.pf-theme-guide.simple .guide-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(360px, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: start;
+  margin-top: clamp(28px, 4vw, 48px);
+  max-width: none;
+}
+.pf-theme-guide .guide-video { position: sticky; top: 20px; min-width: 0; }
+.pf-theme-guide .guide-steps { min-width: 0; display: block; }
+
+/* Stage: the active step's frame, outlined or original. */
+.pf-theme-guide .gd-screen {
+  position: relative;
+  border: 1px solid var(--pf-ink-line); border-radius: var(--pf-radius-panel);
+  background: radial-gradient(ellipse at 50% 40%, var(--pf-ink-3), var(--pf-ink));
+  padding: clamp(14px, 2.2vw, 30px);
+  overflow: hidden;
+}
+/* The picture box shrink-wraps the frame, so the step's pins (moved here
+   from its card on wide screens) sit at the same percentages. */
+.pf-theme-guide .gd-pic { position: relative; width: fit-content; max-width: 100%; margin-inline: auto; }
+.pf-theme-guide .gd-frame {
+  display: block; width: auto; height: auto; max-width: 100%;
+  max-height: calc(100svh - var(--pf-bar) - 440px); min-height: 160px;
+  border-radius: 6px;
+}
+.pf-theme-guide .gd-pins { position: absolute; inset: 0; pointer-events: none; }
+.pf-theme-guide .gd-stage.is-playing .gd-pins { display: none; }
+.pf-theme-guide .gd-frame[hidden] { display: none; }
+.pf-theme-guide .gd-screen .pf-video-block { margin: 0; }
+.pf-theme-guide .gd-screen video { display: block; width: 100%; border-radius: 6px; background: var(--pf-ink); }
+.pf-theme-guide .gd-stage.has-stage:not(.is-playing) .gd-screen .pf-video-block { display: none; }
+.pf-theme-guide .gd-stage.is-playing .gd-frame { display: none; }
+.pf-theme-guide .gd-badge {
+  position: absolute; right: 14px; top: 10px; z-index: 2; margin: 0;
+  display: flex; gap: 8px; align-items: center;
+  padding: 4px 10px; border-radius: var(--pf-radius-pill);
+  background: var(--pf-bar-bg);
+  font-size: 0.75rem; color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .gd-badge i { width: 8px; height: 8px; border-radius: 50%; background: var(--pf-ok); display: block; }
+.pf-theme-guide .gd-stage.is-plain .gd-badge i { background: var(--pf-on-ink-dim); }
+
+.pf-theme-guide .gd-ctl {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 14px;
+  margin-top: 14px; font-size: 0.8125rem; color: var(--pf-on-ink-muted);
+  font-variant-numeric: tabular-nums;
+}
+.pf-theme-guide .gd-ctl[hidden] { display: none; }
+.pf-theme-guide .gd-play {
+  width: 44px; height: 44px; flex: none; padding: 0;
+  display: grid; place-items: center;
+  border-radius: 50%; border: 1px solid var(--pf-ink-line-strong);
+  background: none; color: var(--pf-on-ink); cursor: pointer;
+  transition: border-color var(--pf-motion-ui) var(--pf-ease);
+}
+.pf-theme-guide .gd-play:hover { border-color: var(--pf-accent); }
+.pf-theme-guide .gd-play[hidden] { display: none; }
+.pf-theme-guide .gd-track { flex: 1; min-width: 120px; height: 2px; background: var(--pf-ink-line-strong); position: relative; }
+.pf-theme-guide .gd-track i {
+  position: absolute; top: 0; height: 2px; background: var(--pf-accent);
+  left: var(--gd-from, 0%); width: var(--gd-span, 0%);
+  transition: left var(--pf-motion-reveal) var(--pf-ease), width var(--pf-motion-reveal) var(--pf-ease);
+}
+.pf-theme-guide .gd-sw { display: flex; gap: 8px; align-items: center; margin-left: auto; }
+.pf-theme-guide .gd-tag { font-size: 0.75rem; letter-spacing: 0.06em; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .gd-sw button {
+  min-height: 44px; min-width: 56px; padding: 0 14px;
+  border-radius: var(--pf-radius-pill); border: 1px solid var(--pf-ink-line-strong);
+  background: none; color: var(--pf-on-ink-muted); font: inherit; cursor: pointer;
+}
+.pf-theme-guide .gd-sw button[aria-pressed="true"] { color: var(--pf-on-ink); border-color: var(--pf-accent); }
+.pf-theme-guide .gd-cap {
+  display: flex; justify-content: space-between; gap: 12px;
+  margin: 12px 0 0; font-size: 0.8125rem; color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .guide-video .guide-now {
+  margin-top: var(--pf-space-16); padding: 0; border: 0; background: none;
+}
+.pf-theme-guide .guide-video .guide-now-title { margin: 0; font: 400 1.125rem/1.3 var(--pf-font-display); color: var(--pf-on-ink); }
+.pf-theme-guide .guide-video .guide-now-time { margin: 2px 0 0; font-size: 0.8125rem; color: var(--pf-on-ink-dim); }
+.pf-theme-guide .gd-stage:not(.has-clip) .guide-now,
+.pf-theme-guide .gd-stage:not(.has-clip) .video-note { display: none; }
+.pf-theme-guide .guide .status-ok,
+.pf-theme-guide .guide .status-unchecked {
+  padding: 2px 10px; border-radius: var(--pf-radius-pill); border: 1px solid currentColor;
+  background: none; font-size: 0.75rem; font-weight: 500;
+}
+.pf-theme-guide .guide .status-ok { color: var(--pf-ok); }
+.pf-theme-guide .guide .status-unchecked { color: var(--pf-nudge-text); }
+.pf-theme-guide .guide-video .video-note { margin: 10px 0 0; font-size: 0.75rem; color: var(--pf-on-ink-dim); }
+
+/* Steps: D's ruled list with serif numerals; the active one is lit. */
+.pf-theme-guide .guide .card {
+  margin: 0; padding: 34px 0 38px;
+  border: 0; border-top: 1px solid var(--pf-ink-line); border-radius: 0;
+  background: none; box-shadow: none;
+  scroll-margin-top: 20px;
+}
+.pf-theme-guide .guide .card.is-active { border-left: 0; }
+.pf-theme-guide .guide .card > header {
+  display: grid; grid-template-columns: auto 1fr; align-items: baseline;
+  gap: 0 var(--pf-space-16); padding: 0; border: 0; background: none;
+}
+.pf-theme-guide .gd-no {
+  grid-row: 1 / span 3;
+  font: 400 3.5rem/0.9 var(--pf-font-display);
+  font-variant-numeric: lining-nums;
+  color: var(--pf-on-ink-dim);
+  min-width: 1.1em;
+  transition: color var(--pf-motion-reveal) var(--pf-ease);
+}
+.pf-theme-guide .card.is-active .gd-no { color: var(--pf-accent); }
+.pf-theme-guide .guide .card h2 {
+  margin: 0; font: 500 0.75rem/1.4 var(--pf-font-body);
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .guide .card .time { margin: 2px 0 0; font-size: 0.8125rem; color: var(--pf-on-ink-dim); }
+.pf-theme-guide .guide .card .check-time {
+  justify-self: start; margin: 6px 0 0; padding: 2px 10px;
+  border: 1px solid var(--pf-nudge-line); border-radius: var(--pf-radius-pill);
+  background: var(--pf-nudge-bg); color: var(--pf-nudge-text); font-size: 0.75rem;
+}
+.pf-theme-guide .guide .card .action {
+  margin: 16px 0 0;
+  font: 400 clamp(1.625rem, 2.4vw, 2.125rem)/1.12 var(--pf-font-display);
+  color: var(--pf-on-ink);
+  text-wrap: balance;
+}
+.pf-theme-guide .guide .card .tools {
+  margin: 14px 0 0; padding: 0; list-style: none;
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.pf-theme-guide .guide .card .tools li {
+  padding: 4px 12px; border: 1px solid var(--pf-ink-line-strong); border-radius: var(--pf-radius-pill);
+  font-size: 0.8125rem; color: var(--pf-on-ink-muted);
+}
+
+/* Hazard: D's "Battery safety" strip; the fixed text stays verbatim. */
+.pf-theme-guide .guide .card .pf-hazard {
+  margin: 18px 0 0; padding: 12px 16px;
+  border: 0; border-left: 2px solid var(--pf-accent); border-radius: 0 8px 8px 0;
+  background: var(--pf-warn-bg); color: var(--pf-warn-text);
+  font-size: 0.875rem; max-width: 52ch;
+}
+.pf-theme-guide .guide .card .pf-hazard p { margin: 0; color: inherit; }
+.pf-theme-guide .guide .card .pf-hazard .pf-hazard-title {
+  margin-bottom: 4px; font-weight: 500; color: var(--pf-warn-title);
+  letter-spacing: 0; text-transform: none; font-size: 0.875rem;
+}
+
+/* The card's own frame and per-part shots show on phones (no stage
+   there); on desktop the stage carries the frame. */
+.pf-theme-guide .guide .card .shot {
+  margin: 18px 0 6px; border: 1px solid var(--pf-ink-line); border-radius: 12px;
+  background: var(--pf-ink-2); overflow: hidden;
+}
+.pf-theme-guide .guide .card .parts {
+  margin: 16px 0 0; padding: 0; list-style: none;
+  display: grid; gap: 8px;
+}
+.pf-theme-guide .guide .card .parts > li {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+  padding: 10px 0 0; border-top: 1px solid var(--pf-ink-line);
+  font-size: 0.9375rem; color: var(--pf-on-ink);
+}
+.pf-theme-guide .guide .card .parts .part-shot { flex-basis: 100%; margin: 6px 0 0; }
+.pf-theme-guide .guide .card .parts .part-shot img { border-radius: 8px; }
+/* The fixing view still hides filmed-only detail over the layout above. */
+body.simple.pf-theme-guide .guide .card .pf-filmed-only { display: none; }
+@media (min-width: 901px) {
+  .pf-theme-guide .guide-cols.has-stage .card .shot,
+  .pf-theme-guide .guide-cols.has-stage .card .parts .part-shot { display: none; }
+}
+/* The fixing view has no clip player, so no Play either. */
+body.simple.pf-theme-guide .gd-play { display: none; }
+.pf-theme-guide .gd-parts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pf-theme-guide .gd-parts[hidden] { display: none; }
+.pf-theme-guide .gd-parts button {
+  min-height: 44px; padding: 0 14px; border-radius: var(--pf-radius-pill);
+  border: 1px solid var(--pf-ink-line-strong); background: none; color: var(--pf-on-ink);
+  font: 500 0.8125rem/1 var(--pf-font-body); cursor: pointer;
+}
+.pf-theme-guide .gd-parts button[aria-pressed="true"] { border-color: var(--pf-accent); }
+
+/* Row of small pills under a step: Done, the set-start and nudge controls. */
+.pf-theme-guide .guide .card .step-time {
+  margin-top: 18px; padding: 0; border: 0; background: none;
+  display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px;
+}
+.pf-theme-guide .guide .card .step-time .step-window { margin: 0; font-size: 0.8125rem; color: var(--pf-on-ink-muted); flex-basis: 100%; }
+.pf-theme-guide .guide .card .step-time button,
+.pf-theme-guide .guide .card .gd-done-row button,
+.pf-theme-guide .guide .card .fix-label summary,
+.pf-theme-guide .guide .card .toggle {
+  min-height: 44px; padding: 0 16px;
+  border-radius: var(--pf-radius-pill); border: 1px solid var(--pf-ink-line-strong);
+  background: none; color: var(--pf-on-ink);
+  font: 500 0.875rem/1 var(--pf-font-body);
+  cursor: pointer; display: inline-flex; align-items: center;
+  transition: border-color var(--pf-motion-ui) var(--pf-ease);
+}
+.pf-theme-guide .guide .card .step-time button:hover,
+.pf-theme-guide .guide .card .gd-done-row button:hover,
+.pf-theme-guide .guide .card .fix-label summary:hover { border-color: var(--pf-on-ink); }
+.pf-theme-guide .guide .card .fix-label { flex-basis: 100%; }
+.pf-theme-guide .guide .card .fix-label summary { list-style: none; width: fit-content; min-height: 36px; font-size: 0.8125rem; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .guide .card .fix-label summary::-webkit-details-marker { display: none; }
+.pf-theme-guide .guide .card .fix-form { display: flex; flex-wrap: wrap; gap: 8px; align-items: end; margin-top: 10px; }
+.pf-theme-guide .guide .card .fix-form input[type="text"] {
+  min-height: 44px; padding: 0 12px; border-radius: 10px;
+  border: 1px solid var(--pf-ink-line-strong); background: var(--pf-ink-2); color: var(--pf-on-ink); font: inherit;
+}
+.pf-theme-guide .gd-done-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin-top: 14px; }
+.pf-theme-guide .guide .card .gd-done { margin: 0; padding: 0; }
+.pf-theme-guide .gd-done {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 44px;
+  font-size: 0.875rem; color: var(--pf-on-ink-muted); cursor: pointer;
+}
+.pf-theme-guide .gd-done input { width: 20px; height: 20px; margin: 0; accent-color: var(--pf-accent); }
+.pf-theme-guide .card.is-done .gd-no { color: var(--pf-ok); }
+.pf-theme-guide .card.is-done .action { color: var(--pf-on-ink-muted); }
+
+/* Close: "Ready to pass it on?" */
+.pf-theme-guide .guide .guide-foot {
+  margin-top: 0; padding: 48px 0 56px;
+  border-top: 1px solid var(--pf-ink-line); text-align: left;
+  background: none;
+}
+.pf-theme-guide .guide-foot .kicker {
+  margin: 0; font: 500 0.75rem/1 var(--pf-font-body);
+  letter-spacing: 0.18em; text-transform: uppercase; color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .guide-foot h2 { margin: 14px 0 12px; font-size: clamp(1.75rem, 3vw, 2.5rem); }
+.pf-theme-guide .guide-foot .gd-end-lede { margin: 0 0 22px; max-width: 52ch; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .guide-foot .guide-downloads { display: flex; flex-wrap: wrap; gap: 12px; margin: 0; }
+.pf-theme-guide .guide-foot .dl-link {
+  display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px;
+  border-radius: var(--pf-radius-pill); border: 1px solid var(--pf-ink-line-strong);
+  color: var(--pf-on-ink); font: 500 0.9375rem/1 var(--pf-font-body); text-decoration: none;
+  transition: border-color var(--pf-motion-ui) var(--pf-ease), background-color var(--pf-motion-ui) var(--pf-ease);
+}
+.pf-theme-guide .guide-foot .dl-link:first-child { background: var(--pf-accent); border-color: var(--pf-accent); color: var(--pf-accent-ink); }
+.pf-theme-guide .guide-foot .dl-link:first-child:hover { background: var(--pf-accent-hover); border-color: var(--pf-accent-hover); }
+.pf-theme-guide .guide-foot .dl-link:hover { border-color: var(--pf-on-ink); }
+.pf-theme-guide .guide-foot .gd-end-links { display: flex; flex-wrap: wrap; gap: 6px 22px; margin: 22px 0 0; font-size: 0.875rem; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .guide-foot .gd-end-links a { display: inline-flex; align-items: center; min-height: 44px; }
+.pf-theme-guide .guide-foot .gd-end-links a:hover { color: var(--pf-on-ink); }
+
+/* Phones and narrow tablets: one column, the stage folds away unless the
+   guide has a clip to play; every step is lit and shows its own frame. */
+@media (max-width: 900px) {
+  .pf-theme-guide .guide-cols,
+  .pf-theme-guide.simple .guide-cols { display: block; }
+  .pf-theme-guide .gd-stage.has-clip { margin-bottom: var(--pf-space-24); }
+  .pf-theme-guide .guide-video { position: static; }
+  .pf-theme-guide .gd-stage:not(.has-clip) { display: none; }
+  /* Phones open on the player; scrolling a paused clip to another step
+     (.is-scrubbed) brings the still frame back until it plays again. */
+  .pf-theme-guide .gd-stage.has-clip:not(.is-scrubbed) .gd-frame { display: none; }
+  .pf-theme-guide .gd-stage.has-stage.has-clip:not(.is-scrubbed) .gd-screen .pf-video-block { display: block; }
+  .pf-theme-guide .gd-stage.has-clip .gd-sw { display: none; }
+  .pf-theme-guide .gd-no { font-size: 2.875rem; }
+}
+/* One picture per step on phones: the labelled copy (its own toggle shows
+   the original) stands in for the plain frame; fixing view keeps the frame. */
+@media (max-width: 900px) {
+  .pf-theme-guide:not(.simple) .guide .card:has(.part-shot) .shot { display: none; }
+}
+.pf-theme-guide .guide .card .step-time,
+.pf-theme-guide .guide .card .gd-done-row { margin-left: 0; padding-left: 0; border-left: 0; }
+/* Start-time nudge: D's quiet yellow box when two readings disagree. */
+.pf-theme-guide .guide .step-time .check-time {
+  flex-basis: 100%; margin: 0; padding: 12px 14px;
+  border: 1px solid var(--pf-nudge-line); border-radius: 10px;
+  background: var(--pf-nudge-bg); color: var(--pf-nudge-text); font-weight: 400; font-size: 0.875rem;
+}
+.pf-theme-guide .guide .step-time .nudge-row { margin: 0; gap: 10px; }
+.pf-theme-guide .guide .step-time .time-preview { display: none; }
+.pf-theme-guide .guide .step-time [data-nudge] { min-width: 56px; justify-content: center; border-color: var(--pf-nudge-line); }
+.pf-theme-guide .guide .card > .pf-filmed-only { margin: 0; padding: 0; }
+
+/* The sample guide says plainly what it was made from. */
+.pf-theme-guide .gd-sample-note {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px;
+  margin: 0 0 var(--pf-space-16); font-size: 0.875rem; color: var(--pf-on-ink-muted);
+}
+.pf-theme-guide .gd-sample-note .replay-badge {
+  padding: 2px 10px; border-radius: var(--pf-radius-pill);
+  border: 1px solid var(--pf-ink-line-strong); color: var(--pf-on-ink);
+  font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.pf-theme-guide .gd-sample-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0 0 14px; font-size: 0.875rem; }
+.pf-theme-guide .gd-sample-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--pf-on-ink-muted); }
+
+/* Source notes: what the footage does not show for a step. Sits
+   under the step's action and, as one line, under the stage. */
+.pf-theme-guide .gd-step-note {
+  margin: 12px 0; padding: 12px 14px;
+  border: 1px solid var(--pf-warn-line); border-radius: 10px;
+  background: var(--pf-warn-bg); color: var(--pf-warn-text); font-size: 0.9375rem;
+}
+.pf-theme-guide .gd-step-note p { margin: 0; }
+.pf-theme-guide .gd-step-note-title { font-weight: 600; color: var(--pf-warn-title); margin-bottom: 4px; }
+.pf-theme-guide .gd-stage-note {
+  margin: 8px 0 0; padding: 8px 12px;
+  border: 1px solid var(--pf-warn-line); border-radius: 8px;
+  background: var(--pf-warn-bg); color: var(--pf-warn-title); font-size: 0.8125rem;
+}
+.pf-theme-guide .gd-stage-note[hidden] { display: none; }
+
+/* The fixed bottom bar covers the last --pf-bar of the viewport. Scrolling
+   to a focused control or an anchor leaves it clear, and the sticky stage
+   (frame, controls, caption, note, now-playing) is sized to end above the bar. */
+html { scroll-padding-bottom: calc(var(--pf-bar) + 16px); }
+
+/* Intro: context above step 1, not a repair step (no number, no Done, no start-time edit). */
+.pf-theme-guide .guide .card.gd-intro > header { display: block; margin: 0; padding: 0; }
+.pf-theme-guide .guide .card.gd-intro .gd-intro-note { margin: 4px 0 8px; font-size: 0.875rem; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .guide .card.gd-intro .gd-done-row,
+.pf-theme-guide .guide .card.gd-intro [data-set-start] { display: none; }
+
+/* Reader stop: before acknowledgement each later step shrinks to a row (number, title, its full
+   warnings); only its instructions, images and controls fold. No script shows everything. */
+.pf-js .stop:not(.is-acked) + .after-stop .card > :not(header):not(.pf-hazard),
+.pf-js .stop:not(.is-acked) + .after-stop .card > header .time,
+.pf-js .stop:not(.is-acked) + .after-stop .card > header .check-time { display: none; }
+.pf-theme-guide .stop button.ack { display: none; }
+.pf-js .stop button.ack:not([hidden]) { display: inline-block; }
+.pf-theme-guide .stop .ack {
+  min-height: 44px; padding: 10px 18px; font: inherit; font-weight: 600; cursor: pointer;
+  border: 2px solid currentColor; border-radius: 10px; background: transparent;
+}
+.pf-theme-guide .stop .ack:focus-visible { outline: 3px solid var(--pf-focus, #1b1d1a); outline-offset: 2px; }
+.pf-theme-guide .gd-safety-note { font-weight: 600; }
+.pf-theme-guide .guide .stop { margin: 18px 0; padding: 16px 18px; display: grid; gap: 12px; }
+.pf-theme-guide .guide .stop p { margin: 0; }
+.pf-theme-guide .guide .stop .ack { justify-self: start; text-align: left; }
+.pf-theme-guide .guide-head .badges { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 10px 0 0; }
+.pf-theme-guide .guide-head .badges [class^="badge-"] {
+  padding: 4px 12px; border: 1px solid currentColor; border-radius: var(--pf-radius-pill); font-weight: 600; font-size: 0.875rem;
+}
+.pf-theme-guide .guide-head .badges [class^="badge-"]::before { content: "Difficulty: "; font-weight: 400; }
+.pf-theme-guide .guide-head .verdict-line { font-weight: 600; }
+.pf-theme-guide .guide .stop .stop-folded { display: none; font-weight: 600; }
+.pf-js .stop:not(.is-acked) .stop-folded { display: block; }
+/* The guide's end (downloads, hand-off) waits until every stop is acknowledged, so it never reads as the guide's end while steps are folded. */
+.pf-js:has(.stop:not(.is-acked)) .guide-foot { display: none; }
+
+/* Draft notes: the DRAFT text is for the maker; the reader (fixing view) sees the reader-facing note. */
+body.simple .draft-notes .maker-only { display: none; }
+body:not(.simple) .draft-notes .reader-only { display: none; }

@@ -1,0 +1,10 @@
+{# View switch. Canonical page-level switch.
+   Include ONCE per page, outside any repeated card: the checkbox id is
+   page-unique and reader.js binds that one id. Same checkbox reader.js
+   already drives, so the behaviour is unchanged; only the labels and the
+   look are new. Vars: none. #}
+<p class="view-row pf-view-row">
+  <span class="pf-view" role="group" aria-label="Guide view">
+    <label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box"><span class="pf-view-opt" data-filmed data-copy="view.filmed">I filmed this</span><span class="pf-view-opt" data-fixing data-copy="view.fixing">I&#8217;m fixing this</span></label>
+  </span>
+</p>

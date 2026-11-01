@@ -1,0 +1,87 @@
+{% from "partials/ui/loading.html" import state %}
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.page.title }}</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css">
+{# Shared set first: the component stylesheet wins .pf-btn ties. #}
+<link rel="stylesheet" href="/static/ui/loading.css">
+<link rel="stylesheet" href="/static/ui/upload.css">
+<!-- shell.css stays last: its focus ring wins the specificity tie with upload.css. -->
+<link rel="stylesheet" href="/static/ui/shell.css">
+</head>
+<body class="pf-theme-start">
+{% include "partials/ui/shell-header.html" %}
+<main id="main" class="pf-container">
+<div class="pf-upload pf-wrap">
+<div class="pf-up-intro">
+<p class="pf-kicker" data-copy="upload.kicker">{{ c.page.kicker }}</p>
+<h1 class="pf-title" data-copy="upload.title">{{ c.page.headline }}</h1>
+<p class="pf-lede" data-copy="upload.lede">{{ c.page.lede }}</p>
+<ol class="pf-tips" aria-label="{{ c.page.tips_label }}">
+{% for t in c.tips %}<li data-copy="upload.tip_{{ loop.index }}"><b aria-hidden="true">{{ t.mark }}</b><span><strong>{{ t.lead }}</strong> {{ t.text }}</span></li>
+{% endfor %}</ol>
+</div>
+<div class="pf-up-form">
+{% if blocked %}
+<div class="pf-alert" id="blocked"><p>{{ blocked_copy }}</p></div>
+{% endif %}
+{% if error %}
+<div id="server-error">{{ state("upload-failed", body=error) }}</div>
+{% endif %}
+<div class="pf-alert client" id="client-error" role="alert" tabindex="-1" hidden></div>
+{# The shared loading-set error state stays on the page (hidden) so the state
+   names stay consistent; the visible alert above keeps the upload component's
+   exact announced markup, which upload.js fills and focuses. #}
+<div hidden>{{ state("upload-failed") }}</div>
+<section class="pf-panel" aria-label="Upload">
+<span class="pf-sending" aria-hidden="true"></span>
+<form id="upload-form" action="/upload" method="post" enctype="multipart/form-data" data-pf-busy>
+<label class="pf-drop" id="drop-zone" data-copy="upload.drop">
+<span class="pf-drop-idle">
+<svg class="pf-drop-art" viewBox="0 0 96 96" aria-hidden="true"><rect x="22" y="8" width="52" height="80" rx="9"/><path d="M42 80h12"/><circle class="pf-drop-ring" cx="48" cy="46" r="13"/><path class="pf-drop-tri" d="M45 41l9 5-9 5z"/></svg>
+<span class="pf-drop-title">{{ c.page.drop_title }}</span>
+<span class="pf-drop-sub">{{ c.page.drop_before }}<u>{{ c.page.drop_link }}</u></span>
+</span>
+<input id="clip" type="file" name="clip" accept="video/mp4,video/*" required>
+<span class="pf-picked" id="picked-file" aria-live="polite"></span>
+</label>
+<ul class="pf-spec" data-copy="upload.spec">
+{% for i in c.spec %}<li>{{ i.pre }}{% if i.strong %}<strong>{{ i.strong }}</strong>{% endif %}{{ i.post }}</li>
+{% endfor %}</ul>
+<p class="pf-consent" data-copy="upload.consent">{{ c.page.consent }}</p>
+<div class="pf-actions">
+<span class="pf-sample" data-copy="upload.sample">{{ c.page.sample_before }}<a class="pf-btn" href="/guide/sample">{{ c.page.sample_link }}</a></span>
+<button class="pf-btn pf-btn-ghost" type="submit" data-copy="upload.submit">{{ c.page.submit }}</button>
+</div>
+</form>
+</section>
+</div>
+<section class="pf-next" aria-label="{{ c.next.heading }}">
+<h2 data-copy="upload.next_h">{{ c.next.heading }}</h2>
+<ol class="pf-steps">
+<li data-copy="upload.next_1"><div><h3>{{ c.next.step_1_title }}</h3><p>{{ c.next.step_1_text }}</p></div></li>
+<li data-copy="upload.next_2"><div><h3>{{ c.next.step_2_title }}</h3><p>{{ c.next.step_2_text }}</p></div></li>
+<li data-copy="upload.next_3"><div><h3>{{ c.next.step_3_title }}</h3><p>{{ c.next.step_3_text }}</p></div></li>
+</ol>
+</section>
+<footer class="pf-foot" aria-label="{{ c.retention.heading }}">
+<h2 class="pf-foot-h">{{ c.retention.heading }}</h2>
+<p data-copy="upload.retention_processing">{{ c.retention.processing }}</p>
+<p data-copy="upload.retention_meta">{{ c.retention.meta }}</p>
+<p data-copy="upload.retention_published">{{ c.retention.published }}</p>
+<p data-copy="upload.time"><strong>{{ c.time.heading }}.</strong> {{ c.time.text }}</p>
+<p data-copy="upload.delete">{{ c.retention.delete }}<a href="/delete-request">{{ c.retention.delete_link }}</a>{{ c.retention.delete_after }}</p>
+</footer>
+</div>
+</main>
+{% set pf_footer_note = c.page.footer_note %}{% include "partials/ui/shell-footer.html" %}
+<script>window.PARTFIDELITY_LIMITS = {{ limits_json | safe }};</script>
+<script src="/static/upload.js"></script>
+<script src="/static/ui/vendor/gsap.min.js" defer></script>
+<script src="/static/ui/loading.js" defer></script>
+</body>
+</html>

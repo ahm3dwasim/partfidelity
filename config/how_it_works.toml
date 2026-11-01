@@ -1,0 +1,348 @@
+# The /how-it-works page: copy, the six stages and the models table. Loaded strictly by app/how_config.py
+# (a missing or misspelled key fails). Numbers and model names are NOT typed here: write {placeholders}
+# and the loader fills them from app/contracts.py, app/frame_scoring.py and the running settings.
+# Placeholders: {spark} {sam} {spark_open} {runs} {spread_s} {max_steps} {max_video} {ttl_hours} {chunk_s} {overlap_s}
+# {fps} {best_frames} {sam_parts} {sam_thresholds} {sam_calls} {sam_pace} {cutoff} {max_readbacks}
+# No credentials here.
+
+[page]
+title = "How it works"
+meta_description = "How PartFidelity turns a phone video of a repair into a step-by-step guide, stage by stage, and which models do what."
+eyebrow = "How it works"
+headline = "From a phone video to a guide you can follow."
+intro = "Six stages turn a clip of a repair into a guide with numbered steps, clear pictures and the part outlined. Three models do the reading and checking; the rest is ordinary code and fixed rules."
+bench_heading = "See how your video becomes a guide"
+bench_hint = "Scroll through the six stages, or pick one."
+figure_label = "A concept phone drawn as six labelled layers: cover glass, display, mid-frame, battery, logic board and back with the cameras. The layer for the stage you are reading lifts and lights."
+fig_title = "Concept phone"
+fig_hint = "Pick a stage"
+concept_note = "The phone is a concept drawing for this page, not the device in the sample, and each labelled layer stands for one stage. The stages work on video frames and text; no step touches hardware."
+play = "Play the tour"
+pause = "Pause the tour"
+detail_label = "Under the hood"
+hood_heading = "Which model does what"
+hood_intro = "Three Meta models do the reading and checking, and everything else is ordinary code. This table reads its numbers from the app itself."
+limits_heading = "What it does not do"
+limits_body = "No model writes the safety wording, and no model redraws a part: the outline sits on the pixels you filmed. The guide does not prove a repair worked, and only the fan and the battery can be outlined today. Every model call for the sample is listed on the calls page."
+calls_link = "See the calls for the sample"
+cta_heading = "See it on a real repair."
+cta_sample = "Explore the sample"
+cta_upload = "Use your video"
+in_word = "Goes in"
+out_word = "Comes out"
+stage_word = "Stage"
+stepper_label = "Pick a stage"
+illustrative = "Illustrative"
+
+# Who does the work at each stage. Only stages marked "ai" call a model.
+[kinds]
+code = "Ordinary code, no AI"
+ai = "AI model"
+rules = "Fixed rules, no AI"
+
+[[stages]]
+id = "clip"
+part = "Cover glass"
+kind = "code"
+title = "Upload and prepare your video"
+plain = "You choose a phone video of a repair, up to {max_video} long. We make a small preview and send the clip to Meta's file store for the next stage. That copy is held {ttl_hours} hours at most."
+readout = "Clip in · up to {max_video}"
+in_label = "Your phone video"
+in_note = "A repair clip, up to {max_video}"
+out_label = "A stored copy and a preview"
+out_note = "Held {ttl_hours} hours at most"
+op = "The clip is checked, previewed and sent to Meta's file store so the step model can watch it."
+model = "No model"
+detail = "Long clips are cut into {chunk_s}-second windows that overlap by {overlap_s} seconds, then stitched back together. The file store copy expires within {ttl_hours} hours."
+
+[[stages]]
+id = "steps"
+part = "Display"
+kind = "ai"
+title = "The steps are written"
+plain = "An AI model watches the whole video and writes the repair as numbered steps, in order, each with an approximate start and end time."
+readout = "Steps · in order, approximate times"
+in_label = "The whole video"
+in_note = "The clip, as uploaded"
+out_label = "Numbered steps"
+out_note = "In order, with approximate times"
+op = "The model writes each step and the stretch of video it covers. Times are approximate."
+model = "{spark}"
+detail = "{spark} reads the video {runs} times, each answer checked against a strict step format, and the middle start and end times are kept, so one odd reading cannot decide. When the readings differ by more than {spread_s} seconds, the step carries a check-time badge. A guide holds at most {max_steps} steps."
+
+[[stages]]
+id = "frames"
+part = "Mid-frame"
+kind = "code"
+title = "The clearest frames are picked"
+plain = "For each step, ordinary code looks through that stretch of the video and keeps the {best_frames} sharpest, steadiest frames."
+readout = "Frames · best {best_frames} a step"
+in_label = "One step's stretch of video"
+in_note = "Frames sampled {fps} a second"
+out_label = "The {best_frames} clearest frames"
+out_note = "Real frames from your video"
+op = "Each frame is scored: sharp and still scores high, blurred or moving scores low."
+model = "No model"
+detail = "Ordinary code samples {fps} frames a second inside each step and ranks them by sharpness, discounted by how much the picture moved. It keeps the best {best_frames} real frames per step."
+
+[[stages]]
+id = "outline"
+part = "Battery"
+kind = "ai"
+title = "The part is outlined"
+plain = "On those frames, a vision model looks only for the {sam_parts} and scores each find. The guide draws the outline when the score is high enough. Any other part gets no outline and shows as not checked."
+readout = "Outlines · {sam_parts} only"
+in_label = "A kept frame and the part's name"
+in_note = "The {sam_parts} only"
+out_label = "The frame with the part outlined"
+out_note = "Original pixels stay as filmed"
+op = "The model returns a scored box for the part. The guide draws the outline, and keeps it only when the score reaches the minimum for that part."
+model = "{sam}"
+detail = "{sam} looks for the {sam_parts} only and returns a box with a confidence. The box is kept when the confidence reaches the minimum for that part ({sam_thresholds}). At most {sam_calls} calls per guide, paced to {sam_pace} starts a minute. The renderer draws the outline, adds a numbered badge and pastes the original pixels of the part back. For the sample guide, open-weights SAM 3 made the pixel masks from those boxes."
+
+[[stages]]
+id = "check"
+part = "Logic board"
+kind = "ai"
+title = "Doubtful labels get a second look"
+plain = "When an outline's confidence is under {cutoff}, the step model is asked one yes-or-no question about the finished picture. A yes keeps the label; a no removes it."
+readout = "Check · under {cutoff}, up to {max_readbacks}"
+in_label = "A label under {cutoff} confidence"
+in_note = "One yes-or-no question"
+out_label = "Label kept or removed"
+out_note = "At most {max_readbacks} questions a guide"
+op = "A yes keeps the label. A no removes it, and the part shows as not checked."
+model = "{spark}"
+detail = "Labels between the part's minimum and {cutoff} confidence get a read-back on the rendered frame: {spark} answers yes or no on whether the part is visible. Lowest confidence first, at most {max_readbacks} read-backs per guide."
+
+[[stages]]
+id = "guide"
+part = "Back and cameras"
+kind = "rules"
+title = "The guide comes together"
+plain = "Steps, pictures and outlines become a guide you can read on a phone. Safety warnings and the difficulty rating come from fixed rules and wording, not from a model."
+readout = "Guide out · fixed warnings"
+in_label = "Steps, pictures, outlines"
+in_note = "Fixed rules join them"
+out_label = "The finished guide"
+out_note = "Warnings and difficulty are fixed wording"
+op = "Fixed rules turn the step model's hazard tags into warnings and a difficulty rating. No model writes a warning."
+model = "No model"
+detail = "The step model only proposes tags and part words. Every safety sentence is a fixed template, and one ordered rule drives the maker view and the reader view."
+
+[[tech]]
+name = "{spark}"
+does = "Writes the steps from the video, and answers the yes-or-no read-back questions."
+facts = "Stages 2 and 5. {runs} runs per guide, middle times kept."
+
+[[tech]]
+name = "{sam}"
+does = "Finds the part and scores it; the guide draws the outline."
+facts = "Stage 4. The {sam_parts} only. Minimum confidence: {sam_thresholds}."
+
+[[tech]]
+name = "{spark_open}"
+does = "Gives a background second opinion on each label; a disagreement flags the label for a person to review."
+facts = "Background. Never changes a label."
+
+[[tech]]
+name = "Meta file store"
+does = "Holds your clip while the step model watches it."
+facts = "Stage 1. Kept {ttl_hours} hours at most."
+
+[[tech]]
+name = "Frame ranking"
+does = "Picks the sharpest frames. Plain code, no model."
+facts = "Stage 3. {fps} frames a second sampled per step; best {best_frames} kept."
+
+[[tech]]
+name = "Safety and difficulty rules"
+does = "Write every warning and the difficulty rating. Plain code, no model."
+facts = "Stage 6. Fixed wording."
+
+# How a configured model id is shown to people. An id not listed here is shown as it is.
+[names]
+"muse-spark-1.3" = "Muse Spark 1.3"
+"sam-3.1" = "SAM 3.1"
+"meta-models/muse-spark-open-1026" = "Muse Spark Open"
+
+# Figure motion (read by static/ui/how-figure.js through the page).
+[motion]
+dwell_s = 3.6      # seconds the tour rests on each stage
+follow_s = 0.55    # time constant of the eased follow toward the chosen stage
+reading_position = 0.45
+lift = 9
+brightness_inactive = 0.55
+brightness_active = 1.0
+clearance = 16
+
+# A separate illustrative example, with pieces from different stretches of a ThinkPad T480 clip.
+# Frames live in static/ui/media/how/. It does not reproduce the linked sample guide.
+[example]
+clip_name = "Illustrative example · ThinkPad T480 · 3:34"
+provenance = "A separate illustrative example, not the linked sample guide. The pieces come from different stretches of a ThinkPad clip."
+step_index = 3          # which of the steps below the next stages follow (0-based)
+readback_note = "This frame's answer is unknown, so the page does not say which way it went. Both outcomes are shown."
+guide_note = "Illustrative: shown as it would look if the read-back said yes."
+q_text = "Is the battery visible in this picture?"
+yes_text = "yes · keep the label"
+no_text = "no · remove the label"
+kept_text = "kept"
+score_text = "score"
+below_text = "below"
+steps_head = "Steps written"
+runs_head = "Three readings of one step"
+median_text = "middle kept"
+spread_text = "readings differ by"
+badge_text = "check time"
+difficulty_label = "Difficulty"
+difficulty = "Hard"
+frames_head = "Frames of the step, scored"
+guide_step_word = "Step"
+
+[example.sam]
+file = "k124.webp"
+frame_t = 124.0
+size = [1280, 720]
+box = [224, 275, 1022, 530]
+confidence = 0.6718
+part = "battery"
+
+[[example.strip]]
+t = 3
+file = "s3.webp"
+[[example.strip]]
+t = 40
+file = "s40.webp"
+[[example.strip]]
+t = 89
+file = "s89.webp"
+[[example.strip]]
+t = 102
+file = "s102.webp"
+[[example.strip]]
+t = 150
+file = "s150.webp"
+
+[[example.steps]]
+start = 11.5
+end = 17.0
+title = "Flip over and remove external battery"
+[[example.steps]]
+start = 17.0
+end = 31.0
+title = "Disable internal battery in BIOS"
+[[example.steps]]
+start = 64.0
+end = 67.0
+title = "Remove bottom screws"
+[[example.steps]]
+start = 126.0
+end = 135.5
+title = "Screw down and connect battery"
+[[example.steps]]
+start = 141.5
+end = 160.5
+title = "Refit bottom cover"
+[[example.steps]]
+start = 183.5
+end = 192.5
+title = "Check Device Manager"
+
+[[example.runs]]
+start = 126.0
+end = 135.0
+[[example.runs]]
+start = 126.0
+end = 136.0
+[[example.runs]]
+start = 126.0
+end = 136.0
+
+[example.guide]
+hazards = ["battery", "esd"]
+
+[[example.candidates]]
+t = 124
+sharpness = 1405.7
+motion = 0.0
+
+[[example.candidates]]
+t = 124.5
+sharpness = 1361.3
+motion = 7.0
+
+[[example.candidates]]
+t = 125
+sharpness = 1014.5
+motion = 9.2
+
+[[example.candidates]]
+t = 125.5
+sharpness = 684.8
+motion = 52.9
+
+[[example.candidates]]
+t = 126
+sharpness = 839.8
+motion = 15.7
+
+[[example.candidates]]
+t = 126.5
+sharpness = 652.8
+motion = 10.9
+
+[[example.candidates]]
+t = 127
+sharpness = 1508.2
+motion = 67.1
+
+[[example.candidates]]
+t = 127.5
+sharpness = 1541.2
+motion = 5.0
+
+[[example.candidates]]
+t = 128
+sharpness = 1574.1
+motion = 6.1
+
+[[example.candidates]]
+t = 128.5
+sharpness = 1604.8
+motion = 8.7
+
+[[example.candidates]]
+t = 129
+sharpness = 1485.9
+motion = 8.2
+
+[[example.candidates]]
+t = 129.5
+sharpness = 1577.7
+motion = 8.7
+
+[[example.candidates]]
+t = 130
+sharpness = 1052.4
+motion = 16.9
+
+[[example.candidates]]
+t = 130.5
+sharpness = 1190.6
+motion = 7.5
+
+[[example.candidates]]
+t = 131
+sharpness = 554.4
+motion = 71.4
+
+[[example.candidates]]
+t = 131.5
+sharpness = 546.2
+motion = 28.4
+
+[[example.candidates]]
+t = 132
+sharpness = 397.6
+motion = 21.6

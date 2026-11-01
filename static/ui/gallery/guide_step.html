@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light">
+<title>Guide step card — gallery</title>
+@@brand_icons@@
+<link rel="stylesheet" href="../guide_step.css">
+<script src="../../reader.js" defer></script>
+<script src="../../time_controls.js" defer></script>
+<script src="../guide_step.js" defer></script>
+<style>
+  body {
+    margin: 0;
+    background: var(--pf-paper, #f0eee8);
+    color: var(--pf-on-paper, #1b1d1a);
+    font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+  .demo-head { padding: 2rem 0 0; }
+  .demo-head h1 {
+    font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+    font-size: clamp(1.75rem, 4vw + 1rem, 2.5rem);
+    line-height: 1.1;
+    margin: 0;
+  }
+  .demo-note { color: var(--pf-on-paper-muted, #5d5f58); max-width: 40rem; }
+  .demo-foot { padding: 0 0 3rem; color: var(--pf-on-paper-muted, #5d5f58); }
+</style>
+</head>
+<body>
+<div class="pf-wrap">
+  <div class="pf-span demo-head">
+    <h1 data-copy="gallery.title">Guide step card</h1>
+    <p class="demo-note" data-copy="gallery.note">Demo data over consented local footage (never committed). Flip the switch: “I’m fixing this” shows steps only; “I filmed this” adds the label checks and set-start controls.</p>
+    <p class="view-row pf-view-row">
+      <span class="pf-view" role="group" aria-label="Guide view">
+        <label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box"><span class="pf-view-opt" data-filmed data-copy="view.filmed">I filmed this</span><span class="pf-view-opt" data-fixing data-copy="view.fixing">I&#8217;m fixing this</span></label>
+      </span>
+    </p>
+    <div class="pf-filmed-only pf-video-block">
+      <video id="guide-video" controls playsinline></video>
+      <p class="video-note">Pause the video, then “Set start here” takes that time.</p>
+    </div>
+  </div>
+
+  <div class="pf-span">
+    <article class="pf-card" id="step-1">
+      <div class="pf-card-head">
+        <h2 data-copy="step.title">Step 1</h2>
+        <p class="pf-window" data-copy="step.window">~1:01&#8211;1:25 &#183; times are approximate</p>
+      </div>
+      <figure class="pf-frame is-loading">
+        <img src="../media/local/s05_t62s-1280.webp" srcset="../media/local/s05_t62s-640.webp 640w, ../media/local/s05_t62s-1280.webp 1280w" sizes="(max-width: 60rem) 100vw, 60rem" alt="Step 1 frame: Ease the back cover off with a plastic pry tool; parts: base cover" loading="lazy">
+        <span class="pf-pin" id="pin-1-1" style="--x:48.5%;--y:46%;" aria-hidden="true">1</span>
+      </figure>
+      <p class="pf-action" data-copy="step.action">Ease the back cover off with a plastic pry tool and set it aside.</p>
+      <ol class="pf-legend pf-filmed-only" aria-label="Parts in step 1">
+        <li data-pin="pin-1-1" tabindex="0">
+          <span class="pf-n" aria-hidden="true">1</span>
+          <span class="pf-phrase" data-copy="legend.phrase">base cover</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+      </ol>
+      <p class="parts-note pf-filmed-only" data-copy="proof.help">“No visual changes” means the image pixels for this part were not changed. It does not confirm the label is correct.</p>
+      <div class="pf-card-foot pf-filmed-only">
+        <div class="step-time" data-ui data-step="1" data-start="61" data-end="85" data-video="guide-video">
+          <p class="step-window"><span data-window>~1:01&#8211;1:25</span> <span class="approx-note">approximate</span></p>
+          <button type="button" data-set-start data-copy="time.set_start">Set start here</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="pf-card" id="step-2">
+      <div class="pf-card-head">
+        <h2 data-copy="step.title">Step 2</h2>
+        <p class="pf-window" data-copy="step.window">~1:25&#8211;1:50 &#183; times are approximate</p>
+      </div>
+      <figure class="pf-frame is-loading">
+        <img src="../media/local/s09_t89s-1280.webp" srcset="../media/local/s09_t89s-640.webp 640w, ../media/local/s09_t89s-1280.webp 1280w" sizes="(max-width: 60rem) 100vw, 60rem" alt="Step 2 frame: Find the internal battery, the cooling fan and the battery connector; parts: internal battery, cooling fan, battery connector" loading="lazy">
+        <span class="pf-pin" id="pin-2-1" style="--x:33.5%;--y:58%;" aria-hidden="true">1</span>
+        <span class="pf-pin" id="pin-2-2" style="--x:73%;--y:43%;" aria-hidden="true">2</span>
+        <span class="pf-pin" id="pin-2-3" style="--x:63%;--y:33%;" aria-hidden="true">3</span>
+      </figure>
+      <p class="pf-action" data-copy="step.action">Find the internal battery, the cooling fan and the battery connector before you touch anything.</p>
+      <ol class="pf-legend pf-filmed-only" aria-label="Parts in step 2">
+        <li data-pin="pin-2-1" tabindex="0">
+          <span class="pf-n" aria-hidden="true">1</span>
+          <span class="pf-phrase" data-copy="legend.phrase">internal battery</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+        <li data-pin="pin-2-2" tabindex="0">
+          <span class="pf-n" aria-hidden="true">2</span>
+          <span class="pf-phrase" data-copy="legend.phrase">cooling fan</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+        <li data-pin="pin-2-3" tabindex="0">
+          <span class="pf-n" aria-hidden="true">3</span>
+          <span class="pf-phrase" data-copy="legend.phrase">battery connector</span>
+          <span class="pf-proof is-pending" data-copy="proof.pending">Not checked</span>
+        </li>
+      </ol>
+      <p class="parts-note pf-filmed-only" data-copy="proof.help">“No visual changes” means the image pixels for this part were not changed. It does not confirm the label is correct.</p>
+      <div class="pf-card-foot pf-filmed-only">
+        <div class="step-time" data-ui data-step="2" data-start="85" data-end="110" data-video="guide-video">
+          <p class="step-window"><span data-window>~1:25&#8211;1:50</span> <span class="approx-note">approximate</span></p>
+          <p class="check-time" data-copy="time.check">Check time</p>
+          <img class="time-preview" src="../media/local/s09_t89s-640.webp" alt="Preview frame near step 2 start" loading="lazy">
+          <div class="nudge-row" role="group" aria-label="Nudge step 2 start time">
+            <button type="button" data-nudge="-5" data-copy="time.nudge_down">−5s</button>
+            <button type="button" data-nudge="5" data-copy="time.nudge_up">+5s</button>
+          </div>
+          <button type="button" data-set-start data-copy="time.set_start">Set start here</button>
+        </div>
+      </div>
+    </article>
+
+    <article class="pf-card" id="step-3">
+      <div class="pf-card-head">
+        <h2 data-copy="step.title">Step 3</h2>
+        <p class="pf-window" data-copy="step.window">~1:50&#8211;2:15 &#183; times are approximate</p>
+      </div>
+      <figure class="pf-frame is-loading">
+        <img src="../media/local/s16_t124s-1280.webp" srcset="../media/local/s16_t124s-640.webp 640w, ../media/local/s16_t124s-1280.webp 1280w" sizes="(max-width: 60rem) 100vw, 60rem" alt="Step 3 frame: Disconnect the battery connector, then lift the battery out; parts: internal battery, cooling fan, battery connector" loading="lazy">
+        <span class="pf-pin" id="pin-3-1" style="--x:49%;--y:60%;" aria-hidden="true">1</span>
+        <span class="pf-pin" id="pin-3-2" style="--x:73%;--y:26%;" aria-hidden="true">2</span>
+        <span class="pf-pin" id="pin-3-3" style="--x:59%;--y:37.5%;" aria-hidden="true">3</span>
+      </figure>
+      <p class="pf-action" data-copy="step.action">Disconnect the battery connector from the system board before touching any other part.</p>
+      <div class="pf-hazard" role="note">
+        <p class="pf-hazard-title" data-copy="hazard.battery.title">Hard stop. See a professional before you go on.</p>
+        <p data-copy="hazard.battery.text">A live board can short and destroy the drive. Keep metal tools away from the board.</p>
+      </div>
+      <ol class="pf-legend pf-filmed-only" aria-label="Parts in step 3">
+        <li data-pin="pin-3-1" tabindex="0">
+          <span class="pf-n" aria-hidden="true">1</span>
+          <span class="pf-phrase" data-copy="legend.phrase">internal battery</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+        <li data-pin="pin-3-2" tabindex="0">
+          <span class="pf-n" aria-hidden="true">2</span>
+          <span class="pf-phrase" data-copy="legend.phrase">cooling fan</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+        <li data-pin="pin-3-3" tabindex="0">
+          <span class="pf-n" aria-hidden="true">3</span>
+          <span class="pf-phrase" data-copy="legend.phrase">battery connector</span>
+          <span class="pf-proof is-ok" data-copy="proof.ok">No visual changes to this part</span>
+        </li>
+      </ol>
+      <p class="parts-note pf-filmed-only" data-copy="proof.help">“No visual changes” means the image pixels for this part were not changed. It does not confirm the label is correct.</p>
+      <div class="pf-card-foot pf-filmed-only">
+        <div class="step-time" data-ui data-step="3" data-start="110" data-end="135" data-video="guide-video">
+          <p class="step-window"><span data-window>~1:50&#8211;2:15</span> <span class="approx-note">approximate</span></p>
+          <button type="button" data-set-start data-copy="time.set_start">Set start here</button>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <div class="pf-span demo-foot">
+    <p data-copy="gallery.foot">Gallery demo only: positions, times and statuses are illustrative. Live cards position pins from Detection.box_xyxy as frame-size percentages.</p>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+/* Preview (confirm before we send). The exact clip framed on
+   the left, what happens to it on the right, then the two checks and the
+   one orange action. Every sentence, id and form the consent flow relies
+   on stays as it was. Colours and fonts come from tokens.css only. */
+.pf-pv { padding-block: clamp(36px, 7vw, 88px) clamp(32px, 5vw, 64px); }
+.pf-pv .pf-kicker {
+  margin: 0;
+  font: 500 0.75rem/1 var(--pf-font-body);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pf-on-ink-dim);
+}
+.pf-pv h1 {
+  margin: 18px 0 14px; max-width: 18ch;
+  font-size: clamp(2.25rem, 4.6vw, 4rem); line-height: 1.04; letter-spacing: -0.01em;
+}
+.pf-pv-meta { margin: 0; font: 0.8125rem/1.5 var(--pf-font-mono); color: var(--pf-on-ink-dim); overflow-wrap: anywhere; }
+.pf-pv-cols {
+  display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(28px, 5vw, 80px); align-items: start;
+  margin-top: clamp(28px, 4vw, 48px);
+}
+.pf-pv-frame {
+  padding: clamp(12px, 2vw, 22px);
+  border: 1px solid var(--pf-ink-line); border-radius: var(--pf-radius-panel);
+  background: var(--pf-ink-2);
+}
+.pf-pv-frame video { display: block; width: 100%; max-height: 62svh; border-radius: 8px; background: var(--pf-ink); }
+.pf-pv-note { margin: 14px 0 0; font-size: 0.875rem; color: var(--pf-on-ink-muted); max-width: 52ch; }
+
+.pf-pv-facts { list-style: none; margin: 0; padding: 0; }
+.pf-pv-facts li { padding: 14px 0; border-top: 1px solid var(--pf-ink-line); }
+.pf-pv-facts li:last-child { border-bottom: 1px solid var(--pf-ink-line); }
+.pf-pv-facts p { margin: 0; font-size: 0.9375rem; color: var(--pf-on-ink-muted); }
+.pf-pv-facts strong { display: block; margin-bottom: 2px; font: 400 1.125rem/1.3 var(--pf-font-display); color: var(--pf-on-ink); }
+
+.pf-pv-notice, .pf-pv-state {
+  margin: 22px 0 0; padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--pf-warn-line); border-left: 3px solid var(--pf-danger);
+  background: var(--pf-warn-bg); color: var(--pf-warn-text); font-size: 0.9375rem;
+}
+.pf-pv-state.is-ok { border-color: var(--pf-ink-line); border-left-color: var(--pf-ok); background: var(--pf-ink-2); color: var(--pf-on-ink); }
+
+.pf-pv-confirm { display: grid; gap: 12px; margin-top: 26px; }
+.pf-pv-check {
+  display: grid; grid-template-columns: 22px 1fr; gap: 12px; align-items: start;
+  padding: 14px 16px; border: 1px solid var(--pf-ink-line); border-radius: 12px;
+  font-size: 0.9375rem; color: var(--pf-on-ink); cursor: pointer;
+  transition: border-color var(--pf-motion-ui) var(--pf-ease);
+}
+.pf-pv-check:hover { border-color: var(--pf-ink-line-strong); }
+.pf-pv-check:has(input:checked) { border-color: var(--pf-accent); }
+.pf-pv-check input { width: 20px; height: 20px; margin: 2px 0 0; accent-color: var(--pf-accent); }
+.pf-pv-confirm .pf-pill { justify-self: start; margin-top: 8px; }
+.pf-pv-cancel { margin-top: 12px; }
+.pf-pv a.pf-pill { color: var(--pf-on-ink); }
+
+@media (max-width: 860px) {
+  .pf-pv-cols { grid-template-columns: minmax(0, 1fr); }
+  .pf-pv-confirm .pf-pill, .pf-pv-cancel .pf-pill { width: 100%; }
+}

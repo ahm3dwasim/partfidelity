@@ -1,0 +1,20 @@
+{
+  "_note": "Observed Meta Files API (v1) shapes from a live session (2026-10-27). Field names and value types only; file ids appear solely as <file-id>; no key, no contents, no real identifiers. The upload answer, the GET answer, and every list item share one 8-field file document; created_at and expires_at are unix-seconds ints.",
+  "file_document": {
+    "bytes": "int",
+    "created_at": "int unix-seconds",
+    "expires_at": "int unix-seconds",
+    "filename": "str",
+    "id": "str <file-id>",
+    "object": "str",
+    "purpose": "str",
+    "status": "str"
+  },
+  "list_top": {
+    "data": ["file_document"],
+    "first_id": "str <file-id>",
+    "has_more": "bool",
+    "last_id": "str <file-id>",
+    "object": "str"
+  }
+}

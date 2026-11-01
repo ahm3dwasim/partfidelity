@@ -1,0 +1,477 @@
+/* Guide step card + view switch.
+   Manual look on the shared --pf-* tokens (the shared token file); every var carries a
+   fallback so this file works before the shared tokens.css lands.
+   Zero network: only relative font URLs. Pins are server-rendered spans,
+   positioned from part boxes as --x/--y percentages; JS only highlights. */
+
+@font-face {
+  font-family: "Fraunces";
+  src: url("fonts/Fraunces-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/Inter-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("fonts/Inter-600-normal.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 12-col desktop / 4-col phone grid for guide surfaces. */
+.pf-wrap {
+  max-width: 72rem;
+  margin-inline: auto;
+  padding-inline: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+.pf-span { grid-column: 1 / -1; }
+@media (min-width: 60rem) {
+  .pf-wrap { grid-template-columns: repeat(12, 1fr); gap: 1.5rem; padding-inline: 1.5rem; }
+  .pf-span { grid-column: 3 / 11; }
+}
+
+/* Step card: Manual paper, full-width frame, legend, proof badge. */
+.pf-card {
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  overflow: clip;
+  margin-block: 1.5rem;
+}
+.pf-card-head {
+  padding: 1.25rem 1.25rem 0;
+}
+.pf-card-head h2, .pf-card-head h3 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+  line-height: 1.2;
+  margin: 0;
+}
+.pf-window {
+  color: var(--pf-on-paper-muted, #5d5f58);
+  margin: 0.25rem 0 0;
+}
+.pf-action {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  margin: 0.75rem 0 0;
+  padding-inline: 1.25rem;
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+}
+
+/* Full-width real frame with numbered pins. The skeleton pulse runs only
+   while the is-loading class is set; guide_step.js removes it once the img
+   decodes (or errors), so no card keeps animation work after its frame is
+   visible. Live cards override the aspect ratio inline when the server
+   knows the frame size, so pins point at the right pixels. */
+.pf-frame {
+  position: relative;
+  margin: 1rem 0 0;
+  aspect-ratio: 16 / 9;
+  background: var(--pf-paper-line, #dcd8cf);
+  overflow: clip;
+}
+.pf-frame.is-loading {
+  animation: pf-pulse 1.6s ease-in-out infinite;
+}
+.pf-frame img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@keyframes pf-pulse {
+  50% { background-color: #e9e5d9; }
+}
+.pf-pin {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: 50%;
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.35);
+  display: grid;
+  place-items: center;
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  line-height: 1;
+}
+.pf-pin.on {
+  background: var(--pf-on-paper, #1b1d1a);
+  color: var(--pf-paper-2, #faf9f5);
+}
+
+/* Legend: number -> part phrase + proof badge. */
+.pf-legend {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0 1.25rem;
+}
+.pf-legend li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.625rem 0;
+  border-top: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 2px;
+}
+.pf-n {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+  display: inline-grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  transform: translateY(0.1875rem);
+}
+.pf-phrase { flex: 1 1 auto; }
+
+/* Calm proof badge: quiet dot + status text. Pending is neutral. */
+.pf-proof {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  padding: 0.1875rem 0.75rem;
+  border-radius: 10px;
+}
+.pf-proof::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: currentColor;
+  flex: none;
+}
+.pf-proof.is-ok {
+  background: #e9f2ec;
+  color: #1e6b3a;
+}
+.pf-proof.is-pending {
+  background: transparent;
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  color: var(--pf-on-paper-muted, #5d5f58);
+}
+
+/* Hazard block: calm wash, danger title, no left-border accent. */
+.pf-hazard {
+  margin: 1rem 1.25rem 0;
+  padding: 1rem 1.25rem;
+  background: #f8e9e4;
+  border: 1px solid #e3b8ad;
+  border-radius: 10px;
+}
+.pf-hazard-title {
+  margin: 0;
+  font-weight: 600;
+  color: var(--pf-danger, #c2331f);
+}
+.pf-hazard p { margin: 0.25rem 0 0; }
+.pf-card-foot { padding: 0 1.25rem 1.25rem; }
+
+/* View switch: "I filmed this" (full) / "I'm fixing this" (steps only).
+   A real checkbox drives it, so reader.js behaviour is unchanged; the box
+   is visually hidden but stays focusable, ring on the whole control. */
+.pf-view-row { margin: 1.5rem 0 0; }
+.pf-view-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: var(--pf-paper-2, #faf9f5);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  padding: 0.25rem;
+  cursor: pointer;
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+}
+.pf-view-label:focus-within {
+  outline: 3px solid var(--pf-on-paper, #1b1d1a);
+  outline-offset: 2px;
+}
+.pf-view-box {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.pf-view-opt {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--pf-on-paper-muted, #5d5f58);
+  white-space: nowrap;
+}
+.pf-view-box:not(:checked) ~ [data-filmed],
+.pf-view-box:checked ~ [data-fixing] {
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+}
+
+/* Fixing view hides filmed-only detail. reader.js toggles body.simple on
+   the reader page; the maker page includes the same script for the same.
+   Live .parts/.badges-list carry pf-filmed-only from their renderers, so
+   no separate selector is needed; pins hide too since their numbered
+   legend is gone. */
+body.simple .pf-filmed-only { display: none; }
+body.simple .pf-pin { display: none; }
+body.simple .guide .tools,
+body.simple .guide .check-time,
+body.simple .guide .part-shot figcaption { display: none; }
+
+/* Maker-guide cards (.guide) take the Manual card look. Frame bleeds. */
+.guide .card {
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  border-color: var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  padding-inline: 0;
+  overflow: clip;
+}
+.guide .card > :not(.shot):not(.part-shot) { margin-inline: 1.25rem; }
+.guide .card header h2 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+.guide .card ul.tools, .guide .card ul.parts { padding-left: 1.25rem; }
+.guide .shot img, .guide .part-shot img {
+  border-radius: 0;
+  border-inline: none;
+}
+.guide .toggle {
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  border: 2px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+}
+.guide .status-ok, .guide .status-unchecked {
+  border-radius: 10px;
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+}
+.guide .status-ok { background: #e9f2ec; color: #1e6b3a; }
+.guide .status-unchecked {
+  background: transparent;
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  color: var(--pf-on-paper-muted, #5d5f58);
+}
+/* Live guide figure keeps the card's shot spacing; legend rows wrap so the
+   labelled toggle figure drops to its own row under phrase + badge. */
+.guide .shot.pf-frame { margin: 1rem 0; }
+.guide .parts li { flex-wrap: wrap; }
+.guide .parts .part-shot { flex: 1 1 100%; margin: 0.5rem 0 0; }
+
+/* Reader cards (#main .step) take the same Manual look. */
+#main .step {
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  padding-inline: 0;
+  overflow: clip;
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+}
+#main .step > :not(figure) { margin-inline: 1.25rem; }
+#main .step > h3 {
+  font-family: var(--pf-font-display-guide, "Fraunces"), Georgia, serif;
+  font-weight: 600;
+  font-size: 1.5rem;
+}
+#main .step figure { margin-bottom: 0; }
+#main .step img { border-radius: 0; }
+#main .step figcaption { margin-inline: 1.25rem; }
+#main .chips li { border-radius: 10px; }
+#main .badges-list .badge { border-radius: 10px; }
+#main .badges-list .badge.is-ok { background: #e9f2ec; color: #1e6b3a; }
+#main .badges-list .badge.is-pending {
+  background: transparent;
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  color: var(--pf-on-paper-muted, #5d5f58);
+}
+#main .stop {
+  background: #f8e9e4;
+  border: 1px solid #e3b8ad;
+  border-radius: 10px;
+  padding: 1rem 1.25rem;
+  margin-top: 0;
+  /* Dark pages inherit light text; this panel keeps its pale ground, so it
+     carries its own dark text (AA on #f8e9e4). */
+  color: #2a1812;
+}
+#main .stop strong { color: #8a1c0a; }
+#main .stop a, #main .stop .ack { color: #7a1a0c; }
+#main .stop .long-mark { background: #efd2c8; color: #2a1812; }
+/* Reader pins sit in a .pf-frame nested inside the card's figure, so the
+   frame takes no margin of its own; the outer figure keeps its spacing. */
+#main .step .pf-frame { margin: 0; }
+
+/* Time controls (partials/time_controls.html) restyled, behaviour kept. */
+.step-time .check-time {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  background: #f9eed6;
+  color: var(--pf-amber-ink, #1a1300);
+  border-radius: 10px;
+  font-weight: 600;
+}
+.step-time .nudge-row {
+  display: flex;
+  gap: 0.625rem;
+  margin: 0.625rem 0;
+}
+.step-time .time-preview {
+  border-radius: 10px;
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+.step-time [data-nudge], .step-time [data-set-start] {
+  font-family: var(--pf-font-body, "Inter"), system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  border: 1px solid var(--pf-paper-line, #dcd8cf);
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  cursor: pointer;
+}
+.step-time [data-set-start] {
+  background: var(--pf-amber, #f0a400);
+  border-color: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+}
+
+/* Filmed-view video target for per-step data-set-start on reader pages. */
+.pf-video-block { margin: 1rem 0 0; }
+#guide-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  background: #171410;
+  border-radius: 10px;
+}
+.pf-video-block .video-note {
+  margin: 0.375rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--pf-on-paper-muted, #5d5f58);
+}
+
+.pf-card :focus-visible, .pf-view-label :focus-visible { outline-offset: 2px; }
+.pf-legend li:focus-visible {
+  outline: 3px solid var(--pf-on-paper, #1b1d1a);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-frame { animation: none; }
+  .pf-frame.is-loading { animation: none; }
+  .pf-card *, .pf-view-label, .pf-view-opt {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Correction control: one rename/delete per part row. It lives
+   inside the filmed-only legend, so fixing view never shows it. */
+.guide .fix-label { flex: 1 1 100%; margin: 0.5rem 0 0; }
+.guide .fix-label summary {
+  cursor: pointer;
+  color: var(--pf-amber-deep, #7a5200);
+  font-weight: 600;
+  font-size: 0.9375rem;
+}
+.guide .fix-form { display: flex; flex-wrap: wrap; align-items: end; gap: 0.5rem; margin-top: 0.5rem; }
+.guide .fix-form label { display: grid; gap: 0.25rem; font-size: 0.9375rem; flex: 1 1 14rem; }
+.guide .fix-form input[type="text"] {
+  font: inherit;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--pf-paper-line, #dcd8cf);
+  border-radius: 10px;
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+}
+.guide .fix-form button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  min-height: 2.75rem;
+  border-radius: 10px;
+  border: 2px solid var(--pf-on-paper, #1b1d1a);
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+  cursor: pointer;
+}
+.guide .fix-form button.fix-delete {
+  background: transparent;
+  color: var(--pf-danger, #c2331f);
+  border-color: var(--pf-danger, #c2331f);
+}
+.guide .fix-note {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--pf-ok, #2f7d4f);
+  background: var(--pf-paper-2, #faf9f5);
+  font-weight: 600;
+}
+.guide .fix-note.is-error { border-left-color: var(--pf-danger, #c2331f); color: var(--pf-danger, #c2331f); }
+.guide .guide-downloads { display: flex; flex-wrap: wrap; gap: 0.75rem 1.5rem; }
+.guide .dl-link { color: var(--pf-amber-deep, #7a5200); font-weight: 600; }
+
+/* Second-check flag: a neutral review note under a label another AI check disagreed with.
+   Deliberately not the danger colour: it asks for a look, it does not say the label is wrong.
+   No motion, so reduced motion needs nothing. */
+.guide .second-check-flag {
+  flex: 1 1 100%;
+  margin: 0.5rem 0 0;
+  padding: 0.5rem 0.75rem;
+  border-left: 4px solid var(--pf-on-paper-muted, #5d5f58);
+  background: var(--pf-paper-2, #faf9f5);
+  color: var(--pf-on-paper, #1b1d1a);
+  font-size: 0.9375rem;
+}
+.guide .second-check-flag.is-confirmed { border-left-color: var(--pf-ok, #2f7d4f); }
+.guide .second-check-flag.is-unavailable { border-left-style: dashed; }
+.guide .second-check-flag:focus-visible,
+.guide .second-check-flag button:focus-visible { outline: 3px solid var(--pf-focus, #131313); outline-offset: 2px; }
+.guide .second-check-flag p { margin: 0; }
+.guide .second-check-flag form { margin-top: 0.5rem; }
+.guide .second-check-flag button {
+  font: inherit;
+  font-weight: 600;
+  padding: 0.5rem 1rem;
+  min-height: 2.75rem;
+  border-radius: 10px;
+  border: 2px solid var(--pf-on-paper, #1b1d1a);
+  background: transparent;
+  color: var(--pf-on-paper, #1b1d1a);
+  cursor: pointer;
+}
+.guide .parts-note { margin: 0.5rem 0; font-size: 0.875rem; color: var(--pf-on-paper-muted, #5d5f58); }

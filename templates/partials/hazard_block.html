@@ -1,0 +1,19 @@
+{# Safety blocks. Expects `draft_banner` (universal banner text),
+   `draft_reasons` (tuple, may be empty), and `warnings` (sequence of
+   HazardWarning: tag, text, steps). All safety text is fixed upstream;
+   this partial never edits, truncates, or paraphrases it. #}
+<p class="pf-draft-banner" data-draft-banner>{{ draft_banner }}</p>
+{% if draft_reasons %}
+<div class="pf-draft-flag" role="note" data-draft-flag>
+  {% for reason in draft_reasons %}
+  <p>{{ reason }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% for warning in warnings %}
+<section class="pf-warning" aria-label="Warning: {{ warning.tag }}" data-warning="{{ warning.tag }}">
+  <p class="pf-warning-title">Warning: {{ warning.tag }}</p>
+  <p class="pf-warning-text">{{ warning.text }}</p>
+  <p class="pf-warning-steps">Applies to step{% if warning.steps|length != 1 %}s{% endif %} {{ warning.steps|join(", ") }}.</p>
+</section>
+{% endfor %}

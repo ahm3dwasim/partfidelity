@@ -1,0 +1,29 @@
+{# Reader hard stop. Expects `stop` (ReaderStop: step_number, title,
+   text, cta, reason) and `acknowledged` (bool). The stop text is rendered
+   in full in both states: never apply a truncate filter here.
+   Server rule: render only deliverable_steps(steps, stops, acknowledged),
+   so steps after an unacknowledged stop never leave the server. The form
+   POSTs the immutable guide revision and stop id to the hazard handler; only its
+   validated server record can make a later render acknowledged. Browser
+   storage records pending UI state only and never reveals steps. #}
+<section class="pf-hard-stop" role="alert" aria-label="Stop here"
+    data-hard-stop="{{ stop.step_number }}" data-stop-id="{{ stop.stop_id }}"
+    data-guide-revision="{{ guide_revision if guide_revision is defined else '' }}"
+    data-acknowledged="{{ 'true' if acknowledged else 'false' }}">
+  <p class="pf-hard-stop-title">{{ stop.title }}</p>
+  <p class="pf-hard-stop-text">{{ stop.text }}</p>
+  {% if acknowledged %}
+  <p class="pf-hard-stop-acked" data-hard-stop-acked>Acknowledged. {{ stop.cta }}.</p>
+  {% elif guide_id is defined and guide_id and guide_revision is defined and guide_revision and acknowledge_url is defined and acknowledge_url and stop.stop_id %}
+  <form method="post" action="{{ acknowledge_url }}" data-hard-stop-form>
+    <input type="hidden" name="guide_id" value="{{ guide_id }}">
+    <input type="hidden" name="guide_revision" value="{{ guide_revision }}">
+    <input type="hidden" name="stop_id" value="{{ stop.stop_id }}">
+    <button type="submit" class="pf-hard-stop-button" data-hard-stop-ack>
+    I understand. {{ stop.cta }}.
+    </button>
+  </form>
+  {% else %}
+  <p class="pf-hard-stop-locked">Acknowledgement unavailable. Later steps remain locked.</p>
+  {% endif %}
+</section>

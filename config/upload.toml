@@ -1,0 +1,101 @@
+# Copy for the upload page (/upload) and the confirmation step (/preview/<id>).
+# Read by app/upload_config.py, which fails loudly on a missing, misspelled or
+# mistyped key or an unknown {placeholder}. Limits and hours are never typed
+# here: they come from the code that enforces them (app/uploads.py,
+# app/contracts.py, app/meta_files.py) and are filled in as placeholders:
+#   {duration} upload length limit   {size} upload size limit
+#   {recipient} who receives the clip  {meta_hours} Meta copy expiry
+#   {local_hours} our processing-copy expiry
+#
+# Retention facts below were read from the backend, not assumed. The copy makes
+# no unverified promise and gives one consistent statement.
+
+[page]
+title = "Make a guide — PartFidelity"
+kicker = "Make a guide · 01"
+headline = "Start with your video."
+lede = "A single recording of your own footage can become a guide someone else can follow."
+tips_label = "Before you upload"
+drop_title = "Choose a clip."
+drop_before = "Drop it here, or "
+drop_link = "browse your files"
+consent = "By uploading you confirm this is your own footage and you may share it. Nothing is sent to Meta until you confirm on the next screen, where you see who receives it and how long each copy is kept."
+sample_before = "No clip handy? "
+sample_link = "See a sample guide"
+submit = "Continue to preview"
+footer_note = "nothing goes to Meta until you confirm"
+
+[[tips]]
+mark = "I."
+lead = "Film it clearly."
+text = "Keep the part and your hands in view, one step at a time."
+
+[[tips]]
+mark = "II."
+lead = "Think safety first."
+text = "Power off and unplug the device before working inside it. Stop if the battery is swollen."
+
+[[tips]]
+mark = "III."
+lead = "Keep it short."
+text = "Up to {duration}, one repair. We cap the video at 1080p and remove the audio."
+
+# The limit pills: pre + strong + post.
+[[spec]]
+pre = "Up to "
+strong = "{duration}"
+post = ""
+
+[[spec]]
+pre = ""
+strong = "{size}"
+post = " max"
+
+[[spec]]
+pre = ""
+strong = "MP4"
+post = ""
+
+[[spec]]
+pre = "Audio is removed"
+strong = ""
+post = ""
+
+[next]
+heading = "What happens next"
+step_1_title = "You check the clip"
+step_1_text = "Watch the exact cut that will be used, then confirm."
+step_2_title = "We find the steps"
+step_2_text = "You see each stage as it happens, with elapsed time for each stage."
+step_3_title = "You pass it on"
+step_3_text = "Numbered steps illustrated with still frames from your clip, ready to save or share."
+
+# Retention, said once and the same on both pages. Three different things:
+# our temporary processing copy, Meta's temporary copy, and the published
+# guide's video.
+[retention]
+heading = "What we keep, and for how long"
+processing = "Our processing copy: the trimmed clip we make is deleted about {local_hours} hours after you upload it (our cleanup runs hourly), or at once if you cancel."
+meta = "Meta's copy: sent only after you confirm. It expires within {meta_hours} hours at the latest, and we ask Meta to delete it as soon as we have finished reading it."
+published = "If you publish a guide, your video stays with it until you delete the guide."
+delete = "Need a file removed? "
+delete_link = "Send a delete request"
+delete_after = "."
+
+# Time: no measured typical time exists, so none is claimed.
+[time]
+heading = "How long it takes"
+text = "We have no measured typical time yet. It depends on your clip's length and how busy the models are. The progress page shows elapsed time for each stage, and a run that goes past its time limit stops and says why."
+
+[preview]
+title = "Confirm before we send — PartFidelity"
+kicker = "Make a guide · 02"
+headline = "Check the exact video before we send it"
+note = "This is the exact trimmed, audio-free file we will send. What you see here is what goes."
+recipient_lead = "Who gets it:"
+recipient_text = "{recipient} (model API). We send nothing until you confirm below."
+consent_agree = "I agree to send this exact video to {recipient} for guide building, kept as described above."
+consent_rights = "This is my own footage and I have permission to use it."
+confirm = "Confirm and send"
+cancel = "Cancel and delete now"
+footer_note = "confirm to send · cancel to delete now"

@@ -1,0 +1,9 @@
+{
+  "job_id": "job-trim",
+  "steps": [{"number": 1, "start_s": 0.0, "end_s": 10.0, "action": "Remove the cover", "tools": [], "parts": [], "hazards": [], "time_spread_s": 0.0, "time_needs_check": false}],
+  "frame_paths": [],
+  "labels": [],
+  "difficulty": "Easy",
+  "verdict": "DRAFT",
+  "draft_reasons": []
+}

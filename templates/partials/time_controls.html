@@ -1,0 +1,12 @@
+<div class="step-time" data-ui data-step="{{ number }}" data-start="{{ start }}" data-end="{{ end }}" data-video="{{ video_element_id }}">
+  <p class="step-window"><span data-window>{{ window }}</span> <span class="approx-note">approximate</span></p>
+  {% if flagged %}
+  <p class="check-time">Check time</p>
+  <img class="time-preview" src="{{ preview_frame_url }}" alt="Preview frame near step {{ number }} start" loading="lazy">
+  <div class="nudge-row" role="group" aria-label="Nudge step {{ number }} start time">
+    <button type="button" data-nudge="-5">−5s</button>
+    <button type="button" data-nudge="5">+5s</button>
+  </div>
+  {% endif %}
+  <button type="button" data-set-start>Set start here</button>
+</div>

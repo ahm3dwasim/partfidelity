@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{KICKER}} · PartFidelity</title>
+<style>
+{{GUIDE_CSS}}
+</style>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/guide_step.css">
+<link rel="stylesheet" href="/static/ui/guide-page.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+<script src="/static/reader_stop.js"></script>
+<script src="/static/reader.js" defer></script>
+<!-- ui-guide-step: filmed-view set-start controls need the time-control script. -->
+<script src="/static/time_controls.js" defer></script>
+<script src="/static/ui/guide_step.js" defer></script>
+<script src="/static/ui/guide-page.js" defer></script>
+</head>
+<body class="pf-theme-guide">
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="skip" href="#main">Skip to content</a>
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+<main id="main" class="guide">
+  <header class="guide-head">
+    <div class="gd-head-row">
+      <div>
+        <p class="kicker">{{KICKER}}</p>
+        <h1>Fix it step by step</h1>
+        {{DIFFICULTY}}
+        <p class="meta">{{STEP_COUNT}} steps · times are approximate · photos are the original frames</p>
+      </div>
+      <div class="pf-view-row"><span class="pf-view" role="group" aria-label="Guide view"><label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box"><span class="pf-view-opt" data-filmed data-copy="view.filmed">I filmed this</span><span class="pf-view-opt" data-fixing data-copy="view.fixing">I&#8217;m fixing this</span></label></span></div>
+    </div>
+    {{SAMPLE_NOTE}}
+    {{SAFETY}}
+    <div class="draft-notes">{{DRAFT_NOTES}}</div>
+    {{FIX_NOTE}}
+  </header>
+  <div class="guide-cols" data-guide="{{JOB_ID}}" data-toast-ms="{{TOAST_MS}}" data-observer-top="{{OBSERVER_TOP}}" data-observer-bottom="{{OBSERVER_BOTTOM}}" data-observer-hold="{{OBSERVER_HOLD}}">
+    <div class="guide-video">
+      <div class="gd-stage" id="gd-stage">
+        <div class="gd-screen">
+          <p class="gd-badge" aria-live="polite"><i aria-hidden="true"></i><span id="gd-badge">Original frame</span></p>
+          <!-- ui-guide-step: filmed-view video target for per-step data-set-start. -->
+          <div class="pf-filmed-only pf-video-block">
+          <video id="guide-video" controls playsinline{{GUIDE_VIDEO_ATTRS}}></video>
+          </div>
+          <div class="gd-pic"><img class="gd-frame" id="gd-frame" alt="Frame for the step you are on" hidden><div class="gd-pins" id="gd-pins"></div></div>
+        </div>
+        <div class="gd-ctl" hidden>
+          <button type="button" class="gd-play" id="gd-play" aria-label="Play the clip from this step"><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5l9 5.5-9 5.5z" fill="currentColor"/></svg></button>
+          <span class="gd-t" id="gd-start">0:00</span>
+          <span class="gd-track" aria-hidden="true"><i id="gd-track"></i></span>
+          <span class="gd-t" id="gd-end">0:00</span>
+          <span class="gd-sw"><span class="gd-tag" id="gd-out-label">Outlines</span><button type="button" id="gd-outlines" aria-pressed="true" aria-labelledby="gd-out-label gd-outlines">On</button></span>
+        </div>
+        <p class="gd-cap"><span id="gd-cap">Original frame from your clip</span><span id="gd-count"></span></p>
+        <p class="gd-stage-note" id="gd-stage-note" role="note" hidden></p>
+{{NOW_PLAYING}}
+        <p class="video-note pf-filmed-only">Pause the video, then “Set start here” takes that time.</p>
+      </div>
+    </div>
+    <div class="guide-steps">
+{{CARDS}}
+    </div>
+  </div>
+  <footer class="guide-foot">
+    <p class="kicker">Done</p>
+    <h2>Ready to pass it on?</h2>
+    <p class="gd-end-lede">Save the numbered step images, or the whole guide as one offline page. Labels are drawn on copies of your frames. The part itself is never redrawn.</p>
+    <p class="guide-downloads">{{DOWNLOADS}}</p>
+    <p class="gd-end-links">{{CALLS_LINK}} <a href="/upload">Make a guide</a></p>
+  </footer>
+</main>
+<div class="pf-toast" id="gd-toast" role="status" aria-live="polite"></div>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">Labels are drawn on copies of your frames. The part itself is never redrawn.</p>
+<p data-copy="footer.shell"><a href="/built">How this was built</a> · PartFidelity · guides from your own footage</p>
+</div></footer>
+<script>
+document.querySelectorAll("button.toggle").forEach(function (button) {
+  button.addEventListener("click", function () {
+    var img = document.getElementById(button.dataset.shot);
+    if (!img || !img.dataset.labelled) return;
+    var showingLabelled = img.getAttribute("src") === img.dataset.labelledPng;
+    img.setAttribute("src", showingLabelled ? img.dataset.originalPng : img.dataset.labelledPng);
+    var set = showingLabelled ? img.dataset.originalSrcset : img.dataset.labelledSrcset;
+    var source = img.parentNode.querySelector("source");
+    if (source && set) source.setAttribute("srcset", set);
+    button.setAttribute("aria-pressed", showingLabelled ? "true" : "false");
+    button.textContent = showingLabelled ? "Show labelled" : "Show original";
+  });
+});
+</script>
+</body>
+</html>

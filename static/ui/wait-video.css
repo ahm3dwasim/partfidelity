@@ -1,0 +1,177 @@
+/* Waiting screen: own-video viewer with live part outlines.
+   Workshop look. Every token carries its value from the shared token file as a
+   fallback, so the gallery demo works before tokens.css loads. */
+.wv {
+  --wv-ink: var(--pf-ink, #131313);
+  --wv-ink-2: var(--pf-ink-2, #1d1d1d);
+  --wv-line: var(--pf-ink-line, #2c2c2c);
+  --wv-fg: var(--pf-on-ink, #f2f0eb);
+  --wv-muted: var(--pf-on-ink-muted, #a9a59c);
+  --wv-amber: var(--pf-amber, #f0a400);
+  --wv-amber-ink: var(--pf-amber-ink, #1a1300);
+  --wv-danger: var(--pf-danger, #c2331f);
+  --wv-ok: var(--pf-ok, #2f7d4f);
+  --wv-display: var(--pf-font-display-start, "Oswald", "Arial Narrow", sans-serif);
+  --wv-body: var(--pf-font-body, "Inter", system-ui, sans-serif);
+  --wv-mono: var(--pf-font-mono, ui-monospace, monospace);
+  background: var(--wv-ink);
+  color: var(--wv-fg);
+  font-family: var(--wv-body);
+}
+
+.wv-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 16px;
+}
+
+.wv-viewer { grid-column: 1 / -1; }
+.wv-rail { grid-column: 1 / -1; }
+
+@media (min-width: 900px) {
+  .wv-grid { gap: 24px; grid-template-columns: repeat(12, 1fr); padding: 32px; }
+  .wv-viewer { grid-column: 1 / 9; }
+  .wv-rail { grid-column: 9 / 13; }
+}
+
+.wv-frame {
+  aspect-ratio: 16 / 9;
+  background: var(--wv-ink-2);
+  border: 1px solid var(--wv-line);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+.wv-img {
+  height: 100%;
+  left: 0;
+  object-fit: cover;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
+.wv-img.is-on { opacity: 1; }
+
+.wv-overlay { height: 100%; left: 0; position: absolute; top: 0; width: 100%; }
+
+.wv-loading {
+  color: var(--wv-muted);
+  left: 50%;
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.wv-loading.is-hidden { display: none; }
+
+.wv-viewbar {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  margin-top: 12px;
+}
+
+.wv-clock { font-family: var(--wv-mono); font-size: 14px; margin: 0; }
+.wv-clock span { color: var(--wv-amber); }
+
+.wv-stages {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.wv-stages li {
+  border: 1px solid var(--wv-line);
+  border-radius: 2px;
+  color: var(--wv-muted);
+  font-size: 12px;
+  padding: 4px 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.wv-stages li.is-active { border-color: var(--wv-amber); color: var(--wv-amber); }
+.wv-stages li.is-done { border-color: var(--wv-ok); color: var(--wv-fg); }
+
+.wv-actions { display: flex; gap: 12px; }
+
+.wv-cancel {
+  background: transparent;
+  border: 1px solid var(--wv-danger);
+  border-radius: 2px;
+  color: var(--wv-fg);
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 16px;
+}
+
+.wv-cancel:focus-visible, .wv-guide:focus-visible, .wv-replay:focus-visible {
+  outline: 2px solid var(--wv-amber);
+  outline-offset: 2px;
+}
+
+.wv-cancel:disabled { cursor: default; opacity: 0.5; }
+
+.wv-guide {
+  background: var(--wv-amber);
+  border-radius: 2px;
+  color: var(--wv-amber-ink);
+  display: inline-block;
+  font-family: var(--wv-display);
+  letter-spacing: 0.06em;
+  padding: 8px 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.wv-guide.is-hidden, .wv-replay.is-hidden, .wv-cancel.is-hidden { display: none; }
+
+.wv-note { color: var(--wv-muted); font-size: 14px; min-height: 20px; }
+
+.wv-steps { display: grid; gap: 12px; list-style: none; margin: 12px 0 0; padding: 0; }
+
+.wv-step {
+  border: 1px solid var(--wv-line);
+  border-radius: 2px;
+  display: grid;
+  gap: 4px 12px;
+  grid-template-columns: 96px 1fr;
+  padding: 8px;
+}
+
+.wv-step img {
+  aspect-ratio: 16 / 9;
+  grid-row: span 2;
+  height: auto;
+  object-fit: cover;
+  width: 100%;
+}
+
+.wv-step h3 { font-size: 14px; font-weight: 600; margin: 0; }
+.wv-step p { color: var(--wv-muted); font-family: var(--wv-mono); font-size: 12px; margin: 0; }
+
+.wv-replay {
+  background: transparent;
+  border: 1px solid var(--wv-line);
+  border-radius: 2px;
+  color: var(--wv-fg);
+  cursor: pointer;
+  font: inherit;
+  margin-top: 16px;
+  padding: 8px 16px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wv-img { transition: none; }
+}

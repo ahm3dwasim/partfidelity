@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% if running %}<noscript><meta http-equiv='refresh' content='{{ refresh_s }}'></noscript>{% endif %}
+<title>{{ title }} — PartFidelity</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/wait-screen.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+</head>
+<body class="pf-theme-start">
+{% include "partials/ui/shell-header.html" %}
+<main id="main" class="pf-container">
+<div class="pf-wait" data-job="{{ job_id }}" data-state="{{ state }}" data-refresh="{{ refresh_s }}"{% if running %} data-running{% endif %}>
+<figure class="pf-wait-plate{% if running %} is-tracing{% endif %}" aria-labelledby="pf-wait-plate-cap">
+<svg class="pf-wait-art" viewBox="0 0 480 340" aria-hidden="true">
+<g class="pf-wait-device">
+<path d="M70 70h340a10 10 0 0 1 10 10v190H60V80a10 10 0 0 1 10-10z"/>
+<path d="M30 270h420l-18 26H48z"/>
+<path d="M210 283h60"/>
+<rect x="88" y="98" width="304" height="150" rx="4"/>
+</g>
+<g class="pf-wait-parts">
+<rect class="pf-wait-trace" x="112" y="122" width="108" height="64" rx="6" pathLength="100"/>
+<circle class="pf-wait-trace" cx="300" cy="154" r="34" pathLength="100"/>
+<path class="pf-wait-trace" d="M118 214h150v18H118z" pathLength="100"/>
+<circle class="pf-wait-hub" cx="300" cy="154" r="8"/>
+</g>
+</svg>
+<figcaption id="pf-wait-plate-cap">
+<span class="pf-wait-cap-k">Illustration</span>
+<span>Outlines are drawn on copies of your frames; your guide shows the real ones.</span>
+</figcaption>
+<div class="pf-wait-frames" id="pf-wait-frames">
+{% if view.frames_total %}
+<p class="pf-wait-frame-n"><span>Frame</span> <b>{{ view.frames_done }}</b> / {{ view.frames_total }} <span>outlined</span></p>
+<div class="pf-wait-track" role="img" aria-label="{{ view.frames_done }} of {{ view.frames_total }} frames outlined">
+{% for i in range(view.frames_total) %}<i class="{{ 'is-read' if i < view.frames_done else '' }}"></i>{% endfor %}
+</div>
+{% else %}
+<p class="pf-wait-frame-n is-empty">Frames appear here once the steps are found.</p>
+{% endif %}
+</div>
+</figure>
+
+<div class="pf-wait-text">
+<p class="pf-kicker">Make a guide · 03</p>
+<h1 class="pf-wait-title">{{ title }}</h1>
+<p class="pf-wait-lede">{{ lede }}</p>
+<div id="pf-wait-live" aria-live="polite">
+<p id='state' data-state='{{ state }}' class="pf-wait-msg{% if not running %} is-final{% endif %}">{{ message }}</p>
+<div class="pf-wait-clock" data-start="{{ view.started_at or '' }}" data-end="{{ view.ended_at or '' }}">
+<span class="pf-wait-clock-k">{{ clock_label }}</span>
+<time class="pf-wait-clock-v" id="pf-wait-clock">{{ elapsed_text }}</time>
+{% if running %}<span class="pf-wait-clock-note">no finish estimate: it depends on your clip</span>{% endif %}
+</div>
+<ol class="pf-wait-stages">
+{% for s in view.stages %}
+<li class="is-{{ s.status }}" data-stage="{{ s.id }}">
+<b class="pf-wait-no" aria-hidden="true">{{ numerals[loop.index0] }}</b>
+<span class="pf-wait-what"><strong>{{ s.label }}</strong><span>{{ s.detail }}</span></span>
+<span class="pf-wait-status"><em>{{ status_words[s.status] }}</em>{% if s.took_s is not none %}<span>{{ durations[loop.index0] }}</span>{% endif %}</span>
+</li>
+{% endfor %}
+</ol>
+{% if stage and running %}<p id='stage' class="pf-wait-marker">Current stage: {{ stage }}</p>{% endif %}
+{% if view.log %}
+<section class="pf-wait-log" aria-label="Run log">
+<h2>Run log</h2>
+<ol>{% for iso, when, line in view.log %}<li><time datetime="{{ iso }}">{{ when }} UTC</time> {{ line }}</li>{% endfor %}</ol>
+</section>
+{% endif %}
+</div>
+<div class="pf-wait-actions">
+{% if running %}
+<form action='/preview/{{ job_id }}/cancel' method='post'><button class="pf-btn pf-btn-ghost" type='submit'>Cancel</button></form>
+{% else %}
+<a class="pf-btn" href='/upload'>Upload another video</a>
+{% endif %}
+<a class="pf-wait-calls" href='/calls/{{ job_id }}'>How this guide is being made</a>
+</div>
+</div>
+</div>
+</main>
+{% set pf_footer_note = "you can close this tab: the guide keeps building" if running else "receipts stay with the job" %}{% include "partials/ui/shell-footer.html" %}
+<script src="/static/ui/wait-screen.js" defer></script>
+</body>
+</html>

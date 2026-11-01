@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PartFidelity — take it apart, pass it on</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/site.css">
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+<link rel="preload" as="image" href="$poster_url" fetchpriority="high">
+</head>
+<body class="pf-theme-start">
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="skip" href="#main">Skip to content</a>
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/guide/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/how-it-works" data-copy="nav.how">How it works</a>
+<a href="/upload" data-copy="nav.upload">Make a guide</a>
+</nav>
+</div></header>
+<main id="main">
+<section class="film" id="film" aria-labelledby="main-heading" data-film>
+<div class="film-stage" id="film-stage">
+<div class="film-art" id="film-art" role="img" aria-label="A laptop lifted apart into its layers, from the lid down to the bottom cover." aria-describedby="film-parts">
+<img class="film-poster" id="film-poster" src="$poster_url" alt="" width="1600" height="900" fetchpriority="high" decoding="async">
+<canvas class="film-canvas" id="film-canvas" aria-hidden="true"></canvas>
+</div>
+<div class="film-open" id="film-open">
+<p class="film-eyebrow">A repair, made clear</p>
+<h1 id="main-heading">Take it apart. Pass it on.</h1>
+<p class="sub">Turn a phone video of a repair into a visual guide, one clear step at a time.</p>
+<p class="cta-row">
+<a class="cta-primary" href="/guide/sample">$sample_cta</a>
+<a class="cta-ghost" href="/upload">$make_cta</a>
+</p>
+<p class="film-fine">Clips can be up to $max_video_text long.</p>
+<p class="film-fine film-roles">$meta_roles_html</p>
+</div>
+$parts_html
+<div class="film-labels" id="film-labels" aria-hidden="true"></div>
+$chapters_html
+</div>
+</section>
+<section class="film-end" aria-labelledby="end-h">
+<div class="film-end-inner">
+<div>
+@@brand_footer@@
+<h2 id="end-h">Good work deserves to travel.</h2>
+<p>Make what you know easier to follow.</p>
+</div>
+<p class="cta-row">
+<a class="cta-primary" href="/upload">$make_cta</a>
+<a class="cta-secondary" href="/catch">@@catch_cta@@</a>
+</p>
+<p class="film-fine">Clips can be up to $max_video_text long. Your clip is kept for 24 hours, or until the guide is deleted if you publish it. A shared link works for 24 hours.</p>
+</div>
+</section>
+<section class="sample" aria-labelledby="sample-h">
+<div class="sample-inner">
+<p class="sample-kicker">The sample <span class="replay-badge">real guide</span></p>
+<h2 id="sample-h">See a finished guide before you film your own.</h2>
+<p class="sample-lede">Every step has its frame, its time in the clip and any safety warning. Your guide follows the same layout; what it contains depends on your footage.</p>
+$sample_facts_html
+<p class="cta-row"><a class="cta-primary" href="/guide/sample">$sample_cta</a></p>
+<p class="provenance">$sample_run_note &#183; <a href="/built">How this was built</a></p>
+</div>
+</section>
+</main>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">the sample is a real guide from a real repair video</p>
+<p data-copy="footer.shell"><a href="/built">How this was built</a> · PartFidelity · guides from your own footage</p>
+</div></footer>
+<script type="application/json" id="film-config">$film_json</script>
+<script src="/static/ui/film.js" defer></script>
+</body>
+</html>

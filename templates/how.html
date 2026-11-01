@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title — PartFidelity</title>
+<meta name="description" content="$meta_description">
+@@brand_icons@@
+<link rel="stylesheet" href="/static/site.css">
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+<link rel="stylesheet" href="/static/ui/how-iso.css">
+<link rel="stylesheet" href="/static/ui/how-page.css">
+</head>
+<body class="pf-theme-start">
+<header class="pf-header"><div class="pf-container pf-header-inner">
+<a class="skip" href="#main">Skip to content</a>
+<a class="pf-brand" href="/" aria-label="PartFidelity home">
+@@brand_badge@@
+<span class="pf-wordmark">PartFidelity</span>
+</a>
+<nav class="pf-nav" aria-label="Site">
+<a href="/reader/sample" data-copy="nav.sample">Sample guide</a>
+<a href="/upload" data-copy="nav.upload">Upload</a>
+</nav>
+</div></header>
+<main id="main" class="how-main">
+<section class="how-hero" aria-labelledby="main-heading">
+<div class="how-wrap">
+<p class="how-eyebrow">$eyebrow</p>
+<h1 id="main-heading">$headline</h1>
+<p class="how-intro">$intro</p>
+</div>
+</section>
+<section class="how-bench" data-how aria-labelledby="bench-h">
+<div class="how-wrap">
+<h2 id="bench-h" class="how-section-title">$bench_heading</h2>
+<div class="how-lead-row">
+<p class="how-lede">$bench_hint <span class="how-concept">$concept_note</span> <span class="how-prov">$provenance</span></p>
+<button type="button" class="how-play" data-play aria-pressed="false">$play</button>
+</div>
+<div class="how-scrolly">
+<div class="how-stick">
+<figure class="iso how-iso" data-theme="dark">
+<div class="iso-plate">
+<div class="iso-plate-corners" aria-hidden="true">
+<span class="iso-plate-corner" data-corner="fig">Fig 1</span>
+<span class="iso-plate-corner" data-corner="title">$fig_title</span>
+<span class="iso-plate-corner" data-corner="hint">$fig_hint</span>
+<span class="iso-plate-corner" data-corner="readout" data-readout>$first_readout</span>
+</div>
+<div class="how-art" role="img" aria-label="$figure_label">
+$figure_svg
+</div>
+<p class="how-now"><span class="how-n" data-now-n>01</span> <span data-now-t>$first_title</span></p>
+<div class="how-stepper" role="group" aria-label="$stepper_label">$stepper_html</div>
+</div>
+</figure>
+</div>
+<ol class="how-stages">
+$stages_html
+</ol>
+</div>
+</div>
+</section>
+<section class="how-hood" aria-labelledby="hood-h">
+<div class="how-wrap">
+<h2 id="hood-h" class="how-section-title">$hood_heading</h2>
+<p class="how-lede">$hood_intro</p>
+<dl class="how-tech">
+$tech_html
+</dl>
+<h3 class="how-limits-title">$limits_heading</h3>
+<p class="how-lede">$limits_body <a href="/calls/sample">$calls_link</a>.</p>
+</div>
+</section>
+<section class="how-end" aria-labelledby="end-h">
+<div class="how-wrap">
+<h2 id="end-h">$cta_heading</h2>
+<p class="cta-row">
+<a class="cta-primary" href="/guide/sample">$cta_sample</a>
+<a class="cta-ghost" href="/upload">$cta_upload</a>
+</p>
+</div>
+</section>
+</main>
+<footer class="pf-footer"><div class="pf-container pf-footer-inner">
+<p class="pf-footer-note" data-copy="footer.note">the numbers on this page are read from the app itself</p>
+<p data-copy="footer.shell">PartFidelity · guides from your own footage</p>
+</div></footer>
+<script type="application/json" id="how-config">$config_json</script>
+<script src="/static/ui/how-figure.js" defer></script>
+</body>
+</html>

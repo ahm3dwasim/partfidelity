@@ -1,0 +1,12 @@
+{
+  "5": {
+    "label": "Not in the video",
+    "stage": "The video does not show the battery being disconnected. This frame is not proof it was done.",
+    "text": "The video does not show the battery being disconnected. The frame shown has the battery still in place. \"Part pixels unchanged\" only means the label was drawn without altering the part; it does not mean the disconnect was filmed."
+  },
+  "8": {
+    "label": "Check this yourself",
+    "stage": "This frame does not show the new battery listed. Check it yourself.",
+    "text": "The frame shows Windows Device Manager open with the Batteries group closed, so the video does not show the new battery listed. Open Batteries and check that your new battery appears."
+  }
+}

@@ -1,0 +1,94 @@
+{# PartFidelity loading set. One macro per piece; other modules
+   import what they need, e.g. {% from "partials/ui/loading.html" import progress %}.
+   Stages must stay identical to STAGE_VOCABULARY in app/evidence.py.
+   String slots carry data-copy keys until the copy is approved. #}
+
+{% set pf_loading_stages = ["upload", "extract", "locate", "segment", "readback"] %}
+{% set pf_loading_labels = {
+  "upload": "Uploading your video",
+  "extract": "Finding steps",
+  "locate": "Finding parts",
+  "segment": "Outlining parts",
+  "readback": "Checking labels"
+} %}
+
+{# Guide-step skeleton card: image block plus title and body lines. #}
+{% macro skeleton_step(lines=2) %}
+<div class="pf-skel-step" aria-hidden="true" data-pf-skeleton="step">
+  <div class="pf-skel pf-skel-img"></div>
+  <div class="pf-skel pf-skel-line" style="--w: 55%"></div>
+  {% for _ in range(lines) %}
+  <div class="pf-skel pf-skel-line"></div>
+  {% endfor %}
+</div>
+{% endmacro %}
+
+{# Standalone image skeleton for any framed picture slot. #}
+{% macro skeleton_image() %}
+<div class="pf-skel pf-skel-img" aria-hidden="true" data-pf-skeleton="image"></div>
+{% endmacro %}
+
+{# Progress bar tied to the real pipeline stages. `stage` is one of the
+   five stage names; the fill and label render server-side so the bar is
+   right before JS runs, and PFLoading.progress() moves it after. #}
+{% macro progress(stage="upload") %}
+{% set current = stage if stage in pf_loading_stages else pf_loading_stages[0] %}
+{% set index = pf_loading_stages.index(current) %}
+{% set frac = (index + 1) / (pf_loading_stages | length) %}
+<div class="pf-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100"
+    aria-valuenow="{{ (frac * 100) | round | int }}" aria-label="Guide progress"
+    data-pf-progress data-pf-stage="{{ current }}">
+  <div class="pf-progress-track">
+    <span class="pf-progress-fill" style="transform: scaleX({{ frac }})"></span>
+  </div>
+  <p class="pf-progress-label" data-copy="loading.progress.label">{{ pf_loading_labels[current] }} — step {{ index + 1 }} of {{ pf_loading_stages | length }}</p>
+  <ol class="pf-stages">
+    {% for name in pf_loading_stages %}
+    {% set at = pf_loading_stages.index(name) %}
+    <li data-stage="{{ name }}"{% if at < index %} class="is-done"{% elif at == index %} class="is-current" aria-current="step"{% endif %}>{{ pf_loading_labels[name] }}</li>
+    {% endfor %}
+  </ol>
+</div>
+{% endmacro %}
+
+{# Submit button with a busy state; pair with form[data-pf-busy] so
+   loading.js locks it on submit. #}
+{% macro busy_button(label="Continue") %}
+<button type="submit" class="pf-btn" data-pf-button aria-busy="false">
+  <span data-copy="loading.button.label">{{ label|e }}</span>
+</button>
+{% endmacro %}
+
+{# Photo that fades in on load; visible without JS by construction. #}
+{% macro fade_image(src, alt) %}
+<img src="{{ src|e }}" alt="{{ alt|e }}" data-pf-fade>
+{% endmacro %}
+
+{# Empty/error states with plain wording. `kind` is upload-failed,
+   job-cancelled, or link-expired. `body` overrides the stock body copy
+   with one specific message (e.g. a server validation error). #}
+{% macro state(kind, body=None) %}
+{% if kind == "upload-failed" %}
+<section class="pf-state" role="alert" data-pf-state="upload-failed">
+  <p class="pf-state-title" data-copy="loading.upload_failed.title">Upload failed</p>
+  {% if body %}
+  <p class="pf-state-body">{{ body|e }}</p>
+  {% else %}
+  <p class="pf-state-body" data-copy="loading.upload_failed.body">Your video did not reach us. Check your connection and try again.</p>
+  {% endif %}
+  <a class="pf-state-action" href="/upload" data-copy="loading.upload_failed.action">Try again</a>
+</section>
+{% elif kind == "job-cancelled" %}
+<section class="pf-state" role="alert" data-pf-state="job-cancelled">
+  <p class="pf-state-title" data-copy="loading.job_cancelled.title">This job was cancelled</p>
+  <p class="pf-state-body" data-copy="loading.job_cancelled.body">Nothing was kept. You can start again any time.</p>
+  <a class="pf-state-action" href="/" data-copy="loading.job_cancelled.action">Start again</a>
+</section>
+{% elif kind == "link-expired" %}
+<section class="pf-state" role="alert" data-pf-state="link-expired">
+  <p class="pf-state-title" data-copy="loading.link_expired.title">This link has expired</p>
+  <p class="pf-state-body" data-copy="loading.link_expired.body">Links stop working after 24 hours. Ask the sender for a fresh one.</p>
+  <a class="pf-state-action" href="/" data-copy="loading.link_expired.action">Go home</a>
+</section>
+{% endif %}
+{% endmacro %}

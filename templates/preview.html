@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{ c.preview.title }}</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/static/ui/preview.css">
+<link rel="stylesheet" href="/static/ui/shell.css">
+</head>
+<body class="pf-theme-start">
+{% include "partials/ui/shell-header.html" %}
+<main id="main" class="pf-container">
+<div class="pf-pv">
+<header class="pf-pv-head">
+<p class="pf-kicker">{{ c.preview.kicker }}</p>
+<h1>{{ c.preview.headline }}</h1>
+<p class="pf-pv-meta">Job {{ job_id }} &middot; {{ duration }} s &middot; {{ size }} bytes &middot; audio removed</p>
+</header>
+<div class="pf-pv-cols">
+<div class="pf-pv-media">
+{% if show_video %}
+<div class="pf-pv-frame"><video controls preload="metadata" src="{{ video_url }}" playsinline></video></div>
+<p class="pf-pv-note">{{ c.preview.note }}</p>
+{% endif %}
+</div>
+<div class="pf-pv-side">
+<ul class="pf-pv-facts">
+<li><p><strong>{{ c.preview.recipient_lead }}</strong> {{ c.preview.recipient_text }}</p></li>
+<li><p>{{ c.retention.meta }}</p></li>
+<li><p>{{ c.retention.processing }}</p></li>
+<li><p>{{ c.retention.published }}</p></li>
+<li><p><strong>{{ c.time.heading }}.</strong> {{ c.time.text }}</p></li>
+<li><p>When Meta's copy is deleted we check the API and tell you what it shows. If it is gone: {{ verified_copy }}</p></li>
+<li><p>If the API cannot prove it: {{ acknowledged_copy }}</p></li>
+</ul>
+{% if notice %}
+<p id="notice" class="pf-pv-notice" role="alert">{{ notice }}</p>
+{% endif %}
+{% if state == "consent" %}
+<form class="pf-pv-confirm" action="/preview/{{ job_id }}/confirm" method="post">
+<label class="pf-pv-check"><input type="checkbox" name="consent"> {{ c.preview.consent_agree }}</label>
+<label class="pf-pv-check"><input type="checkbox" name="ownership"> {{ c.preview.consent_rights }}</label>
+<button class="pf-pill pf-pill-primary" type="submit">{{ c.preview.confirm }}</button>
+</form>
+<form class="pf-pv-cancel" action="/preview/{{ job_id }}/cancel" method="post">
+<button class="pf-pill" type="submit">{{ c.preview.cancel }}</button>
+</form>
+{% elif state == "confirmed" %}
+<p id="confirmed" class="pf-pv-state is-ok">Confirmed. Your file id is stored and handed to the guide step.</p>
+<form class="pf-pv-cancel" action="/preview/{{ job_id }}/cancel" method="post">
+<button class="pf-pill" type="submit">{{ c.preview.cancel }}</button>
+</form>
+{% elif state == "cancelled" %}
+<p id="cancelled" class="pf-pv-state">{{ cancelled_copy }}</p>
+<p><a class="pf-pill" href="/upload">Upload another video</a></p>
+{% elif state == "hidden" %}
+<p id="hidden" class="pf-pv-state">{{ hidden_copy }}</p>
+{% endif %}
+</div>
+</div>
+</div>
+</main>
+{% set pf_footer_note = c.preview.footer_note %}{% include "partials/ui/shell-footer.html" %}
+</body>
+</html>

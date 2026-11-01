@@ -1,0 +1,1386 @@
+{
+ "attempts": [
+  {
+   "id": "spark3/chunk0",
+   "runs": [
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show closed laptop intro",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "ThinkPad logo",
+         "position_hint": "bottom right"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Boot to BIOS and disable internal battery",
+       "end_s": 36,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "display screen",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Flip back and loosen bottom screws",
+       "end_s": 51,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top edge"
+        }
+       ],
+       "start_s": 36,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Check screw and open bottom cover",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "cover screw",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 51,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.88,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Introduce laptop on table",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Boot to BIOS to disable internal battery",
+       "end_s": 31,
+       "hazards": [
+        "battery",
+        "esd",
+        "data"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Shut down and reposition for disassembly",
+       "end_s": 37,
+       "hazards": [
+        "battery"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "power button",
+         "position_hint": "right side above keyboard"
+        }
+       ],
+       "start_s": 31,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 60,
+       "hazards": [
+        "sharp",
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "cover screws",
+         "position_hint": "across bottom cover"
+        }
+       ],
+       "start_s": 37,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Introduce closed laptop",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom center then right side"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Boot to BIOS to disable internal battery",
+       "end_s": 36,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Flip over and loosen bottom cover screws",
+       "end_s": 60,
+       "hazards": [
+        "battery",
+        "esd",
+        "sharp"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "cover screw",
+         "position_hint": "center foreground"
+        }
+       ],
+       "start_s": 36,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spark3/chunk0_retry1",
+   "runs": [
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T460",
+     "steps": [
+      {
+       "action": "Intro show closed laptop",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "ThinkPad logo",
+         "position_hint": "bottom right"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Power on and disable internal battery in BIOS",
+       "end_s": 31,
+       "hazards": [
+        "battery",
+        "data"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Shut down and flip to bottom side",
+       "end_s": 37,
+       "hazards": [
+        "display"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "lower center"
+        },
+        {
+         "phrase": "power button",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 31,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "vent grille",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top edge"
+        }
+       ],
+       "start_s": 37,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show closed laptop intro",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "lower edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Power on and disable internal battery in BIOS",
+       "end_s": 31,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "lower center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Shut down and flip to bottom",
+       "end_s": 37,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 31,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 59,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screw",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 37,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry open bottom cover",
+       "end_s": 60,
+       "hazards": [
+        "sharp",
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 59,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro device overview",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "ThinkPad logo",
+         "position_hint": "bottom right"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screwdriver",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Boot to BIOS to disable internal battery",
+       "end_s": 36,
+       "hazards": [
+        "battery",
+        "data"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Flip closed and locate cover screws",
+       "end_s": 41,
+       "hazards": [
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top edge"
+        }
+       ],
+       "start_s": 36,
+       "tools": []
+      },
+      {
+       "action": "Loosen screws and pry open bottom cover",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "side ports",
+         "position_hint": "left edge"
+        }
+       ],
+       "start_s": 41,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spark4/chunk0",
+   "runs": [
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro show closed laptop",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Power on and disable internal battery in BIOS",
+       "end_s": 37,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display screen",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom screws and begin opening cover",
+       "end_s": 60,
+       "hazards": [
+        "battery",
+        "esd",
+        "sharp"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top edge"
+        },
+        {
+         "phrase": "retaining screws",
+         "position_hint": "across cover"
+        }
+       ],
+       "start_s": 37,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro overview",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Power on and disable internal battery",
+       "end_s": 36,
+       "hazards": [
+        "battery",
+        "data",
+        "display"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display panel",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Unscrew and open bottom cover",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 36,
+       "tools": [
+        "phillips screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.88,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro showcase of closed laptop",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "ThinkPad logo",
+         "position_hint": "bottom right"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip device to bottom side",
+       "end_s": 15,
+       "hazards": [],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Remove external battery",
+       "end_s": 28,
+       "hazards": [
+        "battery"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 15,
+       "tools": []
+      },
+      {
+       "action": "Power on and disable internal battery in BIOS",
+       "end_s": 41,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "display",
+         "position_hint": "top center"
+        }
+       ],
+       "start_s": 28,
+       "tools": []
+      },
+      {
+       "action": "Remove bottom cover screws",
+       "end_s": 52,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screws",
+         "position_hint": "around edges"
+        }
+       ],
+       "start_s": 41,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Lift off cover to expose internals",
+       "end_s": 60,
+       "hazards": [
+        "battery",
+        "esd",
+        "sharp"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "fan",
+         "position_hint": "center left"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "motherboard",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 52,
+       "tools": [
+        "spudger"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spark4/chunk0_retry1",
+   "runs": [
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Show device overview",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom edge"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Power on to startup menu",
+       "end_s": 23,
+       "hazards": [
+        "display"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Disable built-in battery in BIOS",
+       "end_s": 31,
+       "hazards": [
+        "battery",
+        "data"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 23,
+       "tools": []
+      },
+      {
+       "action": "Power off and flip to bottom",
+       "end_s": 38,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 31,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 60,
+       "hazards": [
+        "sharp",
+        "esd"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "captive screw",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 38,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.9,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro show closed laptop",
+       "end_s": 9,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "laptop lid",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 0,
+       "tools": []
+      },
+      {
+       "action": "Flip device and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery",
+        "esd"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "center bottom"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 9,
+       "tools": []
+      },
+      {
+       "action": "Power on and open startup menu",
+       "end_s": 23,
+       "hazards": [
+        "display",
+        "battery"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Disable built-in battery in BIOS",
+       "end_s": 31,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        }
+       ],
+       "start_s": 23,
+       "tools": []
+      },
+      {
+       "action": "Power off and flip to bottom",
+       "end_s": 37,
+       "hazards": [
+        "esd"
+       ],
+       "number": 5,
+       "parts": [
+        {
+         "phrase": "keyboard",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 31,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws",
+       "end_s": 52,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 6,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "screw hole",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 37,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Pry open bottom cover",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp",
+        "battery"
+       ],
+       "number": 7,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "side port",
+         "position_hint": "left side"
+        }
+       ],
+       "start_s": 52,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    },
+    {
+     "confidence": 0.85,
+     "device_guess": "Lenovo ThinkPad T480",
+     "steps": [
+      {
+       "action": "Intro overview",
+       "end_s": 10,
+       "hazards": [],
+       "number": 1,
+       "parts": [
+        {
+         "phrase": "lid",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "logo",
+         "position_hint": "bottom right"
+        }
+       ],
+       "start_s": 0,
+       "tools": [
+        "screwdriver"
+       ]
+      },
+      {
+       "action": "Flip over and remove external battery",
+       "end_s": 17,
+       "hazards": [
+        "battery"
+       ],
+       "number": 2,
+       "parts": [
+        {
+         "phrase": "battery",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 10,
+       "tools": []
+      },
+      {
+       "action": "Power on to disable internal battery",
+       "end_s": 36,
+       "hazards": [
+        "battery",
+        "data",
+        "esd"
+       ],
+       "number": 3,
+       "parts": [
+        {
+         "phrase": "display",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "keyboard",
+         "position_hint": "bottom center"
+        },
+        {
+         "phrase": "battery",
+         "position_hint": "right side"
+        }
+       ],
+       "start_s": 17,
+       "tools": []
+      },
+      {
+       "action": "Loosen bottom cover screws to open",
+       "end_s": 60,
+       "hazards": [
+        "esd",
+        "sharp"
+       ],
+       "number": 4,
+       "parts": [
+        {
+         "phrase": "bottom cover",
+         "position_hint": "center"
+        },
+        {
+         "phrase": "battery bay",
+         "position_hint": "top center"
+        },
+        {
+         "phrase": "screw hole",
+         "position_hint": "center"
+        }
+       ],
+       "start_s": 36,
+       "tools": [
+        "screwdriver"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

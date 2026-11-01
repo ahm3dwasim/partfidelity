@@ -1,0 +1,544 @@
+# Photoreal laptop teardown film. Every changeable value of
+# tools/teardown_render.py and assets/3d/teardown/*.py lives here; loaded strictly by
+# tools/teardown_config.py (missing or misspelled keys fail). No credentials here.
+
+[blender]
+download_url = "https://download.blender.org/release/Blender5.2/blender-5.2.3-linux-x64.tar.xz"
+build = "blender-5.2.3-linux-x64"
+cuda_image = "nvidia/cuda:12.4.1-runtime-ubuntu22.04"
+python = "3.11"
+apt_packages = ["wget", "xz-utils", "libxi6", "libxxf86vm1", "libxfixes3", "libxrender1", "libgl1", "libxkbcommon0", "libsm6", "libegl1", "libxext6", "fonts-dejavu-core"]
+pip_packages = ["pillow==11.1.0", "numpy==2.2.3"]
+
+[modal]
+app = "pf-teardown-render"
+gpu = "L4,A10,T4"   # comma list: Modal tries them in order, so a busy first-choice queue does not stall a round
+gpu_timeout_s = 1500
+cpu_timeout_s = 600
+cpu_count = 4
+
+[budget]
+project = "partfidelity"
+job = "teardown-render"
+cap_usd = 15.0
+gpu_usd_per_s = 0.000222
+cpu_usd_per_s = 0.000131
+overhead_s = 40
+ledger = "docs/3d/RENDER_SPEND.md"
+check_hook_env = "RENDER_SPEND_CHECK"   # optional: env var holding an extra spend-check command (exit 0 = go); unset = ledger only
+
+[render]
+preview_res = [800, 450]
+still_res = [1600, 900]
+film_res = [1600, 900]
+phone_width = 900
+preview_samples = 32
+still_samples = 320
+film_samples = 192
+seed = 7
+denoiser = "OPENIMAGEDENOISE"
+adaptive_threshold = 0.01
+fan_deg_per_frame = 0
+exposure = -0.5
+look = "Medium High Contrast"
+texture_ppm = 14
+n_frames = 250
+fps = 25
+local_out = "/tmp/pf-teardown-render"
+stills_dir = "stills-v10"
+film_chunk = 25       # frames per Modal container; chunks run in parallel
+webp_quality = 90
+film_dir = "film-v10"
+film_crf = 18
+
+[scene]
+floor_z = -0.8
+sweep_radius = 3500.0
+wall_y = 9000.0
+bevel_mm = 0.28
+bevel_segments = 3
+lid_open_deg = 110.0
+pivot_yz = [102.0, 6.6]   # lid hinge axis (mm): just inside the rear of the deck, so the hinge stays hidden
+deck_bevel = [0.7, 2]     # mm, segments: the crisp chamfer on the deck and lid edges
+corner_mm = 13.0          # plan-view corner radius of the unibody
+key_jitter_mm = 0.22
+key_dish_mm = 0.0
+glass_rough = 0.05   # glossy black cover glass: a sharp softbox reflection, not a milky haze
+glass_spec = 0.35
+wear = 0.0           # 0..1 fingerprint/dust roughness; 0 = clean anodised metal
+mid_lift = [0.3, 0.2, 0.15]   # extra rim, key, top light at half-explode (4e(1-e) bump; zero at the closed and hold looks) so edge-on layers read
+
+# Logic board, SSD and Wi-Fi card (mm, board coordinates). A few big parts, clustered passives, clean mask.
+[board]
+mask = [22, 26, 32]      # solder-mask colour: near-black blue-grey
+mask_rough = 0.45
+soc_pos = [-6.0, 56.0]
+soc_size = 26.0           # package; a raised steel frame rings the metal lid
+soc_lid = 18.0
+ram_per_side = 2          # memory packages either side of the SoC
+ram_size = [13.0, 10.0]
+ram_gap = 1.4
+passive_len = 1.1         # 0402-size chip passive, mm (width is half)
+passive_h = 0.45
+scatter_passives = 36     # stray passives outside the clusters
+inductor_size = 4.6
+inductor_h = 2.0
+tantalum_size = [7.0, 4.0]
+tantalum = [[30.0, 62.0], [30.0, 67.0], [38.0, 62.0], [38.0, 67.0]]
+inductors = [[18.0, 24.0], [24.0, 24.0], [36.0, 24.0], [42.0, 24.0]]
+seed = 11
+silk_designators = 40     # blank silkscreen marks only (outlines, dots, bars), never text
+trace_bundles = 30        # extra random trace bundles besides those joining the parts
+via_count = 180
+test_points = 12
+
+# IC rows (PMIC, USB-PD, audio codec, sensor hub, EC); at most 6
+[[board.ic]]
+x = 30
+y = 32
+w = 9
+d = 9
+h = 1
+[[board.ic]]
+x = -30
+y = 34
+w = 6
+d = 6
+h = 0.8
+[[board.ic]]
+x = 44
+y = 54
+w = 6
+d = 6
+h = 0.8
+[[board.ic]]
+x = -60
+y = 84
+w = 5
+d = 5
+h = 0.7
+[[board.ic]]
+x = 10
+y = 84
+w = 7
+d = 5
+h = 0.8
+
+# flat metal EMI shield cans
+[[board.shield]]
+x = -60
+y = 58
+w = 26
+d = 22
+h = 1.5
+[[board.shield]]
+x = 44
+y = 82
+w = 30
+d = 16
+h = 1.4
+[[board.shield]]
+x = 96
+y = 88
+w = 24
+d = 12
+h = 1.3
+
+# gold FPC connectors at the board edges: display, keyboard, battery, I/O, trackpad
+[[board.connector]]
+x = -30
+y = 94.5
+w = 18
+d = 3.4
+[[board.connector]]
+x = 14
+y = 94.5
+w = 16
+d = 3.4
+[[board.connector]]
+x = 30
+y = 9.5
+w = 14
+d = 3.4
+[[board.connector]]
+x = -112.5
+y = 50
+w = 3.4
+d = 14
+[[board.connector]]
+x = 114.5
+y = 82
+w = 3.4
+d = 10
+
+# dense passive clusters. ring = true packs the band round the SoC; otherwise a w x d rect. keep = fill probability
+[[board.cluster]]
+x = -6
+y = 56
+w = 36
+d = 36
+ring = true
+pitch_x = 1.4
+pitch_y = 1.1
+keep = 0.8
+[[board.cluster]]
+x = 30
+y = 44
+w = 24
+d = 10
+ring = false
+pitch_x = 1.6
+pitch_y = 1.2
+keep = 0.75
+[[board.cluster]]
+x = -60
+y = 40
+w = 30
+d = 8
+ring = false
+pitch_x = 1.7
+pitch_y = 1.2
+keep = 0.6
+[[board.cluster]]
+x = 0
+y = 80
+w = 40
+d = 10
+ring = false
+pitch_x = 1.6
+pitch_y = 1.2
+keep = 0.65
+[[board.cluster]]
+x = -10
+y = 22
+w = 30
+d = 10
+ring = false
+pitch_x = 1.8
+pitch_y = 1.3
+keep = 0.55
+[[board.cluster]]
+x = -90
+y = 52
+w = 16
+d = 10
+ring = false
+pitch_x = 1.7
+pitch_y = 1.2
+keep = 0.5
+
+# M.2 2280 SSD: controller, NAND, DRAM (w, d, h) and label. Wi-Fi card: one shield can.
+[board.ssd]
+controller = [10.0, 10.0, 0.8]
+nand = [12.0, 16.0, 0.9]
+nand_count = 2
+dram = [5.0, 4.0, 0.7]
+sticker = [22.0, 13.0]
+[board.wifi]
+shield = [14.0, 13.0, 1.2]
+
+# Film: open on a top view of the open laptop, the lid swings shut while the camera eases to a 3/4 view, a beat on the
+# closed laptop, then every part rises out of it one by one (top part first) into one vertical stack, then a hold.
+[choreo]
+close_start = 10         # frame the lid starts to swing shut
+close_frames = 26        # about 1.5 s at 25 fps, ease-in-out
+rise_start = 44          # frame the first part (lid back) starts to rise
+rise_stagger = 8         # frames between one layer and the next
+rise_frames = 28         # frames each layer takes to reach its place (slow, eased)
+
+# screws back out of each layer just before it moves, fan outwards a little and hang beside it
+[screws]
+lead = 5                 # frames before the layer moves (at most rise_stagger, so the layer above has started)
+frames = 12              # frames the screws take to back out
+lift_mm = 9.0
+spread = 0.1             # outward fan: fraction of the distance from the part centre
+
+# The parts return and the laptop reassembles into a steady, complete laptop: after a hold on the
+# exploded stack the parts go back, lowest first, one every `stagger` frames, each taking `frames`; then a hold on the whole laptop.
+[reassemble]
+start = 150              # frame the first part (the speakers, with the screws of the parts that never rise) starts to go back
+stagger = 4
+frames = 22
+
+# sub-millimetre float on each risen layer, zero while seated
+[float]
+amp_mm = 0.5
+period = 60.0            # frames
+phase = 1.3              # radians between one layer and the next
+
+# a few faint out-of-focus dust motes, camera-only
+[dust]
+count = 10
+radius_mm = 0.3
+box = [[-420.0, 420.0], [-360.0, 300.0], [-20.0, 420.0]]
+drift_mm = 0.06          # per frame
+strength = 0.05
+color = [0.85, 0.88, 1.0]
+seed = 5
+
+# camera: top view, then one steady wide camera from frame 40, the end of the
+# opening (the lid is shut by 36), to the last frame, the whole stack in frame: no zoom, no pan, no change of target.
+# fstop per key (low = shallow).
+[[pose.camera]]
+frame = 1
+az = 0.0
+el = 74.0
+dist = 1750.0
+target = [0.0, 40.0, 80.0]
+lens = 85.0
+fstop = 11.0
+[[pose.camera]]
+frame = 10
+az = 2.0
+el = 73.0
+dist = 1750.0
+target = [0.0, 40.0, 80.0]
+lens = 85.0
+fstop = 11.0
+[[pose.camera]]
+frame = 40
+az = 27.0
+el = 16.0
+dist = 1950.0
+target = [0.0, 0.0, 135.0]
+lens = 85.0
+fstop = 9.0
+[[pose.camera]]
+frame = 250
+az = 27.0
+el = 16.0
+dist = 1950.0
+target = [0.0, 0.0, 135.0]
+lens = 85.0
+fstop = 9.0
+
+# explode offsets (mm at full rise). order is bottom to top; rise is the order parts leave (top first, so nothing passes
+# through a part still seated above it). The lid is shut by then, so its layers rise straight up with the rest.
+[explode]
+hide_from = 0.001     # explode progress above which hide_parts leave the render (the clutch bar sits inside the deck before that)
+hide_parts = ["hinges"]
+center = ["speakers", "battery", "logic_board", "cooling"]   # parts that slide to the stack axis as they rise
+order = ["feet", "bottom_cover", "speakers", "battery", "logic_board", "cooling", "top_case", "keyboard", "hinges", "display_panel", "lid_back"]
+rise = ["lid_back", "display_panel", "keyboard", "top_case", "cooling", "logic_board", "battery", "speakers"]
+[explode.offset]
+feet = 0.0
+bottom_cover = 0.0
+speakers = 30.0
+battery = 60.0
+logic_board = 90.0
+cooling = 120.0
+top_case = 150.0
+keyboard = 180.0
+hinges = 0.0
+display_panel = 210.0
+lid_back = 240.0
+
+# light and exposure by explode progress: open (0) -> exploded (1); each light row names its group
+[look.open]
+exposure = -0.45
+key = 1.0
+top = 1.0
+rim = 1.0
+wash = 1.0
+shell = 1.0
+[look.exploded]
+exposure = -0.5
+key = 0.8
+top = 0.7
+rim = 1.25
+wash = 1.0
+shell = 0.75
+
+# named stills: a frame of the film (parts and look) seen from an [[angle]] with this target and distance
+[state.top]
+frame = 1
+target = [0.0, 40.0, 80.0]
+dist = 1750.0
+[state.closing]
+frame = 24
+target = [0.0, 10.0, 60.0]
+dist = 1550.0
+[state.closed]
+frame = 40
+target = [0.0, 0.0, 10.0]
+dist = 1500.0
+[state.rising]
+frame = 80
+target = [0.0, 0.0, 150.0]
+dist = 1700.0
+[state.exploded]
+frame = 142
+target = [0.0, 0.0, 142.0]
+dist = 1960.0
+
+[[angle]]
+name = "top"
+az = 0.0
+el = 74.0
+lens = 85.0
+fstop = 11.0
+[[angle]]
+name = "a"
+az = 33.0
+el = 17.0
+lens = 85.0
+fstop = 10.0
+[[angle]]
+name = "b"
+az = -36.0
+el = 24.0
+lens = 85.0
+fstop = 10.0
+
+[[hero]]
+name = "top.png"
+state = "top"
+angle = "top"
+[[hero]]
+name = "closing.png"
+state = "closing"
+angle = "a"
+[[hero]]
+name = "closed.png"
+state = "closed"
+angle = "a"
+[[hero]]
+name = "exploded.png"
+state = "exploded"
+angle = "a"
+
+# materials (sRGB 0..255). The laptop is space grey; colour comes only from the lights and their reflections.
+[material]
+alu = [92, 94, 100]
+alu_rough = 0.3
+key = [14, 14, 16]          # keycap plastic
+legend = [196, 198, 202]    # key legends
+trackpad = [56, 58, 63]     # glass trackpad tinted to the case
+trackpad_rough = 0.36
+floor = [9, 9, 11]
+floor_rough = 0.5
+floor_spec = 0.12
+world = [3, 3, 5]
+screen_emission = 1.4
+pcb_edge = [20, 22, 26]
+cell = [16, 16, 18]          # matte black pouch cells
+cell_label = [30, 31, 34]
+tray = [26, 27, 30]          # battery tray
+sink = [34, 35, 38]          # heat-sink plate and fan housing
+blade = [12, 12, 14]
+copper_fin = [214, 132, 96]
+zif = [214, 204, 178]        # ivory FPC connectors
+flex = [18, 18, 20]
+wire_yellow = [200, 160, 30]
+
+# display module, cover glass and keyboard backlight
+[display]
+sleep_from = 0.7              # lid-shut progress where the screen image and key backlight start to fade out (off once shut)
+backlight = 1.2               # key-legend glow strength; 0 = backlight off (dark caps, crisp grey legends)
+halo = 0.12                   # faint glow through the gaps round every key, same for all keys
+backlight_color = [0.80, 0.88, 1.0]   # cool white, linear RGB
+glass_opacity = [0.12, 0.4]   # cover glass: share of dark gloss face-on and at grazing angles; the rest is see-through
+glass_fresnel = 0.25          # layer-weight blend for that face-on -> grazing ramp
+# Physical layers, not floating paper-like ones: the
+# display is one sealed module (LCD cell glass + backlight unit in a steel tray), and the cover glass has a polished edge.
+# Together they fill the 2.9 mm lid pocket (layout.py LID_Z0..LID_Z1 - 0.7), so the closed and open laptop are unchanged.
+glass_mm = 0.8                # cover glass thickness
+cell_mm = 0.7                 # LCD cell glass
+backlight_mm = 1.2            # backlight unit (films inside) in its stamped steel tray
+frame_bevel_mm = 0.35         # bevel on the tray's edges, so the rims catch the light
+cell_glass = [14, 18, 20]     # LCD cell glass edge and back: dark, a faint blue-green
+glass_edge = [26, 40, 38]     # polished cover-glass edge: the green-black of thick glass end-on
+panel_steel = [44, 46, 50]    # dark gunmetal back of the display module (was bright stainless, read as a white sheet)
+panel_steel_rough = 0.5
+fpc = [74, 46, 18]            # dark amber polyimide flex off the panel's chin edge
+
+# wallpaper: soft colour ribbons on near-black (no text, no logo)
+[screen]
+background = [4, 4, 10]
+ribbons = [[96, 48, 220], [228, 64, 168], [40, 176, 240]]
+
+# studio lights (m, Blender world). kind area: size = [w, h] m; kind spot: size = [cone deg, blend]. color is linear RGB 0..1.
+# floor = false: light linking keeps that light off the sweep.
+# spread (deg, area lights) narrows the beam (Cycles keeps the power, so a narrow beam needs about sin^2(spread/2) of the power) so the coloured rims light the laptop, not the whole sweep.
+[[light]]
+name = "key"
+kind = "area"
+group = "key"
+loc = [-1.1, -1.6, 1.5]
+target = [0.0, 0.0, 0.08]
+size = [0.5, 0.35]
+power = 45.0
+color = [1.0, 0.98, 0.96]
+spread = 60.0
+floor = true
+[[light]]
+name = "top"
+kind = "area"
+group = "top"
+loc = [0.0, -0.3, 2.4]
+target = [0.0, 0.0, 0.0]
+size = [1.6, 1.6]
+power = 45.0
+color = [0.96, 0.97, 1.0]
+spread = 180.0
+floor = true
+[[light]]
+name = "card"
+kind = "area"
+group = "top"
+loc = [-1.05, 1.6, 0.7]
+target = [0.0, 0.0, 0.1]
+size = [3.0, 1.4]
+power = 3.5
+color = [0.95, 0.96, 1.0]
+spread = 90.0
+floor = false
+[[light]]
+name = "rim_cyan"
+kind = "area"
+group = "rim"
+loc = [-1.6, 1.4, 0.16]
+target = [0.0, 0.0, 0.03]
+size = [0.05, 1.0]
+power = 1.5
+color = [0.12, 0.62, 1.0]
+spread = 20.0
+floor = false
+[[light]]
+name = "rim_magenta"
+kind = "area"
+group = "rim"
+loc = [1.7, 1.2, 0.15]
+target = [0.0, 0.0, 0.03]
+size = [0.05, 1.0]
+power = 1.5
+color = [1.0, 0.16, 0.62]
+spread = 20.0
+floor = false
+[[light]]
+name = "kick_violet"
+kind = "area"
+group = "rim"
+loc = [0.9, -1.6, 0.6]
+target = [0.0, 0.0, 0.05]
+size = [1.0, 0.3]
+power = 1.0
+color = [0.5, 0.3, 1.0]
+spread = 45.0
+floor = false
+[[light]]
+name = "wall_wash"
+kind = "spot"
+group = "wash"
+loc = [0.0, 0.6, 2.0]
+target = [0.0, 2.2, 0.0]
+size = [80.0, 1.0]
+power = 12.0
+color = [0.34, 0.36, 0.44]
+spread = 180.0
+floor = true
+
+[camera]
+sensor_mm = 36.0
+clip_start_m = 0.05
+clip_end_m = 30.0

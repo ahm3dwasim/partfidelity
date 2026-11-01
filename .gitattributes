@@ -1,0 +1,3 @@
+# Vendored upstream bytes: kept byte-identical, never text-diffed or
+# whitespace-checked.
+static/ui/vendor/gsap.min.js binary

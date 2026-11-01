@@ -1,0 +1,146 @@
+/* Waiting screen. Left: a line-art plate whose outlines
+   trace while the job runs, with the real FRAME n / N counter under it.
+   Right: named stages (Done / Working / Waiting / Stopped) with their real
+   times, an honest clock and the last lines of the run log. Colours and
+   fonts come from tokens.css only. */
+.pf-wait {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: clamp(32px, 6vw, 96px);
+  align-items: start;
+  padding-block: clamp(36px, 7vw, 88px) clamp(32px, 5vw, 64px);
+  color: var(--pf-on-ink);
+  font-family: var(--pf-font-body);
+}
+.pf-wait a { color: inherit; }
+
+/* The plate. */
+.pf-wait-plate {
+  position: sticky; top: 24px;
+  margin: 0; padding: clamp(18px, 3vw, 32px);
+  border: 1px solid var(--pf-ink-line); border-radius: 18px;
+  background: var(--pf-ink-2);
+}
+.pf-wait-art { display: block; width: 100%; height: auto; }
+.pf-wait-device { fill: none; stroke: var(--pf-on-ink-dim); stroke-width: 1.5; stroke-linejoin: round; stroke-linecap: round; }
+.pf-wait-trace { fill: none; stroke: var(--pf-accent); stroke-width: 2; stroke-dasharray: 100; stroke-dashoffset: 0; stroke-linejoin: round; }
+.pf-wait-hub { fill: var(--pf-accent); }
+.pf-wait-plate.is-tracing .pf-wait-trace { animation: pf-wait-trace 5.4s var(--pf-ease, ease-in-out) infinite; }
+.pf-wait-plate.is-tracing .pf-wait-trace:nth-of-type(2) { animation-delay: 1.2s; }
+.pf-wait-plate.is-tracing .pf-wait-trace:nth-of-type(3) { animation-delay: 2.4s; }
+@keyframes pf-wait-trace {
+  0% { stroke-dashoffset: 100; }
+  45%, 80% { stroke-dashoffset: 0; }
+  100% { stroke-dashoffset: -100; }
+}
+.pf-wait-plate figcaption {
+  display: grid; gap: 4px; margin-top: 14px;
+  font-size: 0.8125rem; color: var(--pf-on-ink-muted);
+}
+.pf-wait-cap-k, .pf-kicker, .pf-wait .pf-wait-log h2, .pf-wait-clock-k {
+  font: 500 0.75rem/1 var(--pf-font-body);
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--pf-on-ink-dim);
+}
+.pf-wait-frames { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--pf-ink-line); }
+.pf-wait-frame-n { margin: 0 0 10px; font: 400 1.125rem/1.2 var(--pf-font-display); color: var(--pf-on-ink-muted); }
+.pf-wait-frame-n span { font: 500 0.75rem/1 var(--pf-font-body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--pf-on-ink-dim); }
+.pf-wait-frame-n b { font-weight: 400; color: var(--pf-on-ink); font-size: 1.5rem; }
+.pf-wait-frame-n.is-empty { font: 400 0.875rem/1.4 var(--pf-font-body); color: var(--pf-on-ink-dim); margin: 0; }
+.pf-wait-track { display: flex; gap: 3px; }
+.pf-wait-track i { flex: 1 1 0; min-width: 2px; height: 6px; border-radius: 2px; background: var(--pf-ink-line-strong); }
+.pf-wait-track i.is-read { background: var(--pf-accent); }
+
+/* The text column. */
+.pf-kicker { margin: 0; }
+.pf-wait-title {
+  margin: 18px 0 16px;
+  font: 400 clamp(2.25rem, 4.6vw, 4rem)/1.04 var(--pf-font-display);
+  letter-spacing: -0.01em;
+}
+.pf-wait-lede { margin: 0; max-width: 44ch; font-size: 1.0625rem; color: var(--pf-on-ink-muted); }
+.pf-wait-msg { margin: 22px 0 0; font-size: 0.9375rem; color: var(--pf-on-ink-muted); }
+.pf-wait-msg.is-final {
+  padding: 14px 16px; border-radius: 12px;
+  border: 1px solid var(--pf-warn-line); border-left: 3px solid var(--pf-danger);
+  background: var(--pf-warn-bg); color: var(--pf-warn-text);
+}
+.pf-wait[data-state="done"] .pf-wait-msg.is-final { border-left-color: var(--pf-ok); }
+
+.pf-wait-clock {
+  display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 4px 14px;
+  margin-top: 26px; padding: 16px 0; border-block: 1px solid var(--pf-ink-line);
+}
+.pf-wait-clock-v { font: 400 2.25rem/1 var(--pf-font-display); font-variant-numeric: tabular-nums; color: var(--pf-on-ink); }
+.pf-wait-clock-note { grid-column: 1 / -1; font-size: 0.8125rem; color: var(--pf-on-ink-dim); }
+
+.pf-wait-stages { list-style: none; margin: 8px 0 0; padding: 0; }
+.pf-wait-stages li {
+  display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: baseline;
+  padding: 16px 0; border-bottom: 1px solid var(--pf-ink-line);
+}
+.pf-wait-no { font: 400 1.125rem/1.2 var(--pf-font-display); color: var(--pf-on-ink-dim); }
+.pf-wait-what { display: grid; gap: 4px; }
+.pf-wait-what strong { font: 400 1.25rem/1.2 var(--pf-font-display); color: var(--pf-on-ink-muted); }
+.pf-wait-what span { font-size: 0.875rem; color: var(--pf-on-ink-dim); }
+.pf-wait-status { display: grid; justify-items: end; gap: 4px; text-align: right; }
+.pf-wait-status em {
+  font-style: normal; padding: 3px 10px; border-radius: var(--pf-radius-pill);
+  border: 1px solid var(--pf-ink-line-strong);
+  font: 500 0.75rem/1.2 var(--pf-font-body); letter-spacing: 0.06em; color: var(--pf-on-ink-dim);
+}
+.pf-wait-status span { font-size: 0.8125rem; font-variant-numeric: tabular-nums; color: var(--pf-on-ink-muted); }
+.pf-wait-stages li.is-done .pf-wait-what strong { color: var(--pf-on-ink); }
+.pf-wait-stages li.is-done .pf-wait-status em { border-color: var(--pf-ok); color: var(--pf-ok); }
+.pf-wait-stages li.is-working .pf-wait-no { color: var(--pf-accent); }
+.pf-wait-stages li.is-working .pf-wait-what strong { color: var(--pf-on-ink); }
+.pf-wait-stages li.is-working .pf-wait-what span { color: var(--pf-on-ink-muted); }
+.pf-wait-stages li.is-working .pf-wait-status em { border-color: var(--pf-accent); color: var(--pf-accent); }
+.pf-wait-stages li.is-working .pf-wait-status em::before {
+  content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 6px; vertical-align: 1px;
+  border-radius: 50%; background: var(--pf-accent);
+  animation: pf-wait-pulse 1.6s ease-in-out infinite;
+}
+.pf-wait-stages li.is-queued .pf-wait-what strong { color: var(--pf-on-ink); }
+.pf-wait-stages li.is-queued .pf-wait-status em { border-color: var(--pf-on-ink-muted); color: var(--pf-on-ink); }
+.pf-wait-stages li.is-stopped .pf-wait-status em { border-color: var(--pf-danger); color: var(--pf-danger); }
+@keyframes pf-wait-pulse { 50% { opacity: 0.25; } }
+
+.pf-wait-marker { margin: 10px 0 0; font: 0.75rem/1.4 var(--pf-font-mono); color: var(--pf-on-ink-dim); }
+
+.pf-wait-log { margin-top: 26px; }
+.pf-wait .pf-wait-log h2 { margin: 0 0 10px; }
+.pf-wait-log ol {
+  list-style: none; margin: 0; padding: 12px 14px;
+  border: 1px solid var(--pf-ink-line); border-radius: 12px; background: var(--pf-ink-2);
+  font: 0.8125rem/1.7 var(--pf-font-mono); color: var(--pf-on-ink-muted);
+  overflow-wrap: anywhere;
+}
+.pf-wait-log time { color: var(--pf-on-ink-dim); margin-right: 8px; }
+.pf-wait-log li:last-child { color: var(--pf-on-ink); }
+
+.pf-wait-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; margin-top: 28px; }
+.pf-wait-actions form { margin: 0; }
+.pf-wait-calls { font-size: 0.875rem; color: var(--pf-on-ink-muted); }
+.pf-wait .pf-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 0 26px;
+  border-radius: var(--pf-radius-pill); border: 1px solid var(--pf-accent);
+  background: var(--pf-accent); color: var(--pf-accent-ink);
+  font: 500 0.9375rem/1 var(--pf-font-body); text-decoration: none; cursor: pointer;
+}
+.pf-wait a.pf-btn, .pf-wait a.pf-btn:visited { color: var(--pf-accent-ink); }
+.pf-wait .pf-btn:hover { background: var(--pf-accent-hover); border-color: var(--pf-accent-hover); }
+.pf-wait .pf-btn-ghost { background: transparent; border-color: var(--pf-ink-line-strong); color: var(--pf-on-ink); }
+.pf-wait .pf-btn-ghost:hover { background: transparent; border-color: var(--pf-on-ink); }
+
+@media (max-width: 860px) {
+  .pf-wait { grid-template-columns: minmax(0, 1fr); gap: 28px; padding-top: 28px; }
+  .pf-wait-plate { position: static; order: 2; }
+  .pf-wait-text { order: 1; }
+  .pf-wait-stages li { grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pf-wait-plate.is-tracing .pf-wait-trace,
+  .pf-wait-stages li.is-working .pf-wait-status em::before { animation: none; }
+}

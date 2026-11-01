@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Waiting screen: your own video, parts outlined — gallery demo</title>
+@@brand_icons@@
+<link rel="stylesheet" href="../wait-video.css">
+<style>
+  .demo-head { background: #131313; color: #f2f0eb; margin: 0 auto; max-width: 1200px; padding: 32px 32px 0; }
+  .demo-head h1 { font-family: "Oswald", "Arial Narrow", sans-serif; font-size: 28px; letter-spacing: 0.04em; margin: 0; text-transform: uppercase; }
+  .demo-head h1 span { color: #f0a400; }
+  .demo-head p { color: #a9a59c; margin: 8px 0 0; }
+</style>
+</head>
+<body style="margin:0;background:#131313">
+<header class="demo-head">
+  <h1 data-copy="wait.title">Building your guide. <span>Watch it happen.</span></h1>
+  <p data-copy="wait.sub">Your own footage plays while each finished stage traces what it found. Demo drives a fake status script; the live page polls the job-status JSON.</p>
+</header>
+<section class="wv" id="wait-video" aria-label="Guide progress">
+  <div class="wv-grid">
+    <div class="wv-viewer">
+      <div class="wv-frame" id="wv-frame">
+        <img class="wv-img is-on" id="wv-img-a" alt="">
+        <img class="wv-img" id="wv-img-b" alt="" aria-hidden="true">
+        <svg class="wv-overlay" id="wv-overlay" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true"></svg>
+        <p class="wv-loading" id="wv-loading" data-copy="wait.loading">Loading your frames…</p>
+      </div>
+      <div class="wv-viewbar">
+        <p class="wv-clock" data-copy="wait.elapsed">Elapsed <span id="wv-clock" role="timer">0:00</span></p>
+        <ol class="wv-stages" id="wv-stages" aria-live="polite"></ol>
+      </div>
+    </div>
+    <aside class="wv-rail" aria-label="Finished steps">
+      <div class="wv-actions">
+        <button class="wv-cancel" id="wv-cancel" type="button" data-copy="wait.cancel">Cancel and delete</button>
+        <a class="wv-guide is-hidden" id="wv-guide" href="#" data-copy="wait.open">Open your guide</a>
+      </div>
+      <p class="wv-note" id="wv-note" role="status" data-copy="wait.note"></p>
+      <ol class="wv-steps" id="wv-steps"></ol>
+      <button class="wv-replay is-hidden" id="wv-replay" type="button" data-copy="wait.replay">Replay demo</button>
+    </aside>
+  </div>
+</section>
+<script>window.__WV_FAKE__ = true;</script>
+<script src="../vendor/gsap.min.js"></script>
+<script src="../wait-video.js"></script>
+<script>
+(function () {
+  "use strict";
+  var M = "../media/wait-video/"; // committed drawn stand-ins, never footage
+  function stages(done, active) {
+    var ids = [["reading", "Reading video"], ["naming", "Naming steps"],
+               ["finding", "Finding parts"], ["drawing", "Drawing outlines"],
+               ["checking", "Checking"]];
+    return ids.map(function (pair) {
+      var state = "pending";
+      if (pair[0] === active) state = "active";
+      if (done.indexOf(pair[0]) !== -1) state = "done";
+      return { id: pair[0], label: pair[1], state: state };
+    });
+  }
+  var batteryS12 = { part: "Battery", frame_id: "s12",
+    polygon: [[390, 215], [700, 190], [905, 178], [1125, 195], [1125, 595],
+              [990, 645], [470, 628], [388, 555]],
+    label: [390, 215] };
+  var fanS12 = { part: "Fan", frame_id: "s12",
+    polygon: [[830, 45], [860, 130], [940, 190], [1020, 140], [1050, 55]],
+    label: [940, 190] };
+  var step1 = { n: 1, title: "Unscrew the base cover", at: "0:37", thumb: M + "synth-s09.jpg" };
+  var step2 = { n: 2, title: "Remove the back cover", at: "1:01", thumb: M + "synth-s10.jpg" };
+  var step3 = { n: 3, title: "Battery removal", at: "1:25", thumb: M + "synth-s12.jpg" };
+  var step4 = { n: 4, title: "Battery installation", at: "1:50", thumb: M + "synth-s16.jpg" };
+  function frame(id, file) {
+    return { id: id, src: M + file, alt: "Frame from your teardown clip" };
+  }
+  var script = [
+    { at: 0, status: { state: "active", stages: stages([], "reading"),
+        frame: frame("s09", "synth-s09.jpg"), outlines: [], steps: [] } },
+    { at: 2.5, status: { state: "active", stages: stages(["reading"], "naming"),
+        frame: frame("s10", "synth-s10.jpg"), outlines: [], steps: [step1] } },
+    { at: 5, status: { state: "active", stages: stages(["reading", "naming"], "finding"),
+        frame: frame("s12", "synth-s12.jpg"), outlines: [], steps: [step1, step2] } },
+    { at: 8, status: { state: "active", stages: stages(["reading", "naming", "finding"], "drawing"),
+        frame: frame("s12", "synth-s12.jpg"), outlines: [batteryS12],
+        steps: [step1, step2, step3] } },
+    { at: 11, status: { state: "active",
+        stages: stages(["reading", "naming", "finding", "drawing"], "checking"),
+        frame: frame("s12", "synth-s12.jpg"), outlines: [batteryS12, fanS12],
+        steps: [step1, step2, step3, step4] } },
+    { at: 14, status: { state: "done",
+        stages: stages(["reading", "naming", "finding", "drawing", "checking"], ""),
+        frame: frame("s12", "synth-s12.jpg"), outlines: [batteryS12, fanS12],
+        steps: [step1, step2, step3, step4], guide_url: "#guide-ready" } },
+  ];
+  document.addEventListener("DOMContentLoaded", function () {
+    var root = document.getElementById("wait-video");
+    root.dataset.mounted = "1";
+    window.WaitVideo.mount(root, { fakeScript: script });
+  });
+})();
+</script>
+</body>
+</html>

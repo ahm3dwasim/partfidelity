@@ -1,0 +1,9 @@
+sample_calls = "/calls/b3f79c933e2043afc3906a159f473a2b"
+hard_stop = "/guide/sample#step-5"
+# Button wording for the recorded catch page.
+catch_cta = "See the catch"
+# One short line under the home hero's first action. It says what the sample's receipts show; the new-run and offline roles point to /built and /catch.
+meta_roles = "This sample: Muse Spark steps and read-back, SAM 3.1 part boxes, saved SAM 3 contours. New runs add a Muse Spark Open second opinion; Muse Image tests the catch gate offline."
+meta_roles_link = "Sample receipts"
+meta_roles_catch_link = "The catch"
+meta_roles_built_link = "Model roles"

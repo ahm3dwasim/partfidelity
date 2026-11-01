@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$title · PartFidelity</title>
+@@brand_icons@@
+<link rel="stylesheet" href="/static/ui/tokens.css"><link rel="stylesheet" href="/static/ui/shell.css"><link rel="stylesheet" href="/static/ui/built.css"><link rel="stylesheet" href="/static/ui/replay.css">
+</head><body class="pf-theme-start">
+$header
+<main id="main" class="built replay">
+<div class="built-intro"><p class="built-kicker">$kicker</p><h1>$title</h1><p>$intro</p><p>$separate_text <a href="$separate_link">$separate_link_text</a></p></div>
+$recorded
+<section class="built-section"><h2>$replay_heading</h2><p class="replay-banner">$banner</p><h3 class="replay-card-heading">$card_heading</h3>
+<div class="replay-card" aria-label="$aria_label">
+<p class="replay-badge">$banner</p>
+<p class="replay-part">$label_caption: <strong data-replay-label>$shown_label</strong></p>
+<p class="replay-note" role="status" tabindex="-1" data-replay-status>$flagged_text</p>
+<div class="replay-live" id="replay-live" hidden $attrs>
+<div data-replay-flagged>
+<button type="button" class="pf-pill pf-pill-sm" data-replay-confirm>$confirm_label</button>
+<form class="replay-rename" data-replay-rename><label>$rename_input_label <input name="label" maxlength="40" autocomplete="off"></label><button type="submit" class="pf-pill pf-pill-sm">$rename_button</button></form>
+<p class="replay-error" role="alert" data-replay-error></p>
+</div>
+<div data-replay-done hidden><button type="button" class="pf-pill pf-pill-sm" data-replay-undo>$undo_label</button></div>
+<p class="replay-persist" data-replay-persist>$persist_note</p>
+</div>
+</div></section>
+<section class="built-section"><h2>$static_heading</h2><ol class="replay-steps">$steps</ol></section>
+</main><footer class="pf-footer"><div class="pf-container pf-footer-inner"><p>$banner · <a href="/built">How this was built</a></p></div></footer>
+<script src="/static/disagreement_replay.js" defer></script>
+</body></html>

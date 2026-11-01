@@ -1,0 +1,65 @@
+/* the evidence module calls evidence page. Calm workshop, phone first. */
+:root {
+  --paper: #faf7f1;
+  --card: #fffdf8;
+  --ink: #2b2620;
+  --muted: #6f6759;
+  --line: #e3d9c8;
+  --accent: #8a6d2f;
+  --ok-bg: #e7f2e3;
+  --ok-ink: #2f6b2a;
+  --not-bg: #f5e8dc;
+  --not-ink: #8a5a1e;
+  --bad: #a33b2e;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+}
+.page { max-width: 56rem; margin: 0 auto; padding: 1.25rem 1rem 3rem; }
+.crumb { color: var(--muted); font-size: 0.9rem; margin: 0 0 0.25rem; }
+.crumb a, .readback a, .calls a { color: var(--accent); }
+h1 { font-size: 1.6rem; margin: 0 0 0.25rem; letter-spacing: -0.01em; }
+h2 { font-size: 1.1rem; margin: 0 0 0.6rem; }
+.sub { color: var(--muted); margin: 0 0 1.25rem; }
+.sub code {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 0.3rem; padding: 0 0.35rem; font-size: 0.9em;
+}
+.summary {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+.summary > div {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 0.6rem; padding: 0.7rem 0.9rem;
+}
+.summary .num { display: block; font-size: 1.25rem; font-weight: 650; }
+.summary .cap { color: var(--muted); font-size: 0.85rem; }
+.readback, .calls {
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 0.6rem; padding: 1rem; margin-bottom: 1.25rem;
+}
+.readback.fallback { border-style: dashed; }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.45rem 0.6rem; border-top: 1px solid var(--line); }
+thead th { border-top: 0; color: var(--muted); font-weight: 600; white-space: nowrap; }
+.badge {
+  display: inline-block; border-radius: 999px;
+  padding: 0.1rem 0.65rem; font-weight: 650; font-size: 0.85rem;
+}
+.badge-ok { background: var(--ok-bg); color: var(--ok-ink); }
+.badge-not { background: var(--not-bg); color: var(--not-ink); }
+.st-ok { color: var(--ok-ink); font-weight: 600; }
+.st-bad { color: var(--bad); font-weight: 600; }
+.calls-link { color: var(--accent); font-weight: 600; }
+@media (min-width: 40rem) {
+  h1 { font-size: 2rem; }
+  .summary { grid-template-columns: repeat(4, 1fr); }
+  .page { padding: 2rem 1.5rem 4rem; }
+}

@@ -1,0 +1,253 @@
+/* PartFidelity loading set: skeletons, progress, busy
+   buttons, image fade-in, and empty/error states. Paper (manual) is the
+   default; any ancestor with .pf-theme-ink selects the ink (workshop)
+   variant. Token fallbacks match static/ui/tokens.css and apply
+   wherever that file is not loaded. */
+
+:root {
+  /* Shared keyboard-focus token for every page (the shell may adopt it into
+     tokens.css): ink on paper clears 3:1, amber stays for ink pages. */
+  --pf-focus: var(--pf-ink, #131313);
+  --pf-load-bg: var(--pf-paper-2, #faf9f5);
+  --pf-load-line: var(--pf-paper-line, #dcd8cf);
+  --pf-load-text: var(--pf-on-paper, #1b1d1a);
+  --pf-load-muted: var(--pf-on-paper-muted, #5d5f58);
+  --pf-load-skel: #e3dfd4;
+  --pf-load-shine: #f4f2eb;
+  --pf-load-radius: 10px;
+}
+
+.pf-theme-ink {
+  --pf-focus: var(--pf-amber, #f0a400);
+  --pf-load-bg: var(--pf-ink-2, #1d1d1d);
+  --pf-load-line: var(--pf-ink-line, #2c2c2c);
+  --pf-load-text: var(--pf-on-ink, #f2f0eb);
+  --pf-load-muted: var(--pf-on-ink-muted, #a9a59c);
+  --pf-load-skel: #262626;
+  --pf-load-shine: #353535;
+  --pf-load-radius: 2px;
+}
+
+/* Skeletons: shimmer sweep over a flat base. data-pf-stagger parents get a
+   GSAP entrance from loading.js; without JS the blocks still render. */
+.pf-skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--pf-load-skel);
+  border-radius: var(--pf-load-radius);
+}
+
+.pf-skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 20%, var(--pf-load-shine) 50%, transparent 80%);
+  animation: pf-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes pf-shimmer {
+  to { transform: translateX(100%); }
+}
+
+.pf-skel-step {
+  background: var(--pf-load-bg);
+  border: 1px solid var(--pf-load-line);
+  border-radius: var(--pf-load-radius);
+  padding: 16px;
+}
+
+.pf-skel-img {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+}
+
+.pf-skel-step .pf-skel-img {
+  margin-bottom: 12px;
+}
+
+.pf-skel-line {
+  height: 0.85em;
+  width: var(--w, 100%);
+  margin: 0 0 8px;
+}
+
+.pf-skel-line:last-child {
+  margin-bottom: 0;
+}
+
+/* Progress: fill moves with scaleX (transform-only, GSAP-tweened). The
+   partial sets the initial scaleX inline so the bar is right without JS. */
+.pf-progress {
+  background: var(--pf-load-bg);
+  border: 1px solid var(--pf-load-line);
+  border-radius: var(--pf-load-radius);
+  padding: 16px;
+  color: var(--pf-load-text);
+}
+
+.pf-progress-track {
+  height: 8px;
+  background: var(--pf-load-line);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.pf-progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--pf-amber, #f0a400);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.pf-progress-label {
+  margin: 12px 0 8px;
+  font-weight: bold;
+}
+
+.pf-stages {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  color: var(--pf-load-muted);
+  font-size: 0.9em;
+}
+
+.pf-stages li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pf-stages li::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--pf-load-line);
+  flex: none;
+}
+
+.pf-stages li.is-done {
+  color: var(--pf-load-text);
+}
+
+.pf-stages li.is-done::before {
+  background: var(--pf-ok, #2f7d4f);
+}
+
+.pf-stages li.is-current {
+  color: var(--pf-load-text);
+  font-weight: bold;
+}
+
+.pf-stages li.is-current::before {
+  background: var(--pf-amber, #f0a400);
+}
+
+/* Busy button: amber submit that gains a spinner and locks while busy. */
+.pf-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--pf-amber, #f0a400);
+  color: var(--pf-amber-ink, #1a1300);
+  border: none;
+  border-radius: var(--pf-load-radius);
+  padding: 12px 20px;
+  font: inherit;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.pf-btn:hover {
+  filter: brightness(0.95);
+}
+
+.pf-btn[aria-busy="true"] {
+  cursor: wait;
+  pointer-events: none;
+}
+
+.pf-btn[aria-busy="true"]::before {
+  content: "";
+  width: 1em;
+  height: 1em;
+  flex: none;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 999px;
+  animation: pf-spin 0.8s linear infinite;
+}
+
+@keyframes pf-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Image fade-in: hidden state is set by JS only, so no-JS still shows
+   the image. The transition covers the CSS fallback path. */
+[data-pf-fade] {
+  transition: opacity 0.18s ease-out;
+}
+
+img[data-pf-fade] {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Empty/error states: flat card, danger marker, plain wording. */
+.pf-state {
+  background: var(--pf-load-bg);
+  border: 1px solid var(--pf-load-line);
+  border-left: 4px solid var(--pf-danger, #c2331f);
+  border-radius: var(--pf-load-radius);
+  padding: 16px;
+  color: var(--pf-load-text);
+}
+
+.pf-state-title {
+  margin: 0 0 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+.pf-state-body {
+  margin: 0 0 12px;
+}
+
+.pf-state-body:last-child {
+  margin-bottom: 0;
+}
+
+.pf-state-action {
+  color: inherit;
+  font-weight: bold;
+}
+
+.pf-state-action:visited {
+  color: inherit;
+}
+
+/* Keyboard focus stays visible on every interactive piece. */
+.pf-btn:focus-visible,
+.pf-state-action:focus-visible {
+  outline: 3px solid var(--pf-focus, #131313);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pf-skel::after,
+  .pf-btn[aria-busy="true"]::before {
+    animation: none;
+  }
+
+  [data-pf-fade] {
+    transition: none;
+  }
+}

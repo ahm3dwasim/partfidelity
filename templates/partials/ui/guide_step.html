@@ -1,0 +1,53 @@
+{# Guide step card. Canonical markup.
+   Pin positions come from the part boxes the guide already has: the server
+   turns each Detection.box_xyxy into frame-size percentages and passes the
+   box CENTER as pin.x/pin.y (0-100). Pins are aria-hidden spans; the legend
+   carries the same numbers as text. The figure keeps its exact aspect ratio
+   when the server knows the frame size, so pins point at the right pixels.
+   Copy slots use data-copy="<key>" until the copy is approved.
+   Vars: number, window, frame_src, action, phrases (alt join), size (optional
+   [width, height]), pins [{x, y, part}], parts [{phrase, ok, pin}], hazard
+   (optional {title, text}), filmed_only_html (optional label-check/time
+   controls), text (the strict copy from config/guide_text.toml, app.guide_text.TEXT). Pin numbers are part positions (1-based): pin.part names the
+   part the pin sits on, and part.pin repeats the part's own number only
+   when it has a detection (no detection, no pin reference).
+   The view switch lives in guide_view_switch.html and is included ONCE per
+   page, never per card. #}
+<article class="pf-card" id="step-{{ number }}">
+  <div class="pf-card-head">
+    <h2 data-copy="step.title">Step {{ number }}</h2>
+    <p class="pf-window" data-copy="step.window">~{{ window }} &#183; times are approximate</p>
+  </div>
+  <figure class="pf-frame is-loading"{% if size %} style="aspect-ratio: {{ size[0] }} / {{ size[1] }}"{% endif %}>
+    <img src="{{ frame_src }}" alt="Step {{ number }} frame: {{ action }}; parts: {{ phrases }}" loading="lazy">
+    {% for pin in pins %}
+    <span class="pf-pin" id="pin-{{ number }}-{{ pin.part }}" style="--x:{{ pin.x }}%;--y:{{ pin.y }}%;" aria-hidden="true">{{ pin.part }}</span>
+    {% endfor %}
+  </figure>
+  <p class="pf-action" data-copy="step.action">{{ action }}</p>
+  {% if hazard %}
+  <div class="pf-hazard" role="note">
+    <p class="pf-hazard-title" data-copy="hazard.battery.title">{{ hazard.title }}</p>
+    <p data-copy="hazard.battery.text">{{ hazard.text }}</p>
+  </div>
+  {% endif %}
+  <ol class="pf-legend pf-filmed-only" aria-label="Parts in step {{ number }}">
+    {% for part in parts %}
+    <li{% if part.pin %} data-pin="pin-{{ number }}-{{ part.pin }}"{% endif %} tabindex="0">
+      <span class="pf-n" aria-hidden="true">{{ loop.index }}</span>
+      <span class="pf-phrase" data-copy="legend.phrase">{{ part.phrase }}</span>
+      {% if part.ok %}
+      <span class="pf-proof is-ok" data-copy="proof.ok">{{ text.status_unchanged }}</span>
+      {% else %}
+      <span class="pf-proof is-pending" data-copy="proof.pending">Not checked</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ol>
+  {% if parts | selectattr("ok") | list %}
+  <p class="parts-note pf-filmed-only" data-copy="proof.help">{{ text.status_unchanged_help }}</p>
+  {% endif %}
+  {% if filmed_only_html %}
+  <div class="pf-card-foot pf-filmed-only">{{ filmed_only_html }}</div>
+  {% endif %}
+</article>

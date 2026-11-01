@@ -1,0 +1,48 @@
+[guide_text]
+status_unchanged = "No visual changes to this part"   # the visual-change badge; says nothing about whether the label is right
+status_unchanged_help = "\u201cNo visual changes\u201d means the image pixels for this part were not changed. It does not confirm the label is correct."
+intro_title = "Intro"   # the unnumbered context block above step 1
+intro_note = "Context for the clip, not a repair step. Step 1 comes next."
+# Result line after a label edit, by result code. {max} is the configured label length.
+fix_renamed = "Label renamed."
+fix_renamed_unchecked = "Label renamed. The other AI check could not run for it, so it has no second opinion."
+fix_deleted = "Label deleted."
+fix_confirmed = "You confirmed this label."
+fix_unconfirmed = "Confirmation undone."
+fix_stale = "That check changed since you opened the page, so nothing was recorded. Look at the label again."
+fix_blank = "That label needs a name. Type one and try again."
+fix_long = "That name is too long. Keep it to {max} characters or fewer."
+fix_bad = "That label could not be used. Use plain letters and numbers."
+fix_gone = "That label changed since you opened the page. Check it and try again."
+fix_locked = "This guide cannot be edited."
+fix_full = "This guide has had too many edits. Download it as it is."
+fix_failed = "The change could not be saved, so nothing was changed. Try again."
+# The reader stop (live guide and offline export): shown at a battery or glued-screen step.
+stop_line = "See a professional before you go on."
+stop_cta = "I understand. Show the next steps."
+stop_done = "Acknowledged. The later steps are shown below. The warnings stay on the page."
+difficulty_prefix = "Should you try this?"   # leads the hazard-derived verdict under the title
+safety_stop_note = "Where a step has a hard stop, the later steps show only their warnings until you acknowledge it."
+# The stop names the hazard and its risk. {hazard} is the stop's hazard names joined with "and"; {n} is the folded step count.
+stop_title = "Hard stop: {hazard}."
+stop_name_battery = "battery"
+stop_name_glued_screen = "glued screen"
+stop_name_unknown_hazard = "unrecognized hazard"
+stop_risk_unknown_hazard = "This step names a hazard we do not recognize. Treat it as dangerous until a professional says otherwise."
+stop_risk_battery = "Disconnect the battery first. A punctured or shorted cell can catch fire."
+stop_risk_glued_screen = "Prying a glued screen without heat can crack the glass. Too much heat can damage the screen and the battery under it."
+stop_folded_one = "1 more step is below, folded to its warnings."
+stop_folded_many = "{n} more steps are below, folded to their warnings."
+# Plain verdict shown when the stored verdict is a draft or missing; worded from difficulty and stop hazards.
+verdict_easy = "Easy: a careful beginner can try this."
+verdict_medium = "Medium: take your time and have the right tools."
+verdict_hard = "Hard: only if you have done this kind of repair before."
+verdict_hard_battery = "Hard: only if you can safely disconnect a laptop battery."
+verdict_hard_glued_screen = "Hard: only if you can safely heat and lift a glued screen."
+verdict_hard_unknown_hazard = "Hard: a hazard in this guide could not be identified. Stop and check with a professional before you start."
+verdict_hard_battery_glued_screen = "Hard: only if you can safely lift a glued screen and disconnect the battery."
+verdict_hard_battery_unknown_hazard = "Hard: only if you can safely disconnect a laptop battery. A second hazard in this guide could not be identified, so stop and check before you start."
+verdict_hard_glued_screen_unknown_hazard = "Hard: only if you can safely heat and lift a glued screen. A second hazard in this guide could not be identified, so stop and check before you start."
+verdict_hard_battery_glued_screen_unknown_hazard = "Hard: only if you can safely lift a glued screen and disconnect the battery. A third hazard in this guide could not be identified, so stop and check before you start."
+# Reader-facing form of a draft note that carries safety meaning (the maker view shows the DRAFT note instead).
+draft_note_battery_reader = "The video does not show the battery being disconnected. Disconnect it before you go on."

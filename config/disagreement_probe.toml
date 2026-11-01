@@ -1,0 +1,23 @@
+# Disagreement probe for the background Spark Open label opinion (lane mh-disagreement, W-2816; product jury v2 rank 6).
+# Read strictly by tools/disagreement_probe.py: a missing, extra or mistyped key fails. No credentials here:
+# the key is read only from BASETEN_API_KEY. The model, endpoint, prices and caps come from config/open_readback.toml.
+# The probe makes exactly two calls: the same step image with the wrong label, then with the correct one.
+
+[probe]
+image = "app/sample_real/labels/step-06-part-2.png"   # the sample's fan label image (private bundle; unpacked by tools/sample_media.py)
+correct_label = "fan"                                  # what the image shows (the control)
+wrong_label = "keyboard"                               # deliberately absent: this is the underside, no keyboard in frame (battery IS visible, so it is not a wrong label for the visibility question)
+wrong_case = "wrong-label case"
+control_case = "control"
+receipt_path = "docs/evidence/disagreement-probe/run-2-keyboard.json"   # the probe writes here; the replay page shows it as the recorded run 2
+earlier_receipt_path = "docs/evidence/disagreement-probe/run-1-battery.json"  # recorded run 1 (wrong label "battery", visible in the photo)
+note = "Two calls on one image. This shows what the model answered for these two labels only; it is not a measure of accuracy."
+
+[modal]
+app_name = "partfidelity-disagreement-probe"
+secret_name = "partfidelity-meta"                      # must hold BASETEN_API_KEY
+python_version = "3.12"
+remote_root = "/srv/partfidelity"
+timeout_s = 300
+image_folders = ["app", "tools"]
+image_files = ["config/open_readback.toml", "config/disagreement_probe.toml", "docs/evidence/disagreement-probe/run-1-battery.json", "docs/evidence/disagreement-probe/run-2-keyboard.json", "app/sample_real/labels/step-06-part-2.png"]
