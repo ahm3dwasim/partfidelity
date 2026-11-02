@@ -40,7 +40,7 @@ def test_an_edited_caption_is_not_in_the_approved_list(tmp_path):
     assert [s for s in _shipped(path) if s not in approved] == ["Repair videos run on. You pause, rewind and lose your place."]
 
 
-def test_no_committed_config_names_a_machine_path():
+def test_no_demo_config_names_a_machine_path():
     bad = re.compile(r"/Users/|/opt/|/home/|~")
     for path in sorted(df.CONFIG.parent.glob("demo_*.toml")):
         assert not bad.search(path.read_text()), path.name   # whole file, comments included
