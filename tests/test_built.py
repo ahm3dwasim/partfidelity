@@ -24,7 +24,10 @@ def test_built_contains_every_feature_and_release_notes():
         assert page.text.count('<dt>' + escape(name) + '</dt>') == 1, name
     for old, new in built_config.load()['superseded'].items():
         assert 'Replaced by ' + escape(new) in page.text and old in names
-    assert 'Repository link added at release' in page.text
+    url = built_config.load()['page']['repository_url']
+    pinned = 'https://github.com/ahm3dwasim/partfidelity'  # config-ok: test pins the published repository target
+    assert url == pinned and f'<a href="{pinned}">{pinned}</a>' in page.text
+    assert f'<a href="{url}">{url}</a>' in page.text and 'Repository link added at release' not in page.text
     assert 'live app makes no Muse Image call' in page.text
     assert 'made offline and frozen as a test set for the edit check' in page.text
     assert 'Oct 26–Nov 4, 2026' in page.text
@@ -51,7 +54,7 @@ def test_loader_rejects_missing_and_invalid_content(tmp_path: Path):
     with pytest.raises(ValueError, match='Invalid build notes'):
         built_config.load(tmp_path / 'missing.toml')
     broken = tmp_path / 'broken.toml'
-    broken.write_text(built_config.CONFIG.read_text().replace('repository_url = ""', 'repository_url = "javascript:alert(1)"'))
+    broken.write_text(built_config.CONFIG.read_text().replace(built_config.load()['page']['repository_url'], 'javascript:alert(1)'))
     with pytest.raises(ValueError, match='repository URL'):
         built_config.load(broken)
     missing_feature = tmp_path / 'features.md'
