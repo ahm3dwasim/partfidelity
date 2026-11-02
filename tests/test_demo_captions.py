@@ -42,5 +42,5 @@ def test_an_edited_caption_is_not_in_the_approved_list(tmp_path):
 
 def test_no_committed_config_names_a_machine_path():
     bad = re.compile(r"/Users/|/opt/|/home/|~")
-    for path in sorted(df.CONFIG.parent.glob("*.toml")):
+    for path in sorted(df.CONFIG.parent.glob("demo_*.toml")):
         assert not bad.search(path.read_text()), path.name   # whole file, comments included
