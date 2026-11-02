@@ -1,0 +1,31 @@
+/* Extends demo/preview/preview.css (palette, caption block, window, rings come from there and static/ui/tokens.css). */
+.scene { left: 0; top: 0; width: 100%; height: 100%; }
+.scene > * { position: absolute; margin: 0; }
+.scene.k-footage { z-index: 2; }
+
+.fcard {
+  overflow: hidden; transform-origin: 0 0;
+  border: 1px solid color-mix(in srgb, var(--pf-accent) 60%, transparent);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.6);
+}
+.fcard canvas { display: block; width: 100%; height: 100%; }
+.fcard .shade { position: absolute; left: 0; right: 0; bottom: 0; height: 90px; background: linear-gradient(transparent, rgba(0, 0, 0, 0.7)); }
+.bar { position: absolute; left: calc(var(--bar-inset) * 1px); right: calc(var(--bar-inset) * 1px); bottom: calc(var(--bar-bottom) * 1px); height: calc(var(--bar-height) * 1px); border-radius: calc(var(--bar-radius) * 1px); background: rgba(255, 255, 255, 0.3); }
+.bar .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; border-radius: calc(var(--bar-radius) * 1px); background: var(--pf-accent); }
+.bar .dot { position: absolute; top: calc(var(--dot-rise) * -1px); left: 0; width: calc(var(--dot-px) * 1px); height: calc(var(--dot-px) * 1px); margin-left: calc(var(--dot-px) * -0.5px); border-radius: 50%; background: var(--pf-accent); }
+.bar .time { position: absolute; left: 0; bottom: calc(var(--time-bottom) * 1px); font: var(--time-weight) calc(var(--time-px) * 1px) var(--pf-font-mono); color: #fff; text-shadow: 0 1px 4px #000; }
+
+.dim { position: absolute; border-radius: 10px; pointer-events: none; }
+.veil {
+  position: absolute; display: flex; align-items: center; justify-content: center; background: var(--pf-ink);
+  border: 1px solid var(--pf-ink-line-strong); border-radius: calc(var(--veil-radius) * 1px);
+  font-size: calc(var(--veil-px) * 1px); font-weight: var(--veil-weight); letter-spacing: calc(var(--veil-spacing) * 1em); text-transform: uppercase; color: var(--pf-on-ink-dim);
+}
+
+.textcard { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: calc(var(--card-gap) * 1px); text-align: center; transform-origin: 50% 50%; }
+.textcard .line { font-family: var(--pf-font-display); font-size: calc(var(--line-px) * 1px); line-height: 1.1; color: var(--pf-on-ink); }
+.textcard .line.small { font-family: var(--pf-font-body); font-size: calc(var(--line-small-px) * 1px); color: var(--pf-on-ink-muted); }
+.textcard .line.url { font-family: var(--pf-font-body); font-size: calc(var(--line-url-px) * 1px); font-weight: var(--url-weight); color: var(--pf-accent); }
+.logo { display: flex; align-items: center; gap: calc(var(--logo-gap) * 1px); }
+.logo img { width: calc(var(--logo-icon-px) * 1px); height: calc(var(--logo-icon-px) * 1px); transform-origin: 50% 50%; }
+.logo .word { font-family: var(--pf-font-display); font-size: calc(var(--logo-word-px) * 1px); line-height: 1; color: var(--pf-on-ink); white-space: nowrap; }

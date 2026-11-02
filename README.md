@@ -76,7 +76,7 @@ uv pip install --python .venv/bin/python -e '.[test]'
 make verify-public                       # the whole tests/ tree (long)
 ```
 
-The demo video tooling (`demo/`, `config/demo_*.toml`) is render-time only and is not shipped. Its caption word filter and
+The demo video tooling (`demo/`, `config/demo_*.toml`) is render-time only; the private footage it renders is not shipped. Its caption word filter and
 cut validator are advisory lint, not guarantees; what the video says is pinned by the exact `[captions] approved` list in each
 config (`tests/test_demo_captions.py`). Machine paths come from `PF_FFMPEG`, `PF_PLAYWRIGHT_FROM` and `PF_FOOTAGE_ZIP`.
 

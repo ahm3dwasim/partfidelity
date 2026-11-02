@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PartFidelity full demo</title>
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="/demo/preview/preview.css">
+<link rel="stylesheet" href="full.css">
+</head>
+<body>
+<!-- Scenes, captions and the badge are built by full.js from config/demo_full.toml. One paused GSAP timeline;
+     render.mjs calls window.seek(t) per frame. Open with ?play to watch it live. -->
+<div id="stage">
+  <div id="captions"></div>
+  <img id="badge" src="/static/ui/icon.svg" alt="PartFidelity">
+</div>
+<script src="/static/ui/vendor/gsap.min.js"></script>
+<script src="full.js"></script>
+</body>
+</html>

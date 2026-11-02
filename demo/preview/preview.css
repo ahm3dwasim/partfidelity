@@ -1,0 +1,60 @@
+/* Palette, fonts and radii come from static/ui/tokens.css; sizes that change live in config/demo_preview.toml
+   and are set from preview.js as CSS variables. */
+html, body { margin: 0; background: var(--pf-ink); }
+#stage {
+  position: relative; overflow: hidden; background: var(--pf-ink);
+  width: calc(var(--w) * 1px); height: calc(var(--h) * 1px);
+  font-family: var(--pf-font-body); color: var(--pf-on-ink);
+}
+#stage > *, #match > * { position: absolute; margin: 0; }
+
+#footage {
+  left: 0; top: 0; transform-origin: 0 0;
+  border: 1px solid color-mix(in srgb, var(--pf-accent) 60%, transparent);
+  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.6);
+}
+
+.window {
+  overflow: hidden; border: 1px solid var(--pf-ink-line-strong);
+  border-radius: calc(var(--radius) * 1px); background: var(--pf-ink);
+}
+.cam { position: absolute; left: 0; top: 0; transform-origin: 0 0; }
+.cam img { display: block; }
+
+#match { inset: 0; }
+#match figure { margin: 0; }
+.shot {
+  position: relative; overflow: hidden; border: 1px solid var(--pf-ink-line-strong);
+  border-radius: var(--pf-radius-panel); background: var(--pf-ink);
+}
+.shot img { display: block; }
+.ring {
+  position: absolute; left: 0; top: 0; border: calc(var(--ring-border) * 1px) solid var(--pf-accent);
+  border-radius: calc(var(--ring-radius) * 1px);
+  background: color-mix(in srgb, var(--pf-accent) calc(var(--ring-tint) * 1%), transparent);
+}
+#link { left: 0; top: 0; pointer-events: none; }
+#link path { fill: none; stroke: var(--pf-accent); stroke-width: var(--link-stroke); stroke-linecap: round; }
+
+.tag {
+  display: inline-block; font-size: calc(var(--panel-tag-px) * 1px); font-weight: var(--panel-tag-weight);
+  letter-spacing: calc(var(--panel-tag-spacing) * 1em); text-transform: uppercase;
+  color: var(--pf-accent); white-space: nowrap;
+}
+figcaption.tag { position: absolute; left: 0; bottom: calc(100% + var(--panel-tag-gap) * 1px); }
+
+/* One caption block: badge line, then up to two text lines. Top-anchored, so the badge and the first text line
+   sit at the same x/y in every beat; preview.js sets the box, size and gap variables from [caption_box]. */
+.caption {
+  position: absolute; left: 0; top: 0; display: flex; flex-direction: column; margin: 0;
+  gap: calc(var(--tag-gap) * 1px); font-size: calc(var(--text-px) * 1px); line-height: var(--line-height);
+  align-items: var(--cap-items); text-align: var(--cap-align);
+}
+.caption .tag {
+  font-size: calc(var(--tag-px) * 1px); line-height: 1.2; font-weight: var(--caption-tag-weight, var(--panel-tag-weight));
+  padding: calc(var(--tag-pad-v) * 1px) calc(var(--tag-pad-h) * 1px);
+  border: 1px solid var(--pf-warn-line); border-radius: var(--pf-radius-pill);
+}
+.caption .text { max-width: calc(var(--max-chars) * 1ch); text-wrap: balance; }
+#badge { width: calc(var(--mark-px) * 1px); height: calc(var(--mark-px) * 1px); transform-origin: 50% 50%; }
+#dim { position: absolute; border-radius: calc(var(--dim-radius) * 1px); pointer-events: none; }

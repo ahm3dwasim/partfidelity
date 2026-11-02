@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PartFidelity motion preview</title>
+<link rel="stylesheet" href="/static/ui/tokens.css">
+<link rel="stylesheet" href="preview.css">
+</head>
+<body>
+<!-- One paused GSAP timeline; render.mjs calls window.seek(t) per frame. Open with ?play to watch it live. -->
+<div id="stage">
+  <div id="guide" class="window"><div class="cam"><img id="guide-img" alt=""><div id="dim"></div></div></div>
+
+  <div id="match">
+    <figure id="table-panel"><figcaption id="recorded-tag" class="tag"></figcaption>
+      <div class="shot"><img id="table-img" alt=""><div id="row-ring" class="ring"></div></div></figure>
+    <figure id="card-panel"><figcaption id="replay-tag" class="tag"></figcaption>
+      <div class="shot"><img id="card-img" alt=""><div id="note-ring" class="ring"></div></div></figure>
+    <svg id="link"><path id="link-path" d=""/></svg>
+  </div>
+
+  <canvas id="footage"></canvas>
+
+  <div id="captions">
+    <p class="caption" data-beat="footage"><span class="tag"></span><span class="text"></span></p>
+    <p class="caption" data-beat="guide"><span class="tag"></span><span class="text"></span></p>
+    <p class="caption" data-beat="match"><span class="tag"></span><span class="text"></span></p>
+  </div>
+  <img id="badge" src="/static/ui/icon.svg" alt="PartFidelity">
+</div>
+<script src="/static/ui/vendor/gsap.min.js"></script>
+<script src="preview.js"></script>
+</body>
+</html>
