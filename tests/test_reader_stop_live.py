@@ -82,15 +82,16 @@ def test_export_still_uses_the_same_stop_and_difficulty_line(guide, tmp_path):
 
 
 def _visible(page, step):
-    """The step's instructions are shown (a folded step shows only its row and warnings)."""
-    return page.locator(f"#step-{step} .action").is_visible()
+    """The step is open: its time line shows (a folded step shows only its row, action title and warnings)."""
+    return page.locator(f"#step-{step} .time").is_visible()
 
 
 def _warnings_visible(page, step):
     """Every warning block on the step is really visible (computed, not just in the markup)."""
     blocks = page.locator(f"#step-{step} .pf-hazard")
     return blocks.count() > 0 and all(blocks.nth(i).is_visible() for i in range(blocks.count())) \
-        and page.locator(f"#step-{step} h2").is_visible() and page.locator(f"#step-{step} .gd-no").is_visible()
+        and page.locator(f"#step-{step} h2").is_visible() and page.locator(f"#step-{step} .gd-no").is_visible() \
+        and page.locator(f"#step-{step} .action").is_visible()  # a folded step keeps its action title
 
 
 @contextlib.contextmanager

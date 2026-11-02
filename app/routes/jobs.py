@@ -20,7 +20,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
 from app.brand_templates import make_env
 
-from app import db, wait_view
+from app import db, proof_links, wait_view
 from app.hazards import refusal_copy
 from app.pipeline import (
     guide_path, read_pending_settlement, refusal_text_for_job, stage_for_job,
@@ -128,7 +128,7 @@ def _clock(seconds: float | None) -> str:
 
 def _status_page(
     job_id: str, state: str, stage: str | None, refresh_s: int, reason: str | None = None,
-    view: wait_view.WaitView | None = None,
+    view: wait_view.WaitView | None = None, saved_copy: str = "",
 ) -> str:
     message = STATE_COPY.get(state, state)
     if state in ("failed", "pending_settlement") and reason:
@@ -154,7 +154,7 @@ def _status_page(
         ),
         elapsed_text=_clock(view.elapsed_s),
         durations=[_clock(s.took_s) for s in view.stages],
-        numerals=_NUMERALS, status_words=_STATUS_WORDS,
+        numerals=_NUMERALS, status_words=_STATUS_WORDS, saved_copy=saved_copy,
     )
 
 
@@ -204,11 +204,13 @@ def job_status(job_id: str, request: Request) -> Response:
             settings, "job_status_refresh_s", DEFAULT_JOB_STATUS_REFRESH_S
         )
         marker = stage_for_job(job_id, data_root=data_root)
-        view = wait_view.build(
+        saved_copy = proof_links.saved_copy_line(job_id, database)
+        # Installed rows carry install time, so the shipped job shows no clock, stage times or log.
+        view = None if saved_copy else wait_view.build(
             job_id, state, marker, database=database, data_root=data_root,
             now=datetime.now(timezone.utc),
         )
-        return HTMLResponse(_status_page(job_id, state, stage, refresh_s, reason, view))
+        return HTMLResponse(_status_page(job_id, state, stage, refresh_s, reason, view, saved_copy))
     return JSONResponse(
         {
             "job_id": job_id,

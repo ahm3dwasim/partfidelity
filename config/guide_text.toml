@@ -1,5 +1,6 @@
 [guide_text]
 status_unchanged = "No visual changes to this part"   # the visual-change badge; says nothing about whether the label is right
+status_not_checked_help = "Not checked means the model did not confirm this label."   # said once, beside the first Not checked badge
 status_unchanged_help = "\u201cNo visual changes\u201d means the image pixels for this part were not changed. It does not confirm the label is correct."
 intro_title = "Intro"   # the unnumbered context block above step 1
 intro_note = "Context for the clip, not a repair step. Step 1 comes next."

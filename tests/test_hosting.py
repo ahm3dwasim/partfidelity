@@ -23,7 +23,7 @@ from fastapi.testclient import TestClient
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 
-from app import db, guide_clip, persistence
+from app import db, guide_clip, persistence, proof_links
 from app.admission import admit_job, job_dir
 from app.contracts import UploadPreview
 from app.deletion import cancel_and_delete
@@ -148,11 +148,15 @@ def _job_with_preview(db_path: Path, tag: str, *, payload: bytes = b"preview"):
 
 
 def _job_ids(db_path: Path) -> set[str]:
+    """Job ids other than the shipped proof job, which every boot installs (asserted present here)."""
+    proof = proof_links.load()["open_weights_job"]
     conn = sqlite3.connect(db_path)
     try:
-        return {row[0] for row in conn.execute("SELECT id FROM jobs")}
+        ids = {row[0] for row in conn.execute("SELECT id FROM jobs")}
     finally:
         conn.close()
+    assert proof in ids, "the shipped proof job must be installed"
+    return ids - {proof}
 
 
 # --- config -----------------------------------------------------------------

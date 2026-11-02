@@ -16,7 +16,7 @@ VERDICT_KEYS = ("easy", "medium", "hard", "hard_battery", "hard_glued_screen", "
                 "hard_battery_glued_screen", "hard_battery_unknown_hazard", "hard_glued_screen_unknown_hazard",
                 "hard_battery_glued_screen_unknown_hazard")
 FIX_OK = ("renamed", "deleted", "confirmed", "unconfirmed")
-_KEYS = ("status_unchanged", "status_unchanged_help", "intro_title", "intro_note", "stop_line", "stop_cta", "stop_done",
+_KEYS = ("status_unchanged", "status_unchanged_help", "status_not_checked_help", "intro_title", "intro_note", "stop_line", "stop_cta", "stop_done",
          "difficulty_prefix", "safety_stop_note", "draft_note_battery_reader",
          "stop_title", "stop_folded_one", "stop_folded_many",
          *(f"stop_{part}_{kind}" for part in ("name", "risk") for kind in STOP_KINDS),

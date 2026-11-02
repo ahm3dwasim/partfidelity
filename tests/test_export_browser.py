@@ -76,11 +76,11 @@ def test_offline_export_makes_no_request_and_blocks_at_the_stop(browser, guide, 
         sizes = page.evaluate("[...document.images].map(i => i.complete && i.naturalWidth)")
         assert sizes and all(sizes), sizes
         assert page.locator("details.fix-label").count() == 0
-        assert not page.locator("#step-3 .action").is_visible()  # instructions fold ...
-        assert page.locator("#step-3 h2").is_visible()  # ... the row and its warnings stay
+        assert not page.locator("#step-3 .time").is_visible()  # the step body folds ...
+        assert page.locator("#step-3 h2").is_visible() and page.locator("#step-3 .action").is_visible()  # ... the row, action title and warnings stay
         hazards = page.locator("#step-3 .pf-hazard")
         assert all(hazards.nth(i).is_visible() for i in range(hazards.count()))
         page.get_by_text("I understand. Show the next steps.").click()
-        assert page.locator("#step-3 .action").is_visible()
+        assert page.locator("#step-3 .time").is_visible()
     finally:
         context.close()

@@ -87,7 +87,7 @@ _FONT_FACE = re.compile(r"@font-face\s*\{[^}]*\}")
 #: the per-step status line, which stays visible in reader view.
 _EXPORT_CSS = """
 .ack-box { position: absolute; opacity: 0; pointer-events: none; }
-.ack-box:not(:checked) ~ .after-stop .card > :not(header):not(.pf-hazard),
+.ack-box:not(:checked) ~ .after-stop .card > :not(header):not(.pf-hazard):not(.action),
 .ack-box:not(:checked) ~ .after-stop .card > header .time,
 .ack-box:not(:checked) ~ .after-stop .card > header .check-time { display: none; }
 .ack-box:focus-visible ~ .stop .ack { outline: 3px solid var(--focus, #1b1d1a); outline-offset: 2px; }
@@ -233,7 +233,7 @@ def follower_html(
     def image_url(path: Path) -> str:
         return f"{images_dir}/{names[path]}"
 
-    explained = [False]  # one visual-change explanation for the whole export
+    explained = [False, False]  # one visual-change explanation for the whole export
 
     def render_card(card: StepCard) -> str:
         chunk = render_cards_html([card], image_url, hazard_blocks=step_hazard_blocks, explained_once=explained)

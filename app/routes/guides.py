@@ -171,6 +171,7 @@ def _sample_note_html() -> str:
         f'<a href="/catch">{html.escape(proof_links.load()["catch_cta"])}</a> '
         f'<a href="{html.escape(proof_links.load()["sample_calls"], quote=True)}">Calls</a> '
         f'<a href="{html.escape(proof_links.load()["hard_stop"], quote=True)}">Battery warning in the sample</a></nav>'
+        + proof_links.open_weights_note_html()
     )
 
 
@@ -438,7 +439,7 @@ def _render_page(
         if sample and settings is not None
         else None
     )
-    explained = [False]  # the visual-change line is said once across the whole page
+    explained = [False, False]  # the visual-change line is said once across the whole page
     cards_html = gated_cards_html(
         cards,
         lambda card: render_cards_html(
@@ -471,7 +472,7 @@ def _render_page(
         "KICKER": "Sample guide" if sample else "Maker guide",
         "SAMPLE_NOTE": _sample_note_html() if sample else "",
         "STEP_COUNT": str(sum(not step.is_intro for step in guide.steps)),
-        "DRAFT_NOTES": draft_notes_html(guide),
+        "DRAFT_NOTES": proof_links.sample_wording(draft_notes_html(guide)) if sample else draft_notes_html(guide),
         "CARDS": cards_html,
         "GUIDE_CSS": css,
         "CALLS_LINK": calls_link_html(job_id),

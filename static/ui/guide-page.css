@@ -350,6 +350,9 @@ body.simple.pf-theme-guide .gd-play { display: none; }
   border: 1px solid var(--pf-ink-line-strong); color: var(--pf-on-ink);
   font-size: 0.75rem; letter-spacing: 0.06em; text-transform: uppercase;
 }
+.pf-theme-guide .gd-open-weights { margin: 0 0 14px; font-size: 0.875rem; color: var(--pf-on-ink-muted); }
+.pf-theme-guide .gd-open-weights a { display: inline-block; padding: 10px 0; color: var(--pf-on-ink); }
+.guide .status-help { flex-basis: 100%; font-size: 0.8125rem; color: var(--pf-on-paper-muted, #5d5f58); }
 .pf-theme-guide .gd-sample-links { display: flex; flex-wrap: wrap; gap: 6px 20px; margin: 0 0 14px; font-size: 0.875rem; }
 .pf-theme-guide .gd-sample-links a { display: inline-flex; align-items: center; min-height: 44px; color: var(--pf-on-ink-muted); }
 
@@ -380,9 +383,9 @@ html { scroll-padding-bottom: calc(var(--pf-bar) + 16px); }
 .pf-theme-guide .guide .card.gd-intro .gd-done-row,
 .pf-theme-guide .guide .card.gd-intro [data-set-start] { display: none; }
 
-/* Reader stop: before acknowledgement each later step shrinks to a row (number, title, its full
+/* Reader stop: before acknowledgement each later step shrinks to a row (number, action title, its full
    warnings); only its instructions, images and controls fold. No script shows everything. */
-.pf-js .stop:not(.is-acked) + .after-stop .card > :not(header):not(.pf-hazard),
+.pf-js .stop:not(.is-acked) + .after-stop .card > :not(header):not(.pf-hazard):not(.action),
 .pf-js .stop:not(.is-acked) + .after-stop .card > header .time,
 .pf-js .stop:not(.is-acked) + .after-stop .card > header .check-time { display: none; }
 .pf-theme-guide .stop button.ack { display: none; }

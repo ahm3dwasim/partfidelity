@@ -102,6 +102,7 @@ a:visited { color: var(--accent); }
 .sample { margin-top: 3rem; background: var(--card); padding: 1.5rem; border-radius: var(--radius); }
 .sample-steps { margin: 0 0 1rem; padding-left: 1.5rem; }
 .sample-steps li { margin-bottom: 0.5rem; }
+.sample-steps .sample-gap { list-style: none; margin-left: -1.5rem; }
 .sample-links { margin-bottom: 0; }
 
 .replay-badge {

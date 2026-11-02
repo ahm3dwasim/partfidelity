@@ -16,6 +16,7 @@ from __future__ import annotations
 import contextlib
 import fcntl
 import filecmp
+import hashlib
 import json
 import logging
 import os
@@ -29,7 +30,7 @@ from typing import Any, BinaryIO
 import cv2
 import numpy as np
 
-from app import db, persistence
+from app import db, persistence, proof_links
 from app.admission import job_dir
 from app.contracts import (
     JOB_DEADLINE_S,
@@ -491,6 +492,90 @@ def _build_sample_job(settings: Settings, pointer: Path) -> JobId:
     return job_id
 
 
+_RECEIPT_TEXT = ("stage", "model", "endpoint", "status", "estimated_cost_usd")
+
+
+def _check_receipt_values(receipts: list) -> None:
+    """Canonical constraints on each row: finite non-negative cost, non-negative latency, known stage and status."""
+    from decimal import Decimal, InvalidOperation
+    from app.contracts import RECEIPT_STAGES
+    from app.evidence import STATUS_VOCABULARY
+    for r in receipts:
+        try:
+            cost = Decimal(r["estimated_cost_usd"])
+        except InvalidOperation:
+            cost = Decimal(-1)
+        if not (cost.is_finite() and cost >= 0) or r["latency_ms"] < 0 \
+                or r["stage"] not in RECEIPT_STAGES or r["status"] not in STATUS_VOCABULARY:
+            raise RuntimeError("open-weights receipts fixture has an invalid row")
+
+
+def _check_receipts_shape(receipts: object) -> None:
+    ok = isinstance(receipts, list) and bool(receipts) and all(
+        isinstance(r, dict)
+        and all(isinstance(r.get(k), str) and r[k] for k in _RECEIPT_TEXT)
+        and isinstance(r.get("latency_ms"), int) and not isinstance(r["latency_ms"], bool)
+        and all(r.get(k) is None or (isinstance(r[k], int) and not isinstance(r[k], bool)) for k in ("units_in", "units_out"))
+        and isinstance(r.get("evidence"), dict)
+        for r in receipts
+    )
+    if not ok:
+        raise RuntimeError("open-weights receipts fixture has the wrong shape")
+
+
+def install_open_weights_receipts(settings: Settings) -> None:
+    """Install the shipped receipts of the newer job that ran the open-weights second check (read-only, receipts page only).
+
+    Idempotent: the job row and each receipt are inserted once under fixed ids, so a restart changes nothing.
+    A job that already holds real (non-fixture) receipts is left alone and loses any fixture rows.
+    """
+    links = proof_links.load()
+    job_id = links["open_weights_job"]
+    path = Path(__file__).resolve().parent / settings.sample_bundle_dirname / "open_weights_receipts.json"
+    try:
+        raw = path.read_bytes()
+        receipts = json.loads(raw.decode("utf-8"))
+    except (OSError, ValueError) as error:
+        raise RuntimeError(f"open-weights receipts fixture unreadable: {type(error).__name__}") from error
+    if hashlib.sha256(raw).hexdigest() != links["open_weights_fixture_sha256"]:
+        raise RuntimeError("open-weights receipts fixture does not match its pinned sha256")
+    _check_receipts_shape(receipts)
+    if len(receipts) != links["open_weights_receipt_count"]:
+        raise RuntimeError("open-weights receipts fixture has the wrong row count")
+    _check_receipt_values(receipts)
+    now = db.format_dt(db.utcnow())
+    conn = db.connect(settings.db_path)
+    try:
+        conn.execute("BEGIN IMMEDIATE")
+        prefix = proof_links.fixture_id_prefix(job_id)
+        ids = [row[0] for row in conn.execute("SELECT id FROM model_calls WHERE job_id = ?", (job_id,))]
+        if any(not i.startswith(prefix) for i in ids):
+            # The job is a real run with its own receipts: drop any fixture rows an earlier boot added beside them.
+            conn.execute("DELETE FROM model_calls WHERE job_id = ? AND substr(id, 1, ?) = ?", (job_id, len(prefix), prefix))
+            conn.execute("COMMIT")
+            return
+        conn.execute(
+            "INSERT OR IGNORE INTO jobs (id, state, anon_id, ip_hash, video_hash, created_at,"
+            " deadline_at, confirmed_at, completed_at, cost_cap_usd, readback_fired_n)"
+            " VALUES (?, 'done', 'receipts-anon', 'receipts-ip', 'shipped-receipts', ?, ?, ?, ?, '0', 0)",
+            (job_id, now, now, now, now),
+        )
+        for i, r in enumerate(receipts):
+            conn.execute(
+                "INSERT OR IGNORE INTO model_calls (id, job_id, stage, model, endpoint, latency_ms,"
+                " units_in, units_out, estimated_cost_usd, status, evidence_json, created_at)"
+                " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (f"receipts:{job_id}:{i}", job_id, r["stage"], r["model"], r["endpoint"], r["latency_ms"],
+                 r["units_in"], r["units_out"], r["estimated_cost_usd"], r["status"], json.dumps(r["evidence"]), now),
+            )
+        conn.execute("COMMIT")
+    except Exception:
+        conn.execute("ROLLBACK")
+        raise
+    finally:
+        conn.close()
+
+
 def _extend_chunked_parent_deadline(
     settings: Settings, ctx: JobContext, duration_s: float
 ) -> bool:
@@ -798,6 +883,7 @@ __all__ = (
     "clear_client_factory",
     "ensure_sample_job",
     "prepare_sample",
+    "install_open_weights_receipts",
     "fail_interrupted_jobs",
     "sample_job_id",
     "live_pipeline_clients",

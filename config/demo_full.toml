@@ -1,0 +1,521 @@
+# Full demo video, about 2:20 (lane mh-demo-full-cut, W-2844).
+# Extends the approved 14 s preview (config/demo_preview.toml): same ink stage, orange accent, match cut, fit-to-rect camera
+# move, scrim and one fixed lower-third caption block with a badge on every beat. Every changeable value of demo/full/ lives
+# here and is loaded strictly by demo/full/config.py (a missing, misspelled or mistyped key fails). No credentials here.
+# Footage, captures, frame dumps and the MP4 are written under `scratch` (var/ is gitignored) and never committed.
+
+[output]
+width = 1920
+height = 1080
+fps = 30
+crf = 23                     # x264 quality; mostly flat UI, so this stays well under max_mb
+preset = "slow"
+max_mb = 60                  # render.mjs fails if final.mp4 is larger
+contact_cols = 6             # contact sheets: one frame per second, cols x rows per sheet
+contact_rows = 6
+contact_tile_width = 320
+min_total_s = 135.0          # the cut runs 2:15 to 2:45, inside the 3:00 cap
+max_total_s = 165.0
+
+[paths]
+scratch = "var/demo-full"
+ffmpeg = "ffmpeg"                # found on PATH
+playwright_from = "node_modules"   # repo-relative folder holding package.json and node_modules/playwright
+footage_zip = "var/sample-media.zip"   # repo-relative
+footage_member = "sample.mp4"
+
+[path_env]                   # optional environment variables that override the three paths above; no machine path lives here
+ffmpeg = "PF_FFMPEG"
+playwright_from = "PF_PLAYWRIGHT_FROM"
+footage_zip = "PF_FOOTAGE_ZIP"
+
+[source]
+site = "https://was7mahmed--partfidelity-web.us-east.modal.run"   # public pages only, read-only, never signed in, no uploads
+desktop = [1440, 900]        # CSS viewport of the desktop captures
+phone = [390, 844]           # CSS viewport of the phone-width captures (the reader view)
+capture_scale = 2            # device pixel ratio of the captures
+settle_ms = 2500             # wait after scrolling before a capture
+replay_path = "/disagreement-replay"
+source_len_s = 214.0         # length of the sample clip (the scrub bar's full width)
+latest_s = 189.0             # never use footage from 3:09 on
+footage_fps = 30
+footage_width = 1280         # extracted frame width; the card shows at most about 1270 px
+
+[links]
+live_label = "was7mahmed--partfidelity-web.us-east.modal.run"
+repo_url = ""                # OWNER DECISION: the public repository link ("added at release" on /built). Empty: the line is left out.
+
+[layout]
+margin_px = 72               # nothing but background inside this band (checked by margin.sh)
+radius_px = 20
+match_scale = 1.5            # CSS px of the replay-page captures to output px
+match_gap_px = 64
+world_gap_px = 40            # gap between the images of one window (the phone pair)
+camera_margin = 0.06         # a framed target keeps this fraction of the window free on every side
+max_zoom = 2.2               # a target never fills the window beyond this multiple of the unzoomed size (keeps text sharp)
+dim = 0.97                   # opacity of the scrim over everything outside the framed target
+push_s = 1.4                 # one camera move (power2.inOut)
+lead_s = 2.0                 # a window's first still view before its first move (a match-cut scene lands in this time)
+hold_min_s = 2.0             # after each move the shot holds still at least this long, and never longer than hold_max_s
+hold_max_s = 3.0             # no idle frame lasts longer than this
+drift = 0.04                 # text cards drift to this much larger over their length, so they never sit still
+flight_s = 1.4               # the footage card flies into the guide's frame slot, then dissolves into the UI
+
+[panel]                      # the match panels' rings, connector line, labels and the scrim cut-out (read by demo/preview/preview.css)
+ring_border_px = 2
+ring_radius_px = 8
+ring_tint_pct = 12           # accent fill inside a ring, percent
+link_stroke_px = 2.5
+tag_px = 17                  # the small panel labels above the match panels
+tag_weight = 600
+tag_letter_spacing_em = 0.08
+tag_gap_px = 14              # label to panel
+dim_radius_px = 10           # scrim cut-out corner radius
+
+[composition]                # stage pieces of demo/full/full.js (the shared look comes from demo/preview/preview.css)
+footage_aspect = [16, 9]     # the footage card's width : height
+open_rise_s = 0.42           # the opening footage card rises into place
+open_rise_px = 36
+open_caption_s = 0.1         # first caption starts fading in; the PF mark follows
+badge_in_s = 0.6
+flight_move_frac = 0.72      # share of flight_s the card spends moving; the rest is the dissolve into the UI
+slot_radius_px = 7           # card corner radius once it sits in the guide's frame slot
+from_footage_fade = [0.14, 0.56]   # a match-cut window fades in: start offset and length, seconds
+veil_pad_px = 2              # the "Frame left out" block overhangs its mark by this much per side
+veil_label = "Frame left out"
+bar_inset_px = 28            # scrub bar inset from the footage card edge
+bar_bottom_px = 26           # scrub bar distance from the card's bottom edge
+bar_height_px = 6
+bar_radius_px = 3
+dot_px = 18                  # scrub dot diameter
+dot_rise_px = 6              # scrub dot sits this far above the bar top
+time_px = 22                 # elapsed-time readout
+time_weight = 600
+time_bottom_px = 18
+veil_px = 15                 # "Frame left out" label
+veil_weight = 600
+veil_letter_spacing_em = 0.08
+veil_radius_px = 12
+panel_rise_px = 30           # match panels rise by this much as they appear
+row_ring_inset_px = [4, 10]  # row ring: left offset, and width taken off the table width
+note_pad_px = [8, 6]         # note ring: padding left/right, top/bottom around the note
+link_anchor_inset_px = 6     # connector start, inside the table's right edge
+table_label = "Recorded probe run"
+card_label = "The same label in the review screen"
+
+[textcard]                   # logo and text cards
+logo_icon_start_s = 0.3      # not before fade_s, so it never overlaps the scene crossfade (checked)
+logo_icon_s = 0.8
+logo_icon_scale = 0.7        # the icon grows from this scale to 1
+logo_word_start_s = 0.7
+logo_word_s = 0.9
+logo_wordmark = "PartFidelity"
+line_s = 0.6
+line_rise_px = 18
+line_px = 76
+line_small_px = 44
+line_url_px = 54
+logo_icon_px = 150
+logo_word_px = 124
+card_gap_px = 30             # gap between lines of a text card
+logo_gap_px = 28             # gap between the logo icon and the wordmark
+url_weight = 600
+
+[caption_box]                # ONE lower-third caption block, identical in every beat (as in the approved preview)
+align = "center"
+tag_px = 22
+tag_pad_px = [6, 16]
+text_px = 36                 # at least 34
+text_lines = 2
+line_height = 1.28
+max_chars = 60
+tag_gap_px = 14
+stage_gap_px = 48            # stage box to caption block, the same in every beat (at least 48)
+fade_s = 0.3                 # caption and scene crossfade (0.25-0.35)
+min_hold_s = 2.5             # every caption stays at least this long
+tag_font_weight = 600       # weight the caption tag font is loaded at
+mark_px = 52                 # PF mark, bottom-right, centred on the caption block
+
+[captions]                   # the exact strings the video may show (every caption tag and text). tests/test_demo_captions.py pins each caption to this list
+approved = [
+  "Real footage · Lenovo sample",
+  "Repair videos run on and on. You pause, rewind and lose your place.",
+  "Nothing in the clip says which step you are on, or what to check before the next.",
+  "The same clip from its start: a closed laptop, a screwdriver, and no labels or steps on screen.",
+  "Real guide UI · sample job",
+  "PartFidelity turns it into a guide. Step 1 comes with a battery warning, shown in full.",
+  "Parts to check sit under each step, and each stays “Not checked” until you confirm it.",
+  "Step 2 puts the battery and data warnings first, before you touch anything.",
+  "Times are approximate, so each step has a check-time control to set the start yourself.",
+  "Step 3 names the parts it involves, the keyboard and the power button, each marked “Not checked”.",
+  "Each step also has a “Done” box, so you can keep your place while you work.",
+  "Step 4 starts with its warnings: static, and sharp edges when you remove the bottom cover.",
+  "Then the tool to bring, a screwdriver, and the parts to check: the bottom cover and a screw.",
+  "Live site · home",
+  "Muse Spark writes the steps, SAM 3.1 finds the parts, and Muse Image tests the catch gate offline.",
+  "Meta tooling · /built",
+  "Where Meta’s models do the work: Muse Spark reads the video, and SAM 3.1 and SAM 3 find and trace the parts.",
+  "Muse Spark Open gives a second opinion on labels, and Muse Image makes the offline test edits.",
+  "Model-call receipts · /calls",
+  "Every model call leaves a receipt: 18 observed runs on the sample, with latency and cost.",
+  "The read-back row records what Muse Spark answered when asked about the “battery” label.",
+  "SAM 3.1 calls are logged one by one, each with its own latency and cost.",
+  "The three Muse Spark extraction calls are the longest, and the receipts show that too.",
+  "The catch · recorded comparison",
+  "The catch page is a recording of one measured run. It is not a live check.",
+  "Muse Image · offline test set",
+  "Muse Image redrew ten frames offline. The gate is strict, so redrawn frames go to a person for a look.",
+  "Recorded probe run · Simulated replay",
+  "Simulated replay: no model was called. It shows a recorded probe run, not a live answer.",
+  "The same label in the review screen",
+  "A second model disagreed with the label “keyboard”, so the guide asks a person to review it.",
+  "Reader view · phone width",
+  "On a phone the guide is one column, and every warning stays on the page.",
+  "At the battery step it says the disconnect is not in the video, and to check your service manual first.",
+  "Live site",
+  "Open the sample guide, read the build notes, or make a guide from your own clip.",
+  "PartFidelity",
+  "PartFidelity · open source, MIT",
+]
+
+[audio]                      # captions only for now: a music or voice track can be added later by setting `track`
+track = ""                   # path to an audio file; empty means no audio. render.mjs muxes it (aac) and trims to the film
+volume = 1.0
+
+# ---- captures: read-only screenshots of the live site (demo/full/capture.mjs) -----------------------------------------
+# viewport: "desktop" or "phone". ack: press the guide's own "Show the next steps" button (local state only).
+# veil (optional): marks covered by a "Frame left out" block for the whole scene. scroll: element to bring to the top. marks: name -> CSS selector (all matches unioned), "largest:<css>" or "xpath:<expr>".
+[[capture]]
+name = "g1"
+path = "/guide/sample"
+viewport = "desktop"
+ack = true
+scroll = "#step-1"
+marks = { card = "#step-1", frame = "largest:.gd-screen img, .gd-screen video, .gd-screen canvas" }
+
+[[capture]]
+name = "g2"
+path = "/guide/sample"
+viewport = "desktop"
+ack = true
+scroll = "#step-2"
+marks = { card = "#step-2", frame = "largest:.gd-screen img, .gd-screen video, .gd-screen canvas" }
+
+[[capture]]
+name = "g3"
+path = "/guide/sample"
+viewport = "desktop"
+ack = true
+scroll = "#step-3"
+marks = { card = "#step-3", frame = "largest:.gd-screen img, .gd-screen video, .gd-screen canvas" }
+
+[[capture]]
+name = "g4"
+path = "/guide/sample"
+viewport = "desktop"
+ack = true
+scroll = "#step-4"
+marks = { card = "#step-4", frame = "largest:.gd-screen img, .gd-screen video, .gd-screen canvas" }
+veil = ["frame"]             # privacy: the bottom-cover frame carries a small sticker (a possible QR or serial), so it is covered, not blurred
+
+[[capture]]
+name = "p1"
+path = "/guide/sample"
+viewport = "phone"
+ack = true
+scroll = "#step-1"
+marks = { hazard = "#step-1 .pf-hazard" }
+
+[[capture]]
+name = "p5"
+path = "/guide/sample"
+viewport = "phone"
+ack = true
+scroll = "#step-5"
+marks = { stop = "xpath:(//*[normalize-space(text())='Not in the video'])[1]/.." }
+
+[[capture]]
+name = "home"
+path = "/"
+viewport = "desktop"
+ack = false
+scroll = ""
+marks = { roles = ".film-roles" }
+
+[[capture]]
+name = "built"
+path = "/built"
+viewport = "desktop"
+ack = false
+scroll = "xpath:(//*[normalize-space(text())='Meta tooling'])[1]"
+marks = { tooling = "xpath:(//*[normalize-space(text())='Meta tooling'])[1]/.." }
+
+[[capture]]
+name = "calls1"
+path = "/calls/b3f79c933e2043afc3906a159f473a2b"
+viewport = "desktop"
+ack = false
+scroll = ""
+marks = { summary = "section.summary", readback = "section.readback" }
+
+[[capture]]
+name = "calls2"
+path = "/calls/b3f79c933e2043afc3906a159f473a2b"
+viewport = "desktop"
+ack = false
+scroll = "section.calls tbody tr:nth-child(2)"
+marks = { seg = "section.calls tbody tr:nth-child(n+2):nth-child(-n+5)", ex = "section.calls tbody tr:nth-last-child(-n+3)" }
+
+[[capture]]
+name = "catch1"
+path = "/catch"
+viewport = "desktop"
+ack = false
+scroll = ""
+marks = { record = "main ul" }
+
+[[capture]]
+name = "catch2"
+path = "/catch"
+viewport = "desktop"
+ack = false
+scroll = "xpath:(//*[normalize-space(text())='The ten redrawn edits'])[1]"
+marks = { ten = "xpath:(//table)[1]" }
+
+# ---- scenes, in order; each runs back to back. kinds: footage, window, match, card ----------------------------------------
+# A window scene with n stops lasts lead_s + n * (push_s + hold), with hold between hold_min_s and hold_max_s.
+# Caption `at` is seconds into the scene; the first caption of a scene sets where the previous scene's last caption ends.
+
+[[scene]]
+id = "problem"
+kind = "footage"
+dur = 16.0
+map = [[0.0, 17.0], [3.2, 26.0], [4.6, 26.0], [6.0, 20.0], [9.4, 30.0], [10.8, 30.0], [12.2, 24.0], [16.0, 30.0]]   # [scene s, source s]: play, pause, rewind
+scrub = true
+  [[scene.caption]]
+  at = 0.0
+  tag = "Real footage · Lenovo sample"
+  text = "Repair videos run on and on. You pause, rewind and lose your place."
+  [[scene.caption]]
+  at = 8.0
+  tag = "Real footage · Lenovo sample"
+  text = "Nothing in the clip says which step you are on, or what to check before the next."
+
+[[scene]]
+id = "real"
+kind = "footage"
+dur = 8.0
+map = [[0.0, 2.0], [8.0, 9.4]]   # ends on the closed lid with the screwdriver set down: the guide's own step 1 frame (match cut)
+scrub = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Real footage · Lenovo sample"
+  text = "The same clip from its start: a closed laptop, a screwdriver, and no labels or steps on screen."
+
+[[scene]]
+id = "step1"
+kind = "window"
+dur = 10.6
+images = ["g1"]
+stops = ["g1.card:0-0.55", "g1.card:0.5-1"]
+from_footage = true
+  [[scene.caption]]
+  at = 1.5
+  tag = "Real guide UI · sample job"
+  text = "PartFidelity turns it into a guide. Step 1 comes with a battery warning, shown in full."
+  [[scene.caption]]
+  at = 6.0
+  tag = "Real guide UI · sample job"
+  text = "Parts to check sit under each step, and each stays “Not checked” until you confirm it."
+
+[[scene]]
+id = "step2"
+kind = "window"
+dur = 10.6
+images = ["g2"]
+stops = ["g2.card:0-0.58", "g2.card:0.55-1"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Real guide UI · sample job"
+  text = "Step 2 puts the battery and data warnings first, before you touch anything."
+  [[scene.caption]]
+  at = 6.0
+  tag = "Real guide UI · sample job"
+  text = "Times are approximate, so each step has a check-time control to set the start yourself."
+
+[[scene]]
+id = "step3"
+kind = "window"
+dur = 10.6
+images = ["g3"]
+stops = ["g3.card:0-0.5", "g3.card:0.45-1"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Real guide UI · sample job"
+  text = "Step 3 names the parts it involves, the keyboard and the power button, each marked “Not checked”."
+  [[scene.caption]]
+  at = 6.0
+  tag = "Real guide UI · sample job"
+  text = "Each step also has a “Done” box, so you can keep your place while you work."
+
+[[scene]]
+id = "step4"
+kind = "window"
+dur = 10.6
+images = ["g4"]
+stops = ["g4.card:0-0.5", "g4.card:0.4-0.8"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Real guide UI · sample job"
+  text = "Step 4 starts with its warnings: static, and sharp edges when you remove the bottom cover."
+  [[scene.caption]]
+  at = 6.0
+  tag = "Real guide UI · sample job"
+  text = "Then the tool to bring, a screwdriver, and the parts to check: the bottom cover and a screw."
+
+[[scene]]
+id = "roles"
+kind = "window"
+dur = 6.3
+images = ["home"]
+stops = ["home.roles"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Live site · home"
+  text = "Muse Spark writes the steps, SAM 3.1 finds the parts, and Muse Image tests the catch gate offline."
+
+[[scene]]
+id = "tooling"
+kind = "window"
+dur = 10.6
+images = ["built"]
+stops = ["built.tooling:0-0.55@0.3-1", "built.tooling:0.5-1@0.3-1"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Meta tooling · /built"
+  text = "Where Meta’s models do the work: Muse Spark reads the video, and SAM 3.1 and SAM 3 find and trace the parts."
+  [[scene.caption]]
+  at = 6.0
+  tag = "Meta tooling · /built"
+  text = "Muse Spark Open gives a second opinion on labels, and Muse Image makes the offline test edits."
+
+[[scene]]
+id = "receipts"
+kind = "window"
+dur = 10.6
+images = ["calls1"]
+stops = ["calls1.summary", "calls1.readback"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Model-call receipts · /calls"
+  text = "Every model call leaves a receipt: 18 observed runs on the sample, with latency and cost."
+  [[scene.caption]]
+  at = 4.5
+  tag = "Model-call receipts · /calls"
+  text = "The read-back row records what Muse Spark answered when asked about the “battery” label."
+
+[[scene]]
+id = "receipts-table"
+kind = "window"
+dur = 10.6
+images = ["calls2"]
+stops = ["calls2.seg", "calls2.ex"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Model-call receipts · /calls"
+  text = "SAM 3.1 calls are logged one by one, each with its own latency and cost."
+  [[scene.caption]]
+  at = 4.5
+  tag = "Model-call receipts · /calls"
+  text = "The three Muse Spark extraction calls are the longest, and the receipts show that too."
+
+[[scene]]
+id = "catch-record"
+kind = "window"
+dur = 6.3
+images = ["catch1"]
+stops = ["catch1.record"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "The catch · recorded comparison"
+  text = "The catch page is a recording of one measured run. It is not a live check."
+
+[[scene]]
+id = "catch-table"
+kind = "window"
+dur = 6.3
+images = ["catch2"]
+stops = ["catch2.ten@0-0.62"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Muse Image · offline test set"
+  text = "Muse Image redrew ten frames offline. The gate is strict, so redrawn frames go to a person for a look."
+
+[[scene]]
+id = "disagreement"
+kind = "match"
+dur = 8.0
+table_in = [0.3, 0.75]       # recorded probe table rises, after the caption crossfade (checked)
+ring = [0.8, 1.6]            # ring on the real "keyboard / disagree" row
+link = [1.6, 2.8]            # line from that row to the review card
+card = [2.6, 3.8]            # the scripted review card rises
+note = [4.5, 5.5]            # ring on the card's note
+  [[scene.caption]]
+  at = 0.0
+  tag = "Recorded probe run · Simulated replay"
+  text = "Simulated replay: no model was called. It shows a recorded probe run, not a live answer."
+  [[scene.caption]]
+  at = 4.0
+  tag = "The same label in the review screen"
+  text = "A second model disagreed with the label “keyboard”, so the guide asks a person to review it."
+
+[[scene]]
+id = "reader"
+kind = "window"
+dur = 10.6
+images = ["p1", "p5"]
+stops = ["p1.hazard", "p5.stop"]
+from_footage = false
+  [[scene.caption]]
+  at = 0.0
+  tag = "Reader view · phone width"
+  text = "On a phone the guide is one column, and every warning stays on the page."
+  [[scene.caption]]
+  at = 4.5
+  tag = "Reader view · phone width"
+  text = "At the battery step it says the disconnect is not in the video, and to check your service manual first."
+
+[[scene]]
+id = "links"
+kind = "card"
+dur = 6.0
+logo = false
+lines = ["Try the live sample", "{live}", "{repo}"]   # a line with {repo} is left out while links.repo_url is empty
+reveal_start_s = 0.5
+reveal_gap_s = 1.0
+  [[scene.caption]]
+  at = 0.0
+  tag = "Live site"
+  text = "Open the sample guide, read the build notes, or make a guide from your own clip."
+
+[[scene]]
+id = "end"
+kind = "card"
+dur = 5.0
+logo = true
+lines = ["Take it apart. Pass it on."]
+reveal_start_s = 1.6
+reveal_gap_s = 1.0
+  [[scene.caption]]
+  at = 0.0
+  tag = "PartFidelity"
+  text = "PartFidelity · open source, MIT"

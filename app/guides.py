@@ -479,11 +479,11 @@ def render_cards_html(
     element, and the note never changes the label.
     ``step_notes`` maps a step number to what its footage does not show;
     the note sits under the step's action and the stage repeats its label.
-    ``explained_once`` is a one-item flag a caller shares across calls so the
-    visual-change line appears once in the whole document.
+    ``explained_once`` is a two-item flag a caller shares across calls so the
+    visual-change line and the Not checked line each appear once in the whole document.
     """
     out: list[str] = []
-    explained = explained_once if explained_once is not None else [False]  # said once, where it first appears
+    explained = explained_once if explained_once is not None else [False, False]  # said once, where it first appears
     for card in cards:
         step = card.step
         intro = step.is_intro
@@ -573,6 +573,9 @@ def render_cards_html(
                     f'<span class="pf-n" aria-hidden="true">{pos + 1}</span> '
                     f"{html.escape(part.phrase)} — {_status_badge(part.status)}"
                 )
+                if part.status == STATUS_NOT_CHECKED and not explained[1]:
+                    explained[1] = True
+                    item += f' <span class="status-help">{html.escape(TEXT["status_not_checked_help"])}</span>'
                 if flag is not None:
                     item += flag[1]
                 if part_controls is not None:

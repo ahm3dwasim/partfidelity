@@ -63,3 +63,5 @@ thead th { border-top: 0; color: var(--muted); font-weight: 600; white-space: no
   .summary { grid-template-columns: repeat(4, 1fr); }
   .page { padding: 2rem 1.5rem 4rem; }
 }
+
+.gd-open-weights { margin: 1rem 0; font-size: 0.875rem; }

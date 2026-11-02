@@ -70,7 +70,7 @@ def test_recorded_probe_table_receipts_links_and_limit():
         assert res.status_code == 200
         wrong = res.json()["cases"][0]
         assert (wrong["request_label"], wrong["model_answer"]) == (label, answer)
-    assert page.count("meta-models/muse-spark-open-1026") == 1 and "Model: meta-models/muse-spark-open-1026, 2026-11-01" in page
+    assert page.count("meta-models/muse-spark-open-1026") == 1 and "Model: Muse Spark Open (Meta open weights), id meta-models/muse-spark-open-1026, 2026-11-01" in page
     assert "not an accuracy measure" in page and "visible anywhere in the photo" in page
     assert "verified" not in page.lower()
 

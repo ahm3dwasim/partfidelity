@@ -7,3 +7,23 @@ meta_roles = "This sample: Muse Spark steps and read-back, SAM 3.1 part boxes, s
 meta_roles_link = "Sample receipts"
 meta_roles_catch_link = "The catch"
 meta_roles_built_link = "Model roles"
+# The newer job that ran the open-weights second check. It is read-only (label edits are locked, see app/main.py) and the sample links to its receipts.
+open_weights_job = "6c1f4106e797d0dcf779425a66d48872"
+# Date of that recorded run, YYYY-MM-DD. The saved evidence (research/product-jury-v3/judge/evidence) carries no run date for the job, so it stays empty rather than guessed; the pages then omit the date.
+open_weights_run_date = ""
+open_weights_calls = "/calls/6c1f4106e797d0dcf779425a66d48872"
+open_weights_replay = "/disagreement-replay"
+# One honest line on the sample guide and the sample's receipts: what the sample lacks and where the check's receipts are. The recorded count describes that job only and says nothing about accuracy.
+open_weights_note = "This sample was made before the open-weights second check was added, so its receipts have no rows from it."
+open_weights_calls_text = "Receipts of a newer job that ran the check (4 labels asked, 4 agreed)"
+open_weights_replay_text = "Recorded probe and simulated replay"
+# Shown on that newer job's receipts, beside its second-check rows.
+open_weights_second_check_replay_text = "See a recorded probe where the check disagreed, and a simulated replay of what a person sees"
+# The sample's stored draft reason says "your video"; the visitor did not film the sample, so its pages say "this video".
+sample_reason_from = "in your video"
+sample_reason_to = "in this video"
+# The shipped receipts fixture (app/sample_real/open_weights_receipts.json) is pinned: startup refuses a file whose sha256 or row count differs, and /healthz is 503 unless exactly this many rows are installed while the receipts are that fixture.
+open_weights_fixture_sha256 = "27be869781049fba6a2a2264b5721b51e9926e53c6df953d7c0f2fc4492e7b51"
+open_weights_receipt_count = 24
+# When the job's receipts are a real run instead (the fixture is never installed beside them), /healthz needs at least this many spark-open second-check rows, or the exact count above.
+open_weights_real_second_check_min = 4

@@ -51,11 +51,11 @@
 <p class="pf-wait-lede">{{ lede }}</p>
 <div id="pf-wait-live" aria-live="polite">
 <p id='state' data-state='{{ state }}' class="pf-wait-msg{% if not running %} is-final{% endif %}">{{ message }}</p>
-<div class="pf-wait-clock" data-start="{{ view.started_at or '' }}" data-end="{{ view.ended_at or '' }}">
+{% if saved_copy %}<p class="pf-wait-saved-copy" role="note">{{ saved_copy }}</p>{% else %}<div class="pf-wait-clock" data-start="{{ view.started_at or '' }}" data-end="{{ view.ended_at or '' }}">
 <span class="pf-wait-clock-k">{{ clock_label }}</span>
 <time class="pf-wait-clock-v" id="pf-wait-clock">{{ elapsed_text }}</time>
 {% if running %}<span class="pf-wait-clock-note">no finish estimate: it depends on your clip</span>{% endif %}
-</div>
+</div>{% endif %}
 <ol class="pf-wait-stages">
 {% for s in view.stages %}
 <li class="is-{{ s.status }}" data-stage="{{ s.id }}">

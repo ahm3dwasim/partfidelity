@@ -79,7 +79,7 @@ def test_every_sample_file_ships_in_the_image() -> None:
     deploy = load_deploy_config(ROOT / "deploy" / "modal_deploy.toml")
     assert "app" in deploy.modal.image_folders  # the bundle sits under app/, copied whole
     guide = json.loads((BUNDLE / "guide.json").read_text())
-    needed = {Path("guide.json"), Path("sample.mp4"), Path("step_notes.json"), Path("receipts.json"), *map(Path, guide["frame_paths"])}
+    needed = {Path("guide.json"), Path("sample.mp4"), Path("step_notes.json"), Path("receipts.json"), Path("open_weights_receipts.json"), *map(Path, guide["frame_paths"])}
     needed |= {Path(label["provisional"]["rendered_image_path"]) for label in guide["labels"]}
     needed |= {Path(label["detection"]["mask_path"]) for label in guide["labels"]}
     on_disk = {p.relative_to(BUNDLE) for p in BUNDLE.rglob("*") if p.is_file()}

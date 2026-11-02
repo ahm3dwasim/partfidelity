@@ -1,0 +1,138 @@
+# Demo motion preview (lane mh-demo-preview, W-2844).
+# Every changeable value of demo/preview/ lives here; loaded strictly by demo/preview/config.py
+# (a missing, misspelled or mistyped key fails). No credentials here. Footage, captures and the MP4
+# are written under `scratch` (var/ is gitignored) and are never committed.
+
+[output]
+width = 1920
+height = 1080
+fps = 30
+crf = 20                     # x264 quality; the film is mostly flat UI, so this stays well under max_mb
+preset = "slow"
+max_mb = 25                  # render.mjs fails if preview.mp4 is larger
+contact_tiles = 6            # contact.png: this many evenly spaced frames, one row
+contact_tile_width = 640
+
+[paths]
+scratch = "var/demo-preview"
+ffmpeg = "ffmpeg"                # found on PATH
+playwright_from = "node_modules"   # repo-relative folder holding package.json and node_modules/playwright
+footage_zip = "var/sample-media.zip"   # repo-relative
+footage_member = "sample.mp4"
+
+[path_env]                   # optional environment variables that override the three paths above; no machine path lives here
+ffmpeg = "PF_FFMPEG"
+playwright_from = "PF_PLAYWRIGHT_FROM"
+footage_zip = "PF_FOOTAGE_ZIP"
+
+[source]
+site = "https://was7mahmed--partfidelity-web.us-east.modal.run"   # public pages only, never signed in
+guide_path = "/guide/sample"
+replay_path = "/disagreement-replay"
+guide_step = 4               # the guide step the footage belongs to
+capture_width = 1440         # CSS viewport of the desktop captures
+capture_height = 900
+capture_scale = 2            # device pixel ratio of the captures
+settle_ms = 2500             # wait after scrolling before a capture
+
+[footage]
+start_s = 37.6               # step 4 "Remove bottom cover" (guide.json 36.77-86.83): pointing at the screws
+end_s = 41.1                 # ends nearly hand-free, matching the guide's own step 4 frame
+latest_s = 189.0             # never use footage from 3:09 on
+
+[timing]                     # seconds; each beat is [start, end] and they run back to back
+duration_s = 14.0
+footage = [0.0, 4.0]
+to_guide = [4.0, 5.4]        # the footage card flies into the guide's own frame slot, then dissolves into the UI still
+guide = [5.4, 9.2]           # settle on the whole guide, one camera move onto the step card, then a still hold
+to_match = [9.2, 9.9]
+match = [9.9, 13.0]          # recorded disagreement row, then the scripted review card
+badge = [13.0, 14.0]         # PF badge corner hold; no logo reveal (that is the full video's ending)
+
+[layout]
+margin_px = 72               # nothing but background inside this band (checked by margin.sh)
+radius_px = 20
+match_scale = 1.5            # CSS px of the replay-page captures to output px
+connector_gap_px = 64        # gap between the two match panels, also the curve handle length of the connector
+card_aspect = [16, 9]        # the footage card's width : height
+
+[ring]                       # the two highlight rings on the match panels and the connector line
+border_px = 2
+radius_px = 8
+tint_pct = 12                # accent fill inside a ring, percent
+row_inset_px = [4, 10]       # row ring: left offset, and width taken off the table width
+note_pad_px = [8, 6]         # note ring: padding left/right, top/bottom around the note
+anchor_inset_px = 6          # connector start sits this far inside the table's right edge
+stroke_px = 2.5
+
+[tag]                        # the small panel labels above the match panels
+size_px = 17
+weight = 600
+letter_spacing_em = 0.08
+gap_px = 14                  # label to panel
+
+[motion]                     # fractions of a beat (0-1) unless the key says _s or _px
+footage_rise = 0.14          # footage beat: the card rises in over this fraction
+footage_rise_px = 36
+footage_play = 0.07          # footage beat: the clip starts playing at this fraction
+caption_in_s = 0.1           # first caption starts fading in
+badge_in = [0.1, 0.2]        # footage beat: PF mark appears
+fly = [0.0, 0.72]            # to_guide: the card flies into the guide's frame slot
+guide_in = [0.1, 0.5]        # to_guide: the guide fades up around it
+dissolve = [0.72, 1.0]       # to_guide: the card dissolves into the UI still
+slot_radius_px = 7
+slide_out = [0.0, 0.5]       # to_match: the guide slides out
+panel_rise_px = 30
+table_in_start = 0.95        # to_match: the recorded table starts rising; it lands at row_ring[0] of the match beat
+row_ring = [0.1, 0.2]        # match beat
+link = [0.2, 0.36]
+card_in = [0.22, 0.4]
+note_ring = [0.44, 0.56]
+badge_hold = [0.0, 0.5]      # badge beat: panels dim and the mark grows
+badge_hold_alpha = 0.45
+badge_hold_scale = 1.18
+dim_radius_px = 10           # scrim cut-out corner radius
+scrim_spread_px = 4000       # scrim reach beyond the card, larger than any capture
+
+[camera]                     # the zoom onto the step card (lane mh-demo-preview-zoom)
+target = [868, 112, 510, 506]   # step card (number, title, warnings, tools, parts) as x, y, w, h in capture CSS px
+margin_frac = 0.06           # the card ends fully inside the camera window with this margin on every side
+push_s = [5.7, 7.1]          # the one camera move, inside the guide beat (power2.inOut)
+hold_min_s = 2.0             # the framed shot holds still at least this long, so the text can be read
+dim = 0.97                   # opacity of the scrim over everything outside the card while framed
+
+[caption_box]                # ONE lower-third caption block, identical in every beat (lane mh-demo-preview-captions)
+align = "center"             # "center": block and text centred on the frame; "left": left edge on the guide window's left edge
+tag_px = 22                  # badge text size (small caps pill, on its own line above the text)
+tag_pad_px = [6, 16]         # badge padding, vertical and horizontal
+text_px = 36                 # caption text size at 1080p (at least 34)
+text_lines = 2               # at most this many lines; the block reserves room for all of them
+line_height = 1.28
+max_chars = 60               # max text width, in characters
+tag_gap_px = 14              # badge to text
+stage_gap_px = 48            # stage box to caption block, the same in every beat (at least 48)
+fade_s = 0.3                 # caption crossfade (0.25-0.35)
+cuts_s = [5.4, 9.56]         # the two caption cuts: footage to guide, guide to match; each lands after the move before it and ends before the next (checked)
+min_hold_s = 2.5             # every caption stays at least this long
+mark_px = 52                 # PF mark, bottom-right, centred on the caption block
+
+[captions]
+footage = "What the maker filmed: real Lenovo footage of removing the bottom cover."
+footage_tag = "Real footage · Lenovo sample"
+guide = "The sample guide turns that moment into step 4: tools, warnings and parts to check."
+guide_tag = "Real guide UI · sample job"
+match = "Image match: a second model disagrees with the label “keyboard”. Review this label."
+recorded_tag = "Recorded probe run"
+replay_tag = "The same label in the review screen"
+match_tag = "Recorded probe run · Simulated replay"
+# The exact strings the video may show (tag and text). tests/test_demo_captions.py pins every caption above to this list.
+approved = [
+  "What the maker filmed: real Lenovo footage of removing the bottom cover.",
+  "Real footage · Lenovo sample",
+  "The sample guide turns that moment into step 4: tools, warnings and parts to check.",
+  "Real guide UI · sample job",
+  "Image match: a second model disagrees with the label “keyboard”. Review this label.",
+  "Recorded probe run",
+  "The same label in the review screen",
+  "Recorded probe run · Simulated replay",
+]

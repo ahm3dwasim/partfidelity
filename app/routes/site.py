@@ -234,12 +234,16 @@ def _sample_facts_html(guide: Guide | None) -> str:
         else ""
     )
     why = "".join(
-        f'<p class="sample-draft">{escape(r.removeprefix("DRAFT:").strip().capitalize())}.</p>'
+        f'<p class="sample-draft">{escape(proof_links.sample_wording(r.removeprefix("DRAFT:").strip().capitalize()))}.</p>'
         for r in guide.draft_reasons
     )
-    steps = "\n".join(
-        f'<li value="{step.number}">{escape(step.action.rstrip("."))}</li>' for step in _teaser_steps(guide)
-    )
+    steps, last = [], None
+    for step in _teaser_steps(guide):
+        if last is not None and step.number != last + 1:
+            steps.append('<li class="sample-gap" aria-hidden="true">&#8230;</li>')  # steps are skipped here
+        steps.append(f'<li value="{step.number}">{escape(step.action.rstrip("."))}</li>')
+        last = step.number
+    steps = "\n".join(steps)
     return (
         f'<ul class="sample-badges" aria-label="About this guide">{badge_html}</ul>\n'
         f"{why}\n{warnings}\n"
@@ -698,6 +702,7 @@ def built() -> str:
             for row in group_rows
         )
     page["history_count"] = len(rows["history"])
+    page["replay_href"] = escape(proof_links.load()["open_weights_replay"], quote=True)
     page["header"] = fill((TEMPLATES / "partials/ui/shell-header.html").read_text(encoding="utf-8"))
     return _template("built.html").substitute(page)
 

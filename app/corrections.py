@@ -258,7 +258,8 @@ class CorrectionStore:
     """File-backed operation log, one sidecar per job directory.
 
     ``shared_job`` names the public sample job: its guide is one copy every
-    visitor sees, so it is never editable.
+    visitor sees, so it is never editable. ``locked_jobs`` are further read-only
+    jobs that a public page links to.
     """
 
     def __init__(
@@ -267,6 +268,7 @@ class CorrectionStore:
         filename: str,
         *,
         shared_job=lambda: None,
+        locked_jobs=(),
         max_ops: int,
         max_chars: int = DEFAULT_CORRECTION_PHRASE_MAX_CHARS,
         guide_filename: str | None = None,
@@ -274,6 +276,7 @@ class CorrectionStore:
         self._job_dir_for = job_dir_for
         self._filename = filename
         self._shared_job = shared_job
+        self._locked_jobs = tuple(locked_jobs)
         self.max_ops = max_ops
         self.max_chars = max_chars
         self.guide_filename = guide_filename
@@ -282,7 +285,7 @@ class CorrectionStore:
         return Path(self._job_dir_for(job_id)) / self._filename
 
     def editable(self, job_id: str) -> bool:
-        return self._shared_job() != job_id
+        return job_id != self._shared_job() and job_id not in self._locked_jobs
 
     @contextlib.contextmanager
     def locked(self, job_id: str) -> Iterator[None]:

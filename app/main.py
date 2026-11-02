@@ -14,8 +14,10 @@ from fastapi.responses import JSONResponse
 from app import db
 from app import guide_clip
 from app import stage_cache
+from app import proof_links
 from app import service
 from app.admission import job_dir
+from app.contracts import RECEIPT_MODEL_SPARK_OPEN
 from app.body_limit import BodyLimitMiddleware
 from app.corrections import CorrectionStore
 from app.job_runner import JobRunner
@@ -48,6 +50,7 @@ def create_app(
                corrections_filename=resolved.corrections_filename)
     run_startup_cleanup(data_root=resolved.data_root, db_path=resolved.db_path)
     service.prepare_sample(resolved)  # before any request: an old install never serves old sample media
+    service.install_open_weights_receipts(resolved)
     if reconcile_interrupted:
         try:
             meta_client = (
@@ -116,6 +119,7 @@ def create_app(
             lambda job_id: job_dir(job_id, root=resolved.data_root),
             resolved.corrections_filename,
             shared_job=lambda: service.sample_job_id(resolved),
+            locked_jobs=(proof_links.load()["open_weights_job"],),
             max_ops=resolved.correction_max_ops,
             max_chars=resolved.correction_phrase_max_chars,
             guide_filename=resolved.guide_filename,
@@ -128,6 +132,17 @@ def create_app(
         if snapshotter is not None and (snapshotter.last_ok is None or
                 time.monotonic() - snapshotter.last_ok > app.state.snapshot_max_age_s):
             return JSONResponse({"status": "snapshot stale"}, status_code=503)
+        links = proof_links.load()
+        with db.connect(resolved.db_path) as conn:
+            (installed,) = conn.execute("SELECT COUNT(*) FROM model_calls WHERE job_id = ?", (links["open_weights_job"],)).fetchone()
+            (second,) = conn.execute("SELECT COUNT(*) FROM model_calls WHERE job_id = ? AND model = ?", (links["open_weights_job"], RECEIPT_MODEL_SPARK_OPEN)).fetchone()
+        exact = installed == links["open_weights_receipt_count"]
+        if proof_links.receipts_source(resolved.db_path, links["open_weights_job"]) == "fixture":
+            ok = exact
+        else:
+            ok = exact or (installed > 0 and second >= links["open_weights_real_second_check_min"])
+        if not ok:
+            return JSONResponse({"status": "receipts missing"}, status_code=503)
         return JSONResponse({"status": "ok"})
 
     return app

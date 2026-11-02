@@ -133,10 +133,24 @@ def _render_second_check(calls) -> str:
         )
     if not items:
         return ""
+    links = proof_links.load()
     return (
         '<section class="second-check" aria-label="Second check">'
-        "<h2>Second check</h2><ul>" + "".join(items) + "</ul></section>"
+        "<h2>Second check</h2><ul>" + "".join(items) + "</ul>"
+        f'<p><a href="{escape_cell(links["open_weights_replay"])}">{escape_cell(links["open_weights_second_check_replay_text"])}</a></p></section>'
     )
+
+
+def _saved_copy_note(job_id: str, database=None) -> str:
+    line = proof_links.saved_copy_line(job_id, database)
+    return f'<p class="saved-copy" role="note">{escape_cell(line)}</p>' if line else ""
+
+
+def _sample_note(job_id: str) -> str:
+    """On the sample's own receipts: the sample has no open-weights rows; the newer job and the replay are one click away."""
+    if f"/calls/{job_id}" != proof_links.load()["sample_calls"]:
+        return ""
+    return '<section class="second-check" aria-label="Second check">' + proof_links.open_weights_note_html() + "</section>"
 
 
 def _render_table(summary: CallSummary, rows_html: str) -> str:
@@ -262,7 +276,7 @@ def render_calls_page(job_id: str, ctx: JobContext) -> str:
         template.replace("{{PAGE_TITLE}}", escape_cell(f"{CALLS_PAGE_TITLE} · {job_id}"))
         .replace("{{JOB_ID}}", escape_cell(job_id))
         .replace("{{SUMMARY}}", _render_summary(summary))
-        .replace("{{READBACK}}", _render_readback(readback) + _render_second_check(calls))
+        .replace("{{READBACK}}", _saved_copy_note(job_id, getattr(ctx, "_db", None)) + _render_readback(readback) + _render_second_check(calls) + _sample_note(job_id))
         .replace("{{TABLE}}", _render_table(summary, rows_html))
     )
 
