@@ -204,7 +204,7 @@ def test_header_partial_has_skip_brand_nav_and_icon():
 def test_footer_partial_has_note_slot_and_shell_line():
     assert "{{ pf_footer_note }}" in FOOTER_PARTIAL
     assert 'data-copy="footer.note"' in FOOTER_PARTIAL
-    assert "PartFidelity · guides from your own footage" in FOOTER_PARTIAL
+    assert "PartFidelity · guides from repair videos" in FOOTER_PARTIAL
     assert 'data-copy="footer.shell"' in FOOTER_PARTIAL
     for banned in ("<script", "onclick", "http://", "https://"):
         assert banned not in FOOTER_PARTIAL, banned

@@ -26,5 +26,9 @@ model_words = [
   "ideapad", "latitude", "inspiron", "pavilion", "zenbook", "vivobook",
   "surface", "spectre", "envy", "elitebook", "probook", "aspire", "swift",
   "redmi", "note", "edge", "moto", "xperia", "lumia", "series", "book",
+  # Harmless words a model adds to a device name ("15.6 inch gaming laptop
+  # computer"); none names a device class, so a family word is still needed.
+  "computer", "pc", "inch", "gaming", "mobile", "cell", "smart",
+  "generation", "gen", "windows", "intel", "amd", "ryzen", "core", "in",
 ]
 article_words = ["a", "an", "the"]

@@ -125,6 +125,9 @@ def admit_job(
                 waiting = conn.execute(
                     "SELECT COUNT(*) FROM jobs WHERE state = 'waiting'"
                 ).fetchone()[0]
+                # Previews keep their holds and queue capacity, but release running slots.
+                if not internal and running + waiting >= MAX_RUNNING + MAX_WAITING:
+                    raise QueueFullError(QUEUE_FULL_MESSAGE)
                 if internal or running < MAX_RUNNING:
                     state = "active"
                 elif waiting < MAX_WAITING:

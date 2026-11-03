@@ -36,11 +36,11 @@ STATE_COPY = {
     "sending": "Sending your video… This page refreshes on its own.",
     "waiting": "Your job is waiting for a free slot.",
     "active": "Building your guide. This page refreshes on its own.",
-    "failed": "This guide could not be built. Nothing more will run for this upload.",
-    "expired": "This job ran out of time before its guide was built.",
-    "pending_settlement": "This job stopped; its final accounting is still settling.",
+    "failed": "This guide could not be built, and nothing more will run for this upload. Upload the clip again, or try a different one.",
+    "expired": "This job ran out of time before the guide was finished. Upload the clip again, or try a shorter one.",
+    "pending_settlement": "This job stopped, and we are still recording how far it got. Check this page again in a few minutes.",
 }
-DONE_WITHOUT_GUIDE_COPY = "This job finished, but its guide is not available."
+DONE_WITHOUT_GUIDE_COPY = "This job finished, but we cannot find its guide. Upload the clip again."
 RUNNING_STATES = ("waiting", "active", "sending")
 
 

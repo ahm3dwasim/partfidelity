@@ -428,7 +428,7 @@ def _preview_context(job_id: str, record) -> dict:
 def _expire_preview_during_lookup(uploads, job_id: str):
     """Enforce the 24-hour local-preview promise on read; every state.
 
-    Past ``preview_expires_at`` a still-visible record is hidden before
+    At or after ``preview_expires_at`` a still-visible record is hidden before
     anything renders: an unclaimed ``preview`` terminalizes through
     ``recover_job`` (failed, job terminal, footage due), while any
     other state hides through ``hide_expired_preview``, which touches
@@ -444,7 +444,7 @@ def _expire_preview_during_lookup(uploads, job_id: str):
     if record.hidden:
         return loaded
     try:
-        expired = db.utcnow() > record.preview_expires_at
+        expired = db.utcnow() >= record.preview_expires_at
     except Exception:
         expired = False
     if not expired:
@@ -598,7 +598,7 @@ def _render_preview_response(
                 status_code=404,
             )
         try:
-            stale_expired = db.utcnow() > record.preview_expires_at
+            stale_expired = db.utcnow() >= record.preview_expires_at
         except Exception:
             stale_expired = False
         if (

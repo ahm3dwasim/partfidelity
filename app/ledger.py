@@ -579,18 +579,21 @@ def queue_guide_images(
 
 
 def _expire_overdue(conn: sqlite3.Connection, now_text: str) -> tuple[JobId, ...]:
-    """Move past-deadline waiting/active jobs to ``expired``, freeing holds.
+    """Expire overdue runs and expired previews, freeing holds.
 
-    A job whose deadline has been reached (``deadline_at <= now``) is expired,
-    matching the reservation refusal at ``now >= deadline``. Freed running
-    slots are filled FIFO so a waiter never sits out while a slot is empty.
+    A preview has not started its run deadline; only its preview TTL applies.
+    Freed running slots are filled FIFO among jobs ready to run.
     """
     from app.admission import MAX_RUNNING  # deferred: admission imports ledger
 
     overdue = conn.execute(
-        "SELECT id, created_at FROM jobs WHERE state IN ('waiting', 'active') AND deadline_at <= ?"
+        "SELECT id, created_at FROM jobs WHERE state IN ('waiting', 'active')"
+        " AND ((deadline_at <= ? AND NOT EXISTS (SELECT 1 FROM uploads u"
+        " WHERE u.job_id = jobs.id AND u.state = 'preview'))"
+        " OR EXISTS (SELECT 1 FROM uploads u WHERE u.job_id = jobs.id"
+        " AND u.state = 'preview' AND u.preview_expires_at <= ?))"
         " ORDER BY created_at, id",
-        (now_text,),
+        (now_text, now_text),
     ).fetchall()
     expired: list[JobId] = []
     for entry in overdue:
@@ -601,7 +604,8 @@ def _expire_overdue(conn: sqlite3.Connection, now_text: str) -> tuple[JobId, ...
         _release_unsettled_calls(conn, entry["id"])
         _close_job_hold(conn, entry["id"], _day_row_for_job(conn, entry["created_at"]))
         expired.append(JobId(entry["id"]))
-    _promote_waiting(conn, now_text, MAX_RUNNING)
+    if expired:
+        _promote_waiting(conn, now_text, MAX_RUNNING)
     return tuple(expired)
 
 
@@ -642,8 +646,8 @@ def extend_job_deadline(
     clients (and each chunk child carries its own configured Spark
     envelope); reserves, expiry, and client call budgets then share
     the longer window. One shot per job: a deadline already past its
-    original ``created_at + 240 s`` is never pushed again, and no push
-    passes ``created_at + 240 s + max_extra_s`` (default
+    original run start + ``JOB_DEADLINE_S`` is never pushed again, and no push
+    passes run start + ``JOB_DEADLINE_S + max_extra_s`` (default
     ``app.settings.DEFAULT_DEADLINE_EXTENSION_MAX_S``). Conditional
     on ``active`` with a live deadline: terminal jobs and jobs past
     their deadline keep their row and this returns False, never
@@ -690,7 +694,8 @@ def extend_job_deadline(
             now_text = db.format_dt(db.utcnow())
             try:
                 row = conn.execute(
-                    "SELECT created_at, deadline_at FROM jobs"
+                    "SELECT COALESCE((SELECT claim_started_at FROM uploads"
+                    " WHERE job_id = jobs.id AND hidden = 0), created_at) AS started_at, deadline_at FROM jobs"
                     " WHERE id = ? AND state = 'active'",
                     (str(job_id),),
                 ).fetchone()
@@ -702,7 +707,7 @@ def extend_job_deadline(
                     # UPDATE, so extending would resurrect it.
                     conn.execute("ROLLBACK")
                     return False
-                original = db.parse_dt(row["created_at"]) + timedelta(
+                original = db.parse_dt(row["started_at"]) + timedelta(
                     seconds=JOB_DEADLINE_S
                 )
                 current = db.parse_dt(row["deadline_at"])
@@ -1586,14 +1591,19 @@ class JobContextImpl:
 def _promote_waiting(conn: sqlite3.Connection, now_text: str, max_running: int) -> None:
     """Fill freed running slots with the oldest waiting jobs, FIFO.
 
-    Waiting jobs already past their deadline expire instead of running, so a
-    stale queue entry can never start spending after its 240 seconds.
+    Unconfirmed previews release their slots and stay queued until consent.
+    Other waiting jobs already past their deadline expire instead of running.
     """
+    conn.execute(
+        "UPDATE jobs SET state = 'waiting' WHERE state = 'active'"
+        " AND EXISTS (SELECT 1 FROM uploads u WHERE u.job_id = jobs.id AND u.state = 'preview')"
+    )
     active = conn.execute("SELECT COUNT(*) FROM jobs WHERE state = 'active'").fetchone()[0]
     if active >= max_running:
         return
     waiting = conn.execute(
         "SELECT id, created_at, deadline_at FROM jobs WHERE state = 'waiting'"
+        " AND NOT EXISTS (SELECT 1 FROM uploads u WHERE u.job_id = jobs.id AND u.state = 'preview')"
         " ORDER BY created_at, id"
     ).fetchall()
     for entry in waiting:

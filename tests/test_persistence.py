@@ -465,7 +465,7 @@ def test_inaccessible_artifact_aborts_reconcile_without_expiring_jobs(host, monk
         persistence.reconcile(live, data_root)
     conn = sqlite3.connect(live)
     try:
-        assert conn.execute('SELECT state FROM jobs WHERE id = ?', (str(ctx.job_id),)).fetchone()[0] == 'active'
+        assert conn.execute('SELECT state FROM jobs WHERE id = ?', (str(ctx.job_id),)).fetchone()[0] == 'waiting'
         assert conn.execute('SELECT delete_state FROM artifacts').fetchone()[0] == 'live'
     finally:
         conn.close()

@@ -41,11 +41,11 @@ tools_heading = "Meta tooling"
 input_heading = "Pre-event input"
 input = "One input existed before the event: a repair clip filmed by a friend of the author, who gave written permission to use it (held privately by the author; no name or record is published). It is raw input only. The application, the guide made from it and every other output were built during the event, Oct 26–Nov 4, 2026."
 licences_heading = "Licences and sources"
-footer = "PartFidelity · guides from your own footage"
+footer = "PartFidelity · guides from video you filmed or may share"
 
 [[summary]]
 name = "What it does"
-text = "Turns one repair video you filmed into an illustrated step-by-step guide, with safety hard stops for batteries and glued parts."
+text = "Turns one repair video you filmed or have the right to share into an illustrated step-by-step guide, with safety hard stops for batteries and glued parts."
 [[summary]]
 name = "Meta models"
 text = "Muse Spark extracts the steps. SAM 3.1 finds the fan and battery. Spark Open gives a background second opinion on part labels."

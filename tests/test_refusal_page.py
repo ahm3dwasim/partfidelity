@@ -34,7 +34,7 @@ def _client(tmp_path, job_id, marker, state="failed"):
     if marker is not None:
         folder = job_dir(job_id, root=tmp_path)
         folder.mkdir(parents=True)
-        (folder / REFUSAL_MARKER_FILENAME).write_text(json.dumps({"kind": marker}))
+        (folder / REFUSAL_MARKER_FILENAME).write_text(json.dumps(marker if isinstance(marker, dict) else {"kind": marker}))
     app = FastAPI()
     app.state.settings = settings
     app.include_router(router)
@@ -67,7 +67,7 @@ def test_deadline_failure_writes_reason_shown_on_job_page(tmp_path):
     assert result.state == "failed"
     page = _page(client, str(ctx.job_id))
     assert "took longer than the time limit" in page
-    assert "Try a shorter clip" in page
+    assert "Trim it to the repair itself" in page
     assert "took longer than the time limit" in client.get(f"/jobs/{ctx.job_id}").json()["reason"]
 
 
@@ -85,7 +85,7 @@ def test_chunk_parent_stage_marker_overrides_old_upload_receipt(tmp_path):
 
 def test_refusal_copy_kinds():
     assert refusal_copy("none") is None
-    assert "teardown" in refusal_copy("not_a_teardown")
+    assert "repair" in refusal_copy("not_a_teardown")
 
 
 def test_pending_settlement_page_still_shows_reason(tmp_path):
@@ -112,3 +112,53 @@ def test_failed_job_without_marker_still_gets_a_reason(tmp_path):
     assert body["state"] == "failed"
     assert body["reason"] == refusal_copy("failure")
     assert refusal_copy("failure") in _page(client, "jobnull01")
+
+
+def test_scope_stop_names_the_rule_the_clip_hit():
+    from app.hazards import SCOPE_LEAD, SCOPE_RULE_TEXT, assess_hazards
+    from test_hazards import make_step
+    for rule, text in (("hazard:mains", SCOPE_RULE_TEXT["hazard"]), ("device_type:tablet", SCOPE_RULE_TEXT["device"]),
+                       ("device_guess:unlisted", SCOPE_RULE_TEXT["device"])):
+        copy = refusal_copy("scope", rule)
+        assert copy.startswith(text) and SCOPE_LEAD in copy
+    assert refusal_copy("scope").startswith(SCOPE_LEAD)  # old marker: no rule recorded
+    cases = [("ThinkPad T480", make_step(1, hazards=("mains",)), "hazard:mains"),
+             ("ThinkPad T480", make_step(1, "The cell looks swollen."), "hazard:swollen"),
+             ("e-bike", make_step(1), "hazard:e-bike"),
+             ("phone", make_step(1, "It was on fire yesterday."), "hazard:fire"),
+             ("tablet", make_step(1), "device_type:tablet"),
+             ("game controller", make_step(1), "device_guess:unlisted")]
+    for guess, step, rule in cases:
+        got = assess_hazards((step,), guess).refusal_rule
+        assert got == rule, (guess, got)
+
+
+def test_refused_job_page_names_recorded_rule(tmp_path):
+    text = _page(_client(tmp_path, "jobrule01", {"kind": "scope", "rule": "device_type:tablet"}), "jobrule01")
+    assert "The video did not look like a phone or laptop repair." in text
+
+
+def test_pipeline_persists_refusal_rule_on_marker(tmp_path, monkeypatch):
+    from types import SimpleNamespace
+    from app import pipeline
+    client = _client(tmp_path, "jobwire01", None)
+    monkeypatch.setattr(pipeline, "_settle_failed", lambda *a, **k: "failed")
+    ctx = SimpleNamespace(job_id="jobwire01")
+    monkeypatch.setattr(pipeline, "job_dir", lambda job_id, **k: job_dir(job_id, root=tmp_path))
+    pipeline._refuse(ctx, None, "not a teardown", replay=False, refusal_kind="scope", refusal_rule="hazard:mains")
+    marker = job_dir("jobwire01", root=tmp_path) / REFUSAL_MARKER_FILENAME
+    assert json.loads(marker.read_text()) == {"kind": "scope", "rule": "hazard:mains"}
+
+
+def test_refusal_branch_passes_assessment_rule_to_refuse():
+    import ast
+    import inspect
+    from app import pipeline
+    tree = ast.parse(inspect.getsource(pipeline._run_stages_inner))
+    wired = [
+        kw for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and getattr(node.func, "id", "") == "_refuse"
+        for kw in node.keywords
+        if kw.arg == "refusal_rule" and ast.unparse(kw.value) == "assessment.refusal_rule"
+    ]
+    assert wired, "hazard refusal branch no longer passes assessment.refusal_rule to _refuse"

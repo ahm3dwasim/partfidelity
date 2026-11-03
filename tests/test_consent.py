@@ -291,7 +291,7 @@ def test_preview_is_admitted_artifact_and_survives_worker_reload(
     finally:
         conn.close()
     assert kind == "upload_preview"
-    assert state == "active"
+    assert state == "waiting"
     # A second worker (fresh store, same database) reloads the same record.
     worker_b = UploadStoreImpl(lane_db, clock=clock)
     loaded = worker_b.load_job(ctx.job_id)
@@ -1229,14 +1229,9 @@ def test_confirm_on_waiting_job_renders_a_waiting_state(
 
     ctx = _admit("waiting")
     _prepare(uploads, ctx, short_clip)
-    conn = sqlite3.connect(lane_db)
-    try:
-        conn.execute(
-            "UPDATE jobs SET state = 'waiting' WHERE id = ?", (str(ctx.job_id),)
-        )
-        conn.commit()
-    finally:
-        conn.close()
+    # Unconfirmed previews no longer hold slots: fill them with real admitted work.
+    _admit("running-a")
+    _admit("running-b")
     lifecycle = LifecycleRepositoryImpl(lane_db)
     with _overrides(uploads=uploads, lifecycle=lifecycle,
                     meta_client=FakeMetaFiles(clock)):
@@ -1298,6 +1293,43 @@ def test_expired_preview_is_hidden_on_read_without_a_sweep(
     record = uploads.load_job(ctx.job_id)[1]
     assert record.state == "failed"
     assert record.hidden is True
+
+
+@pytest.mark.parametrize("state", ["preview", "confirming", "confirmed"])
+def test_preview_routes_expire_at_exact_ttl(
+    route_client, lane_db: Path, uploads: UploadStoreImpl, clock: FakeClock,
+    short_clip: Path, state: str,
+) -> None:
+    from app.ledger import LifecycleRepositoryImpl
+
+    ctx = _admit("exact-ttl")
+    _prepare(uploads, ctx, short_clip)
+    fake = FakeMetaFiles(clock)
+    if state == "confirming":
+        assert uploads.claim_confirmation(ctx.job_id, clock()).acquired
+    elif state == "confirmed":
+        confirm_and_send(ctx.job_id, uploads=uploads, client=fake)
+    before = uploads.load_job(ctx.job_id)[1]
+    clock.now = before.preview_expires_at
+    with _overrides(uploads=uploads, lifecycle=LifecycleRepositoryImpl(lane_db),
+                    meta_client=fake):
+        page = route_client.get(f"/preview/{ctx.job_id}")
+        assert page.status_code == 410
+        assert f"/preview/{ctx.job_id}/video" not in page.text
+        assert route_client.get(f"/preview/{ctx.job_id}/video").status_code == 410
+        assert route_client.post(
+            f"/preview/{ctx.job_id}/confirm",
+            data={"consent": "on", "ownership": "on"},
+        ).status_code == 410
+    after = uploads.load_job(ctx.job_id)[1]
+    assert after.hidden
+    assert after.state == ("failed" if state == "preview" else state)
+    assert after.claim_id == before.claim_id
+    assert after.meta_file_id == before.meta_file_id
+    assert after.failure_count == 0
+    if before.meta_file_id is not None:
+        assert _meta_row(lane_db, before.meta_file_id)["delete_state"] == "live"
+    assert fake.delete_calls == []
 
 
 def test_confirmed_preview_expiry_hides_locally_without_touching_meta(
@@ -2021,7 +2053,7 @@ def test_render_helper_unreadable_reload_uses_stale_proof(
 
     old_ctx = _admit("staleexpired")
     _prepare(uploads, old_ctx, short_clip)
-    clock.advance(hours=25)
+    clock.now = uploads.load_job(old_ctx.job_id)[1].preview_expires_at
     stale_expired = uploads.load_job(old_ctx.job_id)[1]
     assert stale_expired.hidden is False
     fresh_ctx = _admit("stalelive")

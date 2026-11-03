@@ -26,6 +26,9 @@
 {% endif %}
 </div>
 <div class="pf-pv-side">
+{% if state == "cancelled" %}
+<p id="cancelled" class="pf-pv-state">{{ cancelled_copy }}</p>
+{% endif %}
 <ul class="pf-pv-facts">
 <li><p><strong>{{ c.preview.recipient_lead }}</strong> {{ c.preview.recipient_text }}</p></li>
 <li><p>{{ c.retention.meta }}</p></li>
@@ -53,7 +56,6 @@
 <button class="pf-pill" type="submit">{{ c.preview.cancel }}</button>
 </form>
 {% elif state == "cancelled" %}
-<p id="cancelled" class="pf-pv-state">{{ cancelled_copy }}</p>
 <p><a class="pf-pill" href="/upload">Upload another video</a></p>
 {% elif state == "hidden" %}
 <p id="hidden" class="pf-pv-state">{{ hidden_copy }}</p>

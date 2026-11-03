@@ -40,7 +40,7 @@ def test_sample_guide_renders_the_real_steps(client: TestClient) -> None:
     for title in ("Remove bottom cover", "Not shown in the video: the battery disconnect", "Power on and verify in Windows"):
         assert title in page.text
     assert "Warning: battery" in page.text and "Warning: esd" in page.text
-    assert "I filmed this" in page.text and "I&#8217;m fixing this" in page.text  # both modes stay
+    assert "Edit guide" in page.text and "Follow guide" in page.text  # both modes stay
     assert 'class="pf-pin"' in page.text  # the checked labels keep their pins
     assert "Step 9" not in page.text  # the intro left the numbered steps
     assert "Made from a real repair video" in page.text

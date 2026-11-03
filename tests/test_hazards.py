@@ -106,6 +106,14 @@ def test_proceeding_guide_authorizes_the_frozen_sam_ceiling():
         "Lenovo ThinkPad T-480",
         "ThinkPad T-480 laptop",
         "Lenovo ThinkPad X-1 laptop",
+        "Acer Aspire 3 laptop computer",
+        "15.6 inch gaming laptop",
+        "Windows laptop PC",
+        "Dell Inspiron 15 3000 2-in-1 laptop",
+        "Apple iPhone 12 mobile phone",
+        "Samsung Galaxy S21 cell phone",
+        "Google Pixel 7 smart phone",
+        "Intel Core i5 11th gen laptop",
     ],
 )
 def test_guesses_of_allowlisted_tokens_with_one_family_word_are_admitted(device_guess):
@@ -141,6 +149,11 @@ def test_guesses_of_allowlisted_tokens_with_one_family_word_are_admitted(device_
         "laptop charger",
         "laptop case",
         "phone screen protector",
+        "gaming computer",
+        "Windows PC",
+        "smart speaker",
+        "mobile",
+        "smart tv",
     ],
 )
 def test_negated_mixed_or_near_miss_device_guesses_refuse(device_guess):
@@ -158,15 +171,9 @@ def test_scope_wins_over_non_teardown():
 @pytest.mark.parametrize(
     ("action", "hazards"),
     [
-        ("Open the tablet case.", ()),
-        ("Disconnect the smartwatch battery.", ()),
         ("Open the high‑voltage pack.", ()),
-        ("Remove the watch back.", ()),
         ("Open the EV battery.", ()),
         ("Inspect the e–bike pack.", ()),
-        ("Do the thing.", ("tablet",)),
-        ("Do the thing.", ("smartwatch",)),
-        ("Do the thing.", ("watch",)),
         ("Do the thing.", ("high—voltage",)),
         ("Do the thing.", ("EV",)),
         ("Do the thing.", ("e‑bike",)),
@@ -218,7 +225,7 @@ def test_refusal_text_is_fixed_with_sample_cta():
         f"or anything that was on fire. {CTA_SAMPLE} instead."
     )
     teardown = assess_hazards((), "phone")
-    assert teardown.refusal_text == f"We could not find a teardown. {CTA_SAMPLE} instead."
+    assert teardown.refusal_text == f"We could not find a phone or laptop repair in this video. {CTA_SAMPLE} instead."
 
 
 def test_missing_battery_disconnect_marks_draft():
@@ -450,6 +457,48 @@ def test_draft_banner_is_universal_fixed_text():
     )
 
 
+@pytest.mark.parametrize(
+    "action",
+    [
+        "Watch for the hidden clips.",
+        "Remove the screws near the monitor hinge.",
+        "Unplug the external monitor port cover.",
+        "Switch off tablet mode in the BIOS.",
+        "Lift the desktop replacement laptop base.",
+        "Open the tablet case.",
+        "Remove the watch back.",
+    ],
+)
+def test_device_type_words_in_steps_do_not_refuse_a_laptop(action):
+    assessment = assess_hazards((make_step(1, action, hazards=("tablet",)),), "Acer Aspire 3 laptop")
+    assert assessment.refused is False
+
+
+@pytest.mark.parametrize(
+    ("guess", "rule"),
+    [
+        ("Apple Watch", "device_type:watch"),
+        ("Samsung tablet", "device_type:tablet"),
+        ("desktop PC", "device_type:desktop"),
+        ("LG monitor", "device_type:monitor"),
+        ("microwave", "device_type:microwave"),
+    ],
+)
+def test_device_type_guesses_refuse_and_log_the_rule(guess, rule, caplog):
+    with caplog.at_level("INFO", logger="app.hazards"):
+        assessment = assess_hazards((make_step(1),), guess)
+    assert assessment.refusal_kind == "scope"
+    assert f"scope refusal: {rule}" in caplog.text
+
+
+def test_hazard_step_logs_hazard_rule_without_step_text(caplog):
+    with caplog.at_level("INFO", logger="app.hazards"):
+        assessment = assess_hazards((make_step(1, "Unplug the mains lead SN123."),), "ThinkPad T480")
+    assert assessment.refused is True
+    assert "scope refusal: hazard:mains" in caplog.text
+    assert "SN123" not in caplog.text
+
+
 @pytest.mark.parametrize("word", ["firmware", "campfire stories", "smokestack photo"])
 def test_refusal_words_need_word_boundaries(word):
     assessment = assess_hazards((make_step(1, f"Show the {word}."),), "ThinkPad T480")
@@ -544,3 +593,29 @@ def test_device_scope_loader_fails_on_overlapping_word_sets(tmp_path):
     bad.write_text("[device_scope]\n" + "\n".join(f"{k} = {v}" for k, v in base.items()))
     with pytest.raises(RuntimeError, match="phone"):
         load_device_scope(bad)
+
+
+@pytest.mark.parametrize(
+    "word",
+    ["mains", "swollen", "e-bike", "high voltage", "ev", "fire", "burning", "smoke", "flames"],
+)
+@pytest.mark.parametrize("field", ["device_guess", "action", "tag"])
+def test_every_hazard_concept_refuses_from_every_field(word, field):
+    guess, action, tags = "ThinkPad T480", "Do the thing.", ()
+    if field == "device_guess":
+        guess = f"ThinkPad {word}"
+    elif field == "action":
+        action = f"Careful with the {word} here."
+    else:
+        tags = (word,)
+    assessment = assess_hazards((make_step(1, action, hazards=tags),), guess)
+    assert assessment.refusal_kind == "scope", (word, field)
+    assert assessment.sam_authorized == 0
+
+
+def test_unlisted_device_guess_logs_no_input_token(caplog):
+    with caplog.at_level("INFO", logger="app.hazards"):
+        assessment = assess_hazards((make_step(1),), "Acer laptop AssetTag")
+    assert assessment.refusal_kind == "scope"
+    assert "scope refusal: device_guess:unlisted" in caplog.text
+    assert "assettag" not in caplog.text.lower()

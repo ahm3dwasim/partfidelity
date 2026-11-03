@@ -163,7 +163,7 @@ def test_later_warnings_stay_visible_before_acknowledgement(browser, one_hazard_
             for n in range(3, 6):  # battery warnings on the folded steps 3-5
                 assert not _visible(page, n)
                 assert _warnings_visible(page, n)
-                assert "Disconnect the battery before touching" in page.locator(f"#step-{n} .pf-hazard").first.inner_text()
+                assert "before touching anything else" in page.locator(f"#step-{n} .pf-hazard").first.inner_text()
             page.locator("[data-stop-ack]").click()
             assert all(_visible(page, n) and _warnings_visible(page, n) for n in range(3, 6))
         finally:
@@ -197,12 +197,12 @@ def test_one_gate_per_hazard_chips_stay_on_later_steps(one_hazard_guide):
     assert 'data-stop="2"' in body
     for n in range(2, 6):  # every battery step keeps its own visible warning text
         card = body[body.index(f'id="step-{n}"'):body.index(f'id="step-{n + 1}"')]
-        assert "Disconnect the battery before touching" in card
+        assert "before touching anything else" in card
 
 
 def test_stop_names_the_hazard_and_its_risk(one_hazard_guide, two_stop_guide):
     one = _page(one_hazard_guide)
-    assert "Hard stop: battery." in one and "Disconnect the battery first." in one
+    assert "Hard stop: battery." in one and "disconnect the internal battery first." in one
     assert "glued screen" not in re.search(r'<section class="stop".*?</section>', one, re.S).group(0)
     two = _page(two_stop_guide)
     assert "Hard stop: glued screen." in two and "cracking" not in two and "crack the glass" in two
@@ -316,7 +316,7 @@ def test_draft_note_is_maker_only_and_reader_gets_a_safety_version(tmp_path):
     from app.hazards import DRAFT_ORDER_REASON
     g = _hazard_guide(tmp_path, {2: _B})
     g = type(g)(**{**g.__dict__, "draft_reasons": (DRAFT_ORDER_REASON, "DRAFT: other maker detail")})
-    reader = "The video does not show the battery being disconnected. Disconnect it before you go on."
+    reader = "The video does not show the internal battery being disconnected. Disconnect it yourself, using the service manual for your device, before you go on."
     page, _ = follower_html(g, images_dir="images", frame_pattern="f{number}.png", label_pattern="l{number}.png")
     for body in (_page(g), page):
         assert f'<li class="maker-only">{DRAFT_ORDER_REASON}</li>' in body

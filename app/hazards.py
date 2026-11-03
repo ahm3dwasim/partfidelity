@@ -10,6 +10,7 @@ The reader module consumes ``HazardAssessment``, ``DifficultyResult`` and ``Read
 
 from __future__ import annotations
 
+import logging
 import re
 import tomllib
 import unicodedata
@@ -25,6 +26,8 @@ from fastapi.responses import RedirectResponse
 
 from app.contracts import SAM_MAX_CALLS_PER_JOB, Step
 from app.guide_text import DRAFT_ORDER_REASON
+
+_log = logging.getLogger(__name__)
 
 __all__ = (
     "DRAFT_BANNER",
@@ -73,8 +76,8 @@ DRAFT_BANNER = (
 _ADHESIVE_HEAT_TEXT = "Heat and adhesive can burn. Let parts cool."
 HAZARD_TEMPLATES: dict[str, str] = {
     "battery": (
-        "Power off and unplug. Disconnect the battery before touching "
-        "anything else. Do not pierce, bend or use metal tools on a cell. "
+        "Power off and unplug. Remove the external battery if the device has one, "
+        "and disconnect the internal battery, before touching anything else. Do not pierce, bend or use metal tools on a cell. "
         "If a battery is swollen, stop; do not pry it. Take it to e-waste."
     ),
     "adhesive/heat": _ADHESIVE_HEAT_TEXT,
@@ -119,14 +122,15 @@ CTA_SAMPLE = "Try the sample guide"
 
 # Scope refusal (verbatim) plus the sample CTA from the operational
 # refusal line, so a refused page always offers the sample.
+SCOPE_LEAD = "This tool handles phones and laptops only."
 _SCOPE_REFUSAL_TEXT = (
-    "This tool handles phones and laptops only. It will not make guides for "
+    SCOPE_LEAD + " It will not make guides for "
     "mains-powered devices, e-bike or high-voltage packs, swollen batteries "
     "or anything that was on fire."
 )
-_NOT_A_TEARDOWN_TEXT = "We could not find a teardown."
-_DURATION_REFUSAL_TEXT = "This video is longer than the tool accepts. Trim it and try again."
-_BUDGET_REFUSAL_TEXT = "This video is too long to process within the cost limit. Trim it and try again."
+_NOT_A_TEARDOWN_TEXT = "We could not find a phone or laptop repair in this video."
+_DURATION_REFUSAL_TEXT = "This video is longer than the tool accepts. Trim it and upload it again."
+_BUDGET_REFUSAL_TEXT = "This video is too long for us to process. Trim it and upload it again."
 
 # Spark hazard taxonomy. `mains` is not a warning: it refuses.
 # `heat` shares the adhesive/heat template but stays an "other hazard" for
@@ -136,29 +140,47 @@ _HARD_TAGS = frozenset({"battery", "adhesive", "display"})
 _WARNING_TAGS = ("battery", "adhesive", "heat", "display", "esd", "data", "sharp")
 _ADHESIVE_CLASS = {"adhesive", "heat"}
 
-# Scope refusal patterns over device_guess + step actions + hazard tags
-# (brief: mains, swollen cells, e-bike/high-voltage packs, fire,
-# out-of-scope devices). Word-boundaried so "firmware" never refuses.
-# Refusal concepts count in every input field, tags included.
-_SCOPE_PATTERNS = (
+# Hazard concepts (mains, swollen cells, e-bike/high-voltage packs, fire)
+# refuse in every input field: device_guess, step actions and tags.
+# Word-boundaried so "firmware" never refuses.
+_HAZARD_PATTERNS = (
     re.compile(r"\bmains\b"),
     re.compile(r"\bswollen\b"),
     re.compile(r"\be[\s-]?bike\b"),
     re.compile(r"\bhigh[\s-]?voltage\b"),
-    re.compile(r"\btablets?\b"),
-    re.compile(r"\bsmart[\s-]?watch(?:es)?\b"),
-    re.compile(r"\bwatch(?:es)?\b"),
     re.compile(r"\bev\b"),
     re.compile(r"\bfire\b"),
     re.compile(r"\bburning\b"),
     re.compile(r"\bsmoke\b"),
     re.compile(r"\bflames?\b"),
+)
+
+# Device-type words refuse in device_guess only: a laptop step may say
+# "watch for the clips" or "monitor hinge" without leaving scope.
+_DEVICE_TYPE_PATTERNS = (
+    re.compile(r"\btablets?\b"),
+    re.compile(r"\bsmart[\s-]?watch(?:es)?\b"),
+    re.compile(r"\bwatch(?:es)?\b"),
     re.compile(
         r"\b(television|microwave|dishwasher|washing machine|dryer|"
         r"refrigerator|fridge|freezer|air conditioner|oven|heater|"
         r"desktop|monitor|server)\b"
     ),
 )
+
+# What the stop page names for the rule a clip hit, keyed by the family before
+# the colon in _scope_rule's result; "device" covers any device that is not a
+# phone or laptop (listed or not).
+SCOPE_RULE_TEXT = {
+    "hazard": "The video shows a mains-powered device, a swollen battery, an e-bike or high-voltage pack, or fire, smoke or burning.",
+    "device": "The video did not look like a phone or laptop repair.",
+}
+
+
+def _rule_family(rule: str | None) -> str:
+    """Stop-message key for a _scope_rule result: hazard words vs. not a phone/laptop."""
+    return "hazard" if (rule or "").startswith("hazard:") else "device"
+
 
 _SCOPE_DASH_EXTRAS = frozenset({"\u00ad", "\u2212", "\ufe63", "\uff0d"})
 
@@ -281,6 +303,7 @@ class HazardAssessment:
     draft: bool
     draft_reasons: tuple[str, ...]
     battery_order: BatteryOrderEvidence
+    refusal_rule: str | None = None
 
 
 @dataclass(frozen=True)
@@ -496,12 +519,20 @@ def _normalise_scope_text(value: str) -> str:
     ).lower()
 
 
-def _scope_hit(device_guess: str, steps: Sequence[Step]) -> bool:
+def _scope_rule(device_guess: str, steps: Sequence[Step]) -> str | None:
+    """Name the rule that refuses on scope ("hazard:<m>" or "device_type:<m>"), else None."""
     tags = [t for s in steps for t in _step_tags(s)]
     haystack = _normalise_scope_text(
         " ".join([device_guess, *(s.action for s in steps), *tags])
     )
-    return any(p.search(haystack) for p in _SCOPE_PATTERNS)
+    for p in _HAZARD_PATTERNS:
+        if m := p.search(haystack):
+            return f"hazard:{m.group(0)}"
+    guess = _normalise_scope_text(device_guess)
+    for p in _DEVICE_TYPE_PATTERNS:
+        if m := p.search(guess):
+            return f"device_type:{m.group(0)}"
+    return None
 
 
 def _affirmative_disconnect(step: Step) -> bool:
@@ -620,10 +651,15 @@ def fewer_checks_reason(used: int, expected: int) -> str:
     )
 
 
-def refusal_copy(kind: str) -> str | None:
-    """The plain-words refusal shown for a refusal kind, or None for other kinds."""
+def refusal_copy(kind: str, rule: str | None = None) -> str | None:
+    """The plain-words refusal shown for a refusal kind, or None for other kinds.
+
+    ``rule`` is the scope rule the job recorded; it is named before the general
+    list so the reader sees which one their clip hit."""
     if kind == "scope":
-        return f"{_SCOPE_REFUSAL_TEXT} {CTA_SAMPLE} instead."
+        hit = SCOPE_RULE_TEXT.get(_rule_family(rule)) if rule else None
+        lead = f"{hit} " if hit else ""
+        return f"{lead}{_SCOPE_REFUSAL_TEXT} {CTA_SAMPLE} instead."
     if kind == "not_a_teardown":
         return f"{_NOT_A_TEARDOWN_TEXT} {CTA_SAMPLE} instead."
     if kind == "duration":
@@ -631,22 +667,22 @@ def refusal_copy(kind: str) -> str | None:
     if kind == "budget":
         return f"{_BUDGET_REFUSAL_TEXT} {CTA_SAMPLE} instead."
     failures = {
-        "deadline": "This clip took longer than the time limit for one guide. Try a shorter clip.",
-        "part_check": "We could not finish checking the parts in this clip. Try uploading it again.",
-        "extraction": "We could not identify reliable repair steps in this clip. Try another clip.",
+        "deadline": "This clip took longer than the time limit for one guide. Trim it to the repair itself and upload it again.",
+        "part_check": "We could not finish checking the parts in this clip. Upload it again.",
+        "extraction": "We could not find clear repair steps in this clip. Make sure the part and your hands are in view, then try a different clip.",
         "extract_service_failure": "The AI service did not answer properly for this video. Try again.",
         "upload_failed": "The clip could not be sent for processing. Try uploading it again.",
-        "upload_expired": "The sent video expired before processing started. Please upload it again.",
-        "queue_unavailable": "The job could not start. Please try uploading your clip again.",
-        "interrupted": "Sending stopped when the service restarted. Please upload your clip again.",
+        "upload_expired": "The video was not processed in time and has expired. Upload it again.",
+        "queue_unavailable": "The job could not start. Upload your clip again.",
+        "interrupted": "Sending stopped when the service restarted. Upload your clip again.",
         "processing": "We could not process the video frames. Try another clip.",
-        "frames": "We could not select pictures for this guide. Try another clip.",
-        "readback": "We could not finish checking the guide labels. Try uploading it again.",
-        "finalize": "We could not save the completed guide. Try uploading the clip again.",
-        "settlement": "This guide stopped, and its final accounting is still settling.",
-        "cancelled": "This upload was cancelled and its guide was stopped.",
+        "frames": "We could not pick clear pictures from this clip. Try a different clip with steadier footage.",
+        "readback": "We could not finish checking the part labels. Upload the clip again.",
+        "finalize": "We could not save the finished guide. Upload the clip again.",
+        "settlement": "This guide stopped, and we are still recording how far it got. Check this page again in a few minutes.",
+        "cancelled": "You cancelled this upload, so no guide was made.",
         "service_unavailable": "The guide service was unavailable before processing started. Try again later.",
-        "failure": "This guide could not be built because processing stopped. Try uploading the clip again.",
+        "failure": "This guide could not be built because processing stopped. Upload the clip again, or try a shorter clip.",
     }
     if kind in failures:
         return failures[kind]
@@ -665,7 +701,8 @@ def assess_hazards(steps: Sequence[Step], device_guess: str) -> HazardAssessment
     authorizes up to the frozen per-job ceiling.
     """
     steps = tuple(steps)
-    scope = _scope_hit(device_guess, steps)
+    rule = _scope_rule(device_guess, steps)
+    scope = rule is not None
     guess = _normalise_spaces(device_guess)
     unknown_guess = not steps or not guess or bool(_AMBIGUOUS_GUESS.search(guess))
     if scope:
@@ -676,16 +713,20 @@ def assess_hazards(steps: Sequence[Step], device_guess: str) -> HazardAssessment
         refusal_text = f"{_NOT_A_TEARDOWN_TEXT} {CTA_SAMPLE} instead."
     elif not _names_one_supported_device(guess):
         refusal_kind = "scope"
+        rule = "device_guess:unlisted"
         refusal_text = f"{_SCOPE_REFUSAL_TEXT} {CTA_SAMPLE} instead."
     else:
         refusal_kind = "none"
         refusal_text = None
     refused = refusal_kind != "none"
+    if refusal_kind == "scope":
+        _log.info("scope refusal: %s", rule)  # rule name only, never step text
     order = _battery_order(steps)
     draft_reasons = () if refused or order.battery_first else (DRAFT_ORDER_REASON,)
     return HazardAssessment(
         refused=refused,
         refusal_kind=refusal_kind,
+        refusal_rule=rule if refusal_kind == "scope" else None,
         refusal_text=refusal_text,
         sam_authorized=0 if refused else SAM_MAX_CALLS_PER_JOB,
         warnings=() if refused else _warnings(steps),

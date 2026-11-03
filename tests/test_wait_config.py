@@ -148,3 +148,10 @@ def test_failed_or_empty_segmentation_does_not_claim_parts_outlined(tmp_path):
     lines = [line for _, _, line in view.log]
     assert "segment call failed" in lines
     assert "Parts outlined" not in lines
+
+
+def test_progress_stages_gloss_muse_spark_and_sam_on_first_use():
+    from app import wait_config
+    details = {s["id"]: s["detail"] for s in wait_config.load()["stages"]}
+    assert details["steps"].startswith("Muse Spark (Meta's model that reads the video)")
+    assert details["outline"].startswith("SAM 3.1 (Meta's model that outlines the part)")

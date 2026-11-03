@@ -71,7 +71,7 @@
   overflow-wrap: anywhere;
 }
 .pf-picked::before {
-  content: "Ready to send"; display: block; margin-bottom: 8px;
+  content: "Clip chosen"; display: block; margin-bottom: 8px;
   font: 500 0.75rem/1 var(--pf-font-body); letter-spacing: 0.18em; text-transform: uppercase; color: var(--pf-ok);
 }
 .pf-drop.has-file { border-style: solid; border-color: var(--pf-accent); }

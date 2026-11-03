@@ -158,7 +158,7 @@ def test_failure_copy_is_one_service_reason():
     assert refusal_copy("extract_service_failure") == (
         "The AI service did not answer properly for this video. Try again."
     )
-    assert "reliable repair steps" in (refusal_copy("extraction") or "")
+    assert "clear repair steps" in (refusal_copy("extraction") or "")
 
 
 def test_fewer_checks_note_says_how_many_reads_and_never_claims_a_check():

@@ -64,7 +64,7 @@ Model names and page content live in `config/*.toml`; upload limits are set in
 ### How it fits together
 
 ```
-upload                    app/uploads.py, app/admission.py   preview, your confirmation, then job admission
+upload                    app/uploads.py, app/admission.py   upload, admission and preview; your confirmation takes the running slot; then the run starts
   -> step extraction      app/pipeline.py, app/providers/meta_spark.py   Muse Spark reads the video, three runs
   -> part outlines        app/sam.py, app/providers/meta_sam.py          SAM 3.1 boxes for the fan and battery, drawn as outlines
   -> label checks         app/readback.py, app/providers/open_readback.py

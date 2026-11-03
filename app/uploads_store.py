@@ -35,6 +35,7 @@ from app.contracts import (
     DELETE_REQUEST_PAGE_SIZE,
     DELETE_REQUEST_RETENTION_DAYS,
     GUIDE_CLIP_ARTIFACT_KIND,
+    JOB_DEADLINE_S,
     META_EXPIRY_GUARD_MARGIN_HOURS,
     META_UPLOAD_MAX_HOURS,
     UPLOAD_ERROR_MAX_CHARS,
@@ -55,6 +56,8 @@ from app.ledger import (
     JobContextImpl,
     LedgerError,
     _finalize_job_failed,
+    _expire_overdue,
+    _promote_waiting,
     queue_guide_images,
     _locked,
 )
@@ -368,6 +371,7 @@ class UploadStoreImpl:
                             moment,
                         ),
                     )
+                    _promote_waiting(conn, moment, MAX_RUNNING)
                     conn.execute("COMMIT")
                     return self._record_for(conn, ctx_job_id)
                 except BaseException:
@@ -414,13 +418,14 @@ class UploadStoreImpl:
     ) -> ConfirmationClaim:
         """Single-winner ``BEGIN IMMEDIATE`` claim; only the winner calls Meta.
 
-        Requires an admitted active job; a missing or non-active job is
-        refused outright. A ``confirming``/``confirmed`` row then returns the
+        Requires an admitted open job. A preview acquires a running slot and
+        starts its run deadline atomically with consent; a full queue is retryable.
+        A ``confirming``/``confirmed`` row then returns the
         durable record with ``acquired=False`` without re-checking the
         deadline or preview expiry, so a contender racing a live claim
         stands down instead of erroring. Acquiring needs an unhidden
-        ``preview`` upload before both the job deadline and the preview
-        expiry: the guarded update persists the random 128-bit
+        ``preview`` upload before its preview expiry: the guarded update
+        persists the random 128-bit
         provider-queryable ``claim_id`` with ``claim_started_at`` and
         ``guard_deadline_utc`` (claim start + 24h + the 1h margin) before
         any external I/O. Exactly one contender receives ``acquired=True``;
@@ -428,17 +433,14 @@ class UploadStoreImpl:
         """
         consented_at = _aware(consented_at, "consented_at")
         job_text = str(job_id)
-        now = self._now()
-        now_text = db.format_dt(now)
         claim_id = secrets.token_hex(16)
-        guard_text = db.format_dt(
-            now + timedelta(hours=META_UPLOAD_MAX_HOURS + META_EXPIRY_GUARD_MARGIN_HOURS)
-        )
         conn = db.connect(self._db)
         try:
             try:
                 conn.execute("BEGIN IMMEDIATE")
                 try:
+                    now = self._now()
+                    now_text = db.format_dt(now)
                     up = conn.execute(
                         "SELECT state, preview_expires_at, hidden FROM uploads WHERE job_id = ?",
                         (job_text,),
@@ -449,11 +451,7 @@ class UploadStoreImpl:
                         "SELECT state, deadline_at FROM jobs WHERE id = ?",
                         (job_text,),
                     ).fetchone()
-                    if job is None or job["state"] != "active":
-                        if job is not None and job["state"] == "waiting":
-                            raise ClaimWaitingError(
-                                f"job {job_text} is not active"
-                            )
+                    if job is None or job["state"] not in ("active", "waiting"):
                         raise ClaimTerminalError(
                             f"job {job_text} is not active"
                         )
@@ -466,16 +464,27 @@ class UploadStoreImpl:
                         raise UploadError(
                             f"job {job_text} upload is {up['state']}, not preview"
                         )
-                    if now_text >= job["deadline_at"]:
-                        raise ClaimExpiredError(
-                            f"job {job_text} passed its deadline"
-                        )
                     if now_text >= up["preview_expires_at"]:
                         raise ClaimExpiredError(
                             f"job {job_text} preview expired"
                         )
                     if up["hidden"]:
                         raise UploadError(f"job {job_text} upload is hidden")
+                    # Claim the worker in this same transaction, before any Meta I/O.
+                    _expire_overdue(conn, now_text)
+                    _promote_waiting(conn, now_text, MAX_RUNNING)
+                    active = conn.execute(
+                        "SELECT COUNT(*) FROM jobs WHERE state = 'active'"
+                    ).fetchone()[0]
+                    if active >= MAX_RUNNING:
+                        raise ClaimWaitingError(f"job {job_text} is waiting for a worker")
+                    conn.execute(
+                        "UPDATE jobs SET state = 'active', deadline_at = ? WHERE id = ?",
+                        (db.format_dt(now + timedelta(seconds=JOB_DEADLINE_S)), job_text),
+                    )
+                    guard_text = db.format_dt(now + timedelta(
+                        hours=META_UPLOAD_MAX_HOURS + META_EXPIRY_GUARD_MARGIN_HOURS
+                    ))
                     updated = conn.execute(
                         "UPDATE uploads SET state = 'confirming', claim_id = ?,"
                         " claim_started_at = ?, guard_deadline_utc = ?, consented_at = ?,"
@@ -1200,7 +1209,7 @@ class UploadStoreImpl:
             rows = conn.execute(
                 "SELECT job_id FROM uploads"
                 " WHERE (claim_id IS NOT NULL AND meta_file_id IS NULL)"
-                " OR (state = 'preview' AND claim_id IS NULL AND preview_expires_at < ?)"
+                " OR (state = 'preview' AND claim_id IS NULL AND preview_expires_at <= ?)"
                 " ORDER BY updated_at, job_id",
                 (now_text,),
             ).fetchall()
@@ -1273,7 +1282,7 @@ class UploadStoreImpl:
                     if (
                         state == "preview"
                         and claim is None
-                        and now_text > up["preview_expires_at"]
+                        and now_text >= up["preview_expires_at"]
                     ):
                         state = "failed"
                         conn.execute(
@@ -1347,7 +1356,7 @@ class UploadStoreImpl:
         """Hide one preview-expired upload without touching any lifecycle.
 
         One ``BEGIN IMMEDIATE`` transaction sets ``hidden`` when ``now``
-        is past ``preview_expires_at`` and the row is still visible. It
+        is at or after ``preview_expires_at`` and the row is still visible. It
         changes no state, writes no failure row, and touches neither the
         artifact nor the Meta row, so a ``confirming`` claim still
         completes (completion keys off cancellation, not visibility) and
@@ -1369,7 +1378,7 @@ class UploadStoreImpl:
                     ).fetchone()
                     if up is None:
                         raise UploadError(f"unknown upload job {job_text}")
-                    if not up["hidden"] and now_text > up["preview_expires_at"]:
+                    if not up["hidden"] and now_text >= up["preview_expires_at"]:
                         conn.execute(
                             "UPDATE uploads SET hidden = 1, updated_at = ?"
                             " WHERE job_id = ?",

@@ -35,7 +35,7 @@ def test_home_meta_roles_line_links_to_the_sample_receipts_and_names_every_role(
     for role in ('Muse Spark', 'SAM 3.1', 'SAM 3', 'Muse Spark Open', 'Muse Image'):
         assert role in line, role
     assert 'href="/catch">' in line and 'href="/built">' in line
-    assert len(line) < 400
+    assert len(line) < 520
     assert 'verified' not in line.lower()
 
 
@@ -61,7 +61,7 @@ def _load_with(tmp_path, monkeypatch, old, new):
 
 def test_meta_roles_must_name_every_model_and_never_say_verified(tmp_path, monkeypatch):
     import pytest
-    for old, new in (('Muse Image tests', 'Image tests'), ('This sample:', 'Verified on')):
+    for old, new in (('Muse Image tests', 'Image tests'), ('This sample used', 'Verified on')):
         with pytest.raises(ValueError, match='invalid sample proof link'):
             _load_with(tmp_path, monkeypatch, old, new)
         (tmp_path / 'config/proof_links.toml').unlink()
@@ -75,3 +75,10 @@ def test_meta_roles_rejects_substring_stand_ins(tmp_path, monkeypatch):
             _load_with(tmp_path, monkeypatch, old, new)
         (tmp_path / 'config/proof_links.toml').unlink()
         (tmp_path / 'config').rmdir()
+
+
+def test_home_glosses_muse_spark_and_sam_on_first_use():
+    from app.routes.site import create_site_app
+    home = TestClient(create_site_app()).get('/').text.replace('&#x27;', "'")
+    assert "Muse Spark steps and label checks (Meta's model that reads the video)" in home
+    assert "SAM 3.1 part boxes (Meta's model that outlines the part)" in home

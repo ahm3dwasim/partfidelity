@@ -25,7 +25,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from app import db, guide_clip, persistence, proof_links
 from app.admission import admit_job, job_dir
-from app.contracts import UploadPreview
+from app.contracts import MetaFileId, UploadPreview
 from app.deletion import cancel_and_delete
 from app.deploy_config import HostConfig, load_deploy_config
 from app.hosting import SweepLoop, build_hosted_app
@@ -130,7 +130,9 @@ def _boot(host: HostConfig, **kwargs):
     return build_hosted_app(host, env=REPLAY_ENV, start_loops=False, **kwargs)
 
 
-def _job_with_preview(db_path: Path, tag: str, *, payload: bytes = b"preview"):
+def _job_with_preview(
+    db_path: Path, tag: str, *, payload: bytes = b"preview", confirmed: bool = False,
+):
     ctx = admit_job(f"anon-{tag}", f"ip-{tag}", f"video-{tag}")
     root = job_dir(str(ctx.job_id), root=db.data_root())
     root.mkdir(parents=True, exist_ok=True)
@@ -141,9 +143,18 @@ def _job_with_preview(db_path: Path, tag: str, *, payload: bytes = b"preview"):
         job_id=ctx.job_id, local_video=target, duration_s=12.5,
         size_bytes=len(payload), audio_removed=True, confirmed_at=None,
     )
-    UploadStoreImpl(db_path).register_preview(
+    uploads = UploadStoreImpl(db_path)
+    uploads.register_preview(
         ctx, preview, artifact_id, db.utcnow() + timedelta(hours=24)
     )
+    if confirmed:
+        claim = uploads.claim_confirmation(ctx.job_id, db.utcnow())
+        assert claim.acquired
+        now = db.utcnow()
+        uploads.complete_confirmation(
+            claim.record.claim_id, MetaFileId(f"meta-{ctx.job_id}"),
+            now + timedelta(hours=23), now, now,
+        )
     return ctx, target
 
 
@@ -502,7 +513,7 @@ def test_in_process_sweep_deletes_everything_at_24h_but_keeps_a_published_guide(
     fake = FakeMetaFiles(clock)
 
     # A published guide: keeps its clip until deleted.
-    ctx_g, preview_g = _job_with_preview(settings.db_path, "guide")
+    ctx_g, preview_g = _job_with_preview(settings.db_path, "guide", confirmed=True)
     assert guide_clip.retain_guide_clip(ctx_g, uploads) is True
     from app.contracts import Guide
     save_guide(Guide(
@@ -532,8 +543,8 @@ def test_in_process_sweep_deletes_everything_at_24h_but_keeps_a_published_guide(
         settings, 3600, client_factory=lambda _s: fake,
         after_sweep=app.state.snapshotter.request,
     )
-    # 24 h plus one sweep interval later.
-    clock.advance(hours=25, minutes=1)
+    # The exact 24 h boundary deletes previews while keeping published guides.
+    clock.advance(hours=24)
     result = sweeper.run_once()
     assert result is not None and result.failures == ()
 
@@ -743,7 +754,7 @@ def test_missing_clip_expires_job_and_guide_routes(tmp_path):
     from app.contracts import Guide
     host = _host(tmp_path)
     app = _boot(host)
-    ctx, preview = _job_with_preview(host.local_db, 'missing-clip')
+    ctx, preview = _job_with_preview(host.local_db, 'missing-clip', confirmed=True)
     assert guide_clip.retain_guide_clip(ctx, UploadStoreImpl(host.local_db))
     save_guide(Guide(job_id=ctx.job_id, steps=(_step(1, ()),), frame_paths=(), labels=(),
                      difficulty='Easy', verdict='TRY', draft_reasons=()))

@@ -21,6 +21,7 @@ from app.pipeline import guide_path
 from app.pipeline import save_guide, load_guide
 from app.guides import assemble_guide
 from tests.test_guide import RecordingContext, _render, _decision, _slot, _step, _frame
+from app.uploads import confirm_and_send
 from app.uploads_store import UploadStoreImpl
 from tests.test_deletion import FakeClock, FakeMetaFiles, _prepare  # noqa: F401
 from tests.test_deletion import short_clip  # noqa: F401  (fixture)
@@ -58,6 +59,7 @@ def _publish(tag: str, uploads, clip: Path, *, finish: str = "done"):
     """A job holding one kept and one discarded render, a frame and a mask."""
     ctx = admit_job(f"anon-{tag}", f"ip-{tag}", f"video-{tag}")
     _prepare(uploads, ctx, clip)
+    confirm_and_send(ctx.job_id, uploads=uploads, client=FakeMetaFiles())
     directory = job_dir(str(ctx.job_id))
     paths = {}
     render = _render(RecordingContext(), directory, "kept", "fan")

@@ -1102,19 +1102,41 @@ def test_waiting_confirmed_job_expires_with_reason_before_clients(
     )
 
 
+@pytest.mark.parametrize("delayed_preview", [False, True])
+@pytest.mark.parametrize("persist_extension", [False, True])
 def test_parent_extension_is_one_shot(
     tmp_path: Path,
     lane_db: Path,
     uploads: UploadStoreImpl,
     live_settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+    delayed_preview: bool,
+    persist_extension: bool,
 ) -> None:
-    """A second extension call adds no further envelopes."""
+    """Delayed consent still needs one persisted bounded extension, including on replay."""
+    now = db.utcnow()
+    monkeypatch.setattr(db, "utcnow", lambda: now)
+    monkeypatch.setattr(uploads, "_clock", lambda: now)
+    real_claim = uploads.claim_confirmation
+
+    def delayed_claim(job_id, consented_at):
+        nonlocal now
+        if delayed_preview:
+            now += timedelta(seconds=2 * live_settings.chunk_deadline_allowance_s + JOB_DEADLINE_S)
+        return real_claim(job_id, consented_at)
+
+    monkeypatch.setattr(uploads, "claim_confirmation", delayed_claim)
     ctx = _confirm_65s_job(uploads, tmp_path)
     before = db.parse_dt(_deadline_of(lane_db, str(ctx.job_id)))
-    service._extend_chunked_parent_deadline(live_settings, ctx, 65.0)
+    if not persist_extension:
+        monkeypatch.setattr(service, "extend_job_deadline", lambda *a, **kw: False)
+        assert not service._extend_chunked_parent_deadline(live_settings, ctx, 65.0)
+        assert _deadline_of(lane_db, str(ctx.job_id)) == db.format_dt(before)
+        return
+    assert service._extend_chunked_parent_deadline(live_settings, ctx, 65.0)
     once = db.parse_dt(_deadline_of(lane_db, str(ctx.job_id)))
     assert once - before == timedelta(seconds=2 * live_settings.chunk_deadline_allowance_s)
-    service._extend_chunked_parent_deadline(live_settings, ctx, 65.0)
+    assert service._extend_chunked_parent_deadline(live_settings, ctx, 65.0)
     assert _deadline_of(lane_db, str(ctx.job_id)) == db.format_dt(once)
 
 

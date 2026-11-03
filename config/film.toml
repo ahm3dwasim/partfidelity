@@ -85,7 +85,7 @@ start = 30
 end = 60
 name = "The screen"
 title = "Start with what you see."
-body = "Record the work on your phone. Each movement becomes a place to begin."
+body = "Film the repair on your phone. Each action in the video can become a step."
 cta_text = ""
 cta_url = ""
 
@@ -94,7 +94,7 @@ start = 60
 end = 84
 name = "The keyboard"
 title = "Find the right part."
-body = "Meta’s SAM 3.1 finds the part in a frame, and the guide outlines it, so the next person knows where to look."
+body = "Meta’s SAM 3.1 finds the part in a frame and the guide outlines it, so the reader knows where to look. For now it outlines the fan and battery only."
 cta_text = ""
 cta_url = ""
 
@@ -103,7 +103,7 @@ start = 84
 end = 250
 name = "Inside"
 title = "Keep the context."
-body = "Muse Spark turns the sequence into short instructions linked to moments in the clip."
+body = "Muse Spark turns the video into short instructions, each linked to a moment in the clip."
 cta_text = "Explore the sample"
 cta_url = "/guide/sample"
 

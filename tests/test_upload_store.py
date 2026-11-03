@@ -90,6 +90,204 @@ def _claim(uploads: UploadStoreImpl, ctx, consented_at: datetime):
     return uploads.claim_confirmation(ctx.job_id, consented_at)
 
 
+def test_preview_wait_does_not_consume_run_deadline(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl,
+    clock: FakeClock, monkeypatch,
+) -> None:
+    from app.contracts import JOB_DEADLINE_S
+    from app.ledger import JobTimedOut, expire_overdue_jobs, extend_job_deadline
+
+    monkeypatch.setattr(db, "utcnow", clock)
+    holders = [_admit(f"busy-{n}") for n in range(2)]
+    target = _admit("long-wait")
+    _register(uploads, target, _root(tmp_path, target.job_id), clock())
+    clock.advance(seconds=JOB_DEADLINE_S + 1)
+    expire_overdue_jobs(clock(), path=lane_db)
+    assert _claim(uploads, target, clock()).acquired
+    assert target.remaining_s() == JOB_DEADLINE_S
+    # A run started after preview time can still receive its one chunk allowance.
+    assert extend_job_deadline(target.job_id, 1, path=lane_db, max_extra_s=1)
+    assert not extend_job_deadline(target.job_id, 1, path=lane_db, max_extra_s=1)
+    clock.advance(seconds=JOB_DEADLINE_S + 1)
+    with pytest.raises(JobTimedOut):
+        target.reserve("sam", Decimal("0.0025"))
+    with db.connect(lane_db) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM model_calls").fetchone()[0] == 0
+
+
+def test_previews_keep_queue_capacity_and_money_holds(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl, clock: FakeClock,
+) -> None:
+    from app.admission import MAX_RUNNING, MAX_WAITING, QueueFullError
+    from app.ledger import JOB_HOLD_USD, JobNotActive
+
+    for n in range(MAX_RUNNING + MAX_WAITING):
+        ctx = _admit(f"preview-cap-{n}")
+        _register(uploads, ctx, _root(tmp_path, ctx.job_id), clock())
+        with pytest.raises(JobNotActive):
+            ctx.reserve("sam", Decimal("0.0025"))
+    with pytest.raises(QueueFullError):
+        _admit("preview-over-cap")
+    with db.connect(lane_db) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM jobs WHERE state = 'active'").fetchone()[0] == 0
+        assert conn.execute("SELECT COUNT(*) FROM jobs WHERE state = 'waiting'").fetchone()[0] == MAX_RUNNING + MAX_WAITING
+        assert Decimal(conn.execute(
+            "SELECT held_usd FROM budget_rows WHERE name = 'aggregate'"
+        ).fetchone()[0]) == JOB_HOLD_USD * (MAX_RUNNING + MAX_WAITING)
+        assert conn.execute("SELECT COUNT(*) FROM reservations WHERE state = 'held'").fetchone()[0] == 0
+
+
+def test_simultaneous_confirms_obey_running_limit_and_retry_after_run_deadline(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl,
+    clock: FakeClock, monkeypatch,
+) -> None:
+    from app.admission import MAX_RUNNING
+    from app.contracts import JOB_DEADLINE_S
+    from app.uploads_store import ClaimWaitingError
+
+    monkeypatch.setattr(db, "utcnow", clock)
+    contexts = [_admit(f"confirm-racer-{n}") for n in range(MAX_RUNNING + 1)]
+    for ctx in contexts:
+        _register(uploads, ctx, _root(tmp_path, ctx.job_id), clock())
+    barrier = threading.Barrier(len(contexts))
+    acquired, waiting, errors = [], [], []
+
+    def attempt(ctx) -> None:
+        try:
+            barrier.wait(timeout=10)
+            claim = _claim(UploadStoreImpl(lane_db, clock=clock), ctx, clock())
+            assert claim.acquired
+            acquired.append(ctx)
+        except ClaimWaitingError:
+            waiting.append(ctx)
+        except BaseException as error:
+            errors.append(error)
+
+    threads = [threading.Thread(target=attempt, args=(ctx,)) for ctx in contexts]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=30)
+    assert not errors and not any(thread.is_alive() for thread in threads)
+    assert len(acquired) == MAX_RUNNING and len(waiting) == 1
+    clock.advance(seconds=JOB_DEADLINE_S - 1)
+    assert not _claim(uploads, acquired[0], clock()).acquired
+    assert acquired[0].remaining_s() == 1  # A duplicate never refreshes the run.
+    with pytest.raises(ClaimWaitingError):
+        _claim(uploads, waiting[0], clock())
+    clock.advance(seconds=1)
+    assert _claim(uploads, waiting[0], clock()).acquired
+    assert waiting[0].remaining_s() == JOB_DEADLINE_S
+    with db.connect(lane_db) as conn:
+        assert conn.execute("SELECT COUNT(*) FROM jobs WHERE state = 'active'").fetchone()[0] == 1
+        assert conn.execute("SELECT COUNT(*) FROM jobs WHERE state = 'expired'").fetchone()[0] == MAX_RUNNING
+        assert conn.execute("SELECT COUNT(*) FROM model_calls").fetchone()[0] == 0
+
+
+def test_waiting_preview_still_expires_at_preview_ttl(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl,
+    clock: FakeClock, monkeypatch,
+) -> None:
+    from app.ledger import expire_overdue_jobs
+    from app.uploads_store import ClaimExpiredError, ClaimTerminalError
+
+    monkeypatch.setattr(db, "utcnow", clock)
+    ctx = _admit("preview-ttl")
+    record, _, _ = _register(uploads, ctx, _root(tmp_path, ctx.job_id), clock())
+    clock.now = record.preview_expires_at
+    with pytest.raises(ClaimExpiredError):
+        _claim(uploads, ctx, clock())
+    assert expire_overdue_jobs(clock(), path=lane_db) == (ctx.job_id,)
+    with pytest.raises(ClaimTerminalError):
+        _claim(uploads, ctx, clock())
+    with db.connect(lane_db) as conn:
+        assert Decimal(conn.execute(
+            "SELECT held_usd FROM budget_rows WHERE name = 'aggregate'"
+        ).fetchone()[0]) == 0
+
+
+@pytest.mark.parametrize(
+    "elapsed_s, newest, outcome",
+    [(0, False, "waiting"), (121, False, "claimed"),
+     (121, True, "claimed"), (241, False, "claimed")],
+)
+def test_confirm_retry_expires_real_runs_and_skips_unconfirmed_previews(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl,
+    clock: FakeClock, monkeypatch, elapsed_s: int, newest: bool, outcome: str,
+) -> None:
+    from app.uploads import (
+        CONFIRM_WAITING_COPY,
+        ConfirmationConflictError,
+        claim_for_send,
+    )
+
+    monkeypatch.setattr(db, "utcnow", clock)
+    holders = [_admit(f"holder-{n}") for n in range(2)]
+    for ctx in holders:
+        _register(uploads, ctx, _root(tmp_path, ctx.job_id), clock())
+        assert _claim(uploads, ctx, clock()).acquired
+    clock.advance(seconds=120)
+    waiters = []
+    for n in range(3):
+        ctx = _admit(f"waiter-{n}")
+        _register(uploads, ctx, _root(tmp_path, ctx.job_id), clock())
+        waiters.append(ctx)
+        clock.advance(microseconds=1)  # Give FIFO an unambiguous creation order.
+    clock.advance(seconds=elapsed_s)
+    target = waiters[-1] if newest else waiters[0]
+
+    if outcome == "claimed":
+        assert claim_for_send(target.job_id, uploads=uploads).acquired
+    elif outcome == "waiting":
+        with pytest.raises(ConfirmationConflictError) as caught:
+            claim_for_send(target.job_id, uploads=uploads)
+        assert caught.value.message == CONFIRM_WAITING_COPY
+
+    with db.connect(lane_db) as conn:
+        states = dict(conn.execute("SELECT id, state FROM jobs"))
+        held = Decimal(conn.execute(
+            "SELECT held_usd FROM budget_rows WHERE name = 'aggregate'"
+        ).fetchone()[0])
+        assert conn.execute("SELECT COUNT(*) FROM model_calls").fetchone()[0] == 0
+    assert [states[str(ctx.job_id)] for ctx in holders] == [
+        "active" if elapsed_s == 0 else "expired"
+    ] * 2
+    assert [states[str(ctx.job_id)] for ctx in waiters] == (
+        ["active" if ctx is target and outcome == "claimed" else "waiting" for ctx in waiters]
+    )
+    assert held == Decimal("0.46") * (5 if elapsed_s == 0 else 3)
+    record = uploads.load_job(target.job_id)[1]
+    assert record.state == {"claimed": "confirming", "waiting": "preview", "expired": "failed"}[outcome]
+
+
+def test_waiting_confirm_without_overdue_jobs_leaves_queue_unchanged(
+    lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl,
+    clock: FakeClock, monkeypatch,
+) -> None:
+    from unittest.mock import Mock
+
+    from app.uploads import CONFIRM_WAITING_COPY, ConfirmationConflictError, claim_for_send
+
+    monkeypatch.setattr(db, "utcnow", clock)
+    holder = _admit("holder")
+    _admit("other-holder")
+    waiter = _admit("waiter")
+    _register(uploads, waiter, _root(tmp_path, waiter.job_id), clock())
+    with db.connect(lane_db) as conn:
+        # Both running slots are genuinely occupied; refusal must change nothing.
+        before = tuple(conn.iterdump())
+    claim = Mock(wraps=uploads.claim_confirmation)
+    monkeypatch.setattr(uploads, "claim_confirmation", claim)
+
+    with pytest.raises(ConfirmationConflictError) as caught:
+        claim_for_send(waiter.job_id, uploads=uploads)
+
+    assert caught.value.message == CONFIRM_WAITING_COPY
+    claim.assert_called_once_with(waiter.job_id, clock())
+    with db.connect(lane_db) as conn:
+        assert tuple(conn.iterdump()) == before
+
+
 def test_upload_preview_registration_requires_admitted_job_and_matching_artifact(
     lane_db: Path, tmp_path: Path, uploads: UploadStoreImpl, clock: FakeClock
 ) -> None:
@@ -283,7 +481,12 @@ def test_upload_preview_load_rehydrates_context_after_restart(
     assert record2 == record
     assert ctx2.job_id == ctx.job_id
     assert isinstance(ctx2, contracts.JobContext)
-    # The rehydrated context authorizes paid calls (reserve-before-spend).
+    # Reloading a preview cannot authorize paid calls before consent.
+    from app.ledger import JobNotActive
+
+    with pytest.raises(JobNotActive):
+        ctx2.reserve("sam", Decimal("0.0025"))
+    assert _claim(restarted, ctx2, clock()).acquired
     reservation = ctx2.reserve("sam", Decimal("0.0025"))
     reservation.settle(Decimal("0.001"), "succeeded")
     assert restarted.load_job(JobId("no-such-job")) is None
@@ -958,7 +1161,8 @@ def test_upload_state_transition_matrix_refuses_every_other_edge(
         confirmed_ctx.job_id,
         "confirmed",
     )
-    # A waiting job cannot claim; cancelling the preview job promotes it.
+    # A waiting preview cannot claim while both real running slots are held.
+    filler = _admit("mx-filler")
     waiter = _admit("mx-waiter")
     _register(uploads, waiter, _root(tmp_path, waiter.job_id), clock())
     conn = db.connect(lane_db)
@@ -977,6 +1181,7 @@ def test_upload_state_transition_matrix_refuses_every_other_edge(
         preview_ctx.job_id,
         "cancelling",
     )
+    filler.finish("failed")
     failed_claim = _claim(uploads, waiter, clock())
     uploads.record_failure(waiter.job_id, "mx-second", "meta_upload", "boom", clock())
     assert _state_of(uploads, waiter.job_id) == "failed"
@@ -1281,7 +1486,7 @@ def test_expired_unclaimed_preview_is_recoverable_and_terminalized_before_artifa
     root = _root(tmp_path, ctx.job_id)
     record, _, target = _register(uploads, ctx, root, clock(), ttl_hours=1)
     assert uploads.list_recoverable(clock()) == ()
-    clock.advance(hours=2)
+    clock.now = record.preview_expires_at
     assert [row.preview.job_id for row in uploads.list_recoverable(clock())] == [
         ctx.job_id
     ]
@@ -1443,9 +1648,10 @@ def test_record_failure_on_unclaimed_preview_terminalizes_job_in_same_transactio
     filler = _admit("failprev-filler")
     waiter = _admit("failprev-waiter")
     root = _root(tmp_path, ctx.job_id)
-    record, _, _ = _register(uploads, ctx, root, clock())
+    # A legacy hold predating preview registration must still be released on failure.
     hold = ctx.reserve("other", Decimal("0.04"))
     assert hold is not None
+    record, _, _ = _register(uploads, ctx, root, clock())
     failed = uploads.record_failure(
         ctx.job_id, "prev-k1", "meta_upload", "boom", clock()
     )
@@ -1476,7 +1682,7 @@ def test_record_failure_on_unclaimed_preview_terminalizes_job_in_same_transactio
     assert filler.job_id != ctx.job_id
 
 
-def test_hide_expired_preview_hides_only_past_expiry_and_touches_nothing_else(
+def test_hide_expired_preview_hides_at_expiry_and_touches_nothing_else(
     tmp_path: Path, uploads: UploadStoreImpl, clock: FakeClock
 ) -> None:
     ctx = _admit("hideprev")
@@ -1486,7 +1692,7 @@ def test_hide_expired_preview_hides_only_past_expiry_and_touches_nothing_else(
     same = uploads.hide_expired_preview(ctx.job_id, clock())
     assert same.hidden is False
     assert same.state == "preview"
-    clock.advance(hours=25)
+    clock.now = record.preview_expires_at
     hidden = uploads.hide_expired_preview(ctx.job_id, clock())
     assert hidden.hidden is True
     assert hidden.state == "preview"

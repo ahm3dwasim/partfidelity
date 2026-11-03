@@ -49,7 +49,7 @@ def test_control_hidden_in_reader_view_and_failure_is_shown(browser, server, siz
         page.goto(f"{server}/guides/{JOB}")
         controls = page.locator("details.fix-label summary")
         assert controls.first.is_visible()
-        page.locator("label.pf-view-label").click()  # I'm fixing this (reader view)
+        page.locator("label.pf-view-label").click()  # Follow guide (reader view)
         assert page.evaluate("document.body.classList.contains('simple')")
         assert not controls.first.is_visible()
         page.locator("label.pf-view-label").click()

@@ -195,7 +195,7 @@
 .pf-hazard p { margin: 0.25rem 0 0; }
 .pf-card-foot { padding: 0 1.25rem 1.25rem; }
 
-/* View switch: "I filmed this" (full) / "I'm fixing this" (steps only).
+/* View switch: "Edit guide" (full) / "Follow guide" (steps only).
    A real checkbox drives it, so reader.js behaviour is unchanged; the box
    is visually hidden but stays focusable, ring on the whole control. */
 .pf-view-row { margin: 1.5rem 0 0; }

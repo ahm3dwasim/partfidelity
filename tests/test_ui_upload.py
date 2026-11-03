@@ -57,7 +57,7 @@ def test_upload_page_has_workshop_elements() -> None:
     assert "300 seconds or less" in body
     # The length reads from the configured cap, in minutes (D: "up to 5 minutes").
     assert "Up to 5 minutes" in body
-    assert "own footage" in body
+    assert "filmed this video" in body
     assert "What happens next" in body
     assert body.count("data-copy=") >= 10
     # Exactly the three "what happens next" stages.
@@ -185,7 +185,7 @@ def test_retention_is_stated_the_same_on_both_pages() -> None:
         assert "stays with it until you delete the guide" in body
         assert "no measured typical time" in body
     # The decision step names who receives it and keeps the rights checkbox.
-    assert "Meta" in preview and "own footage" in preview
+    assert "Meta" in preview and "filmed this video" in preview
     # The old two-way promise (clip and Meta both "24 hours or less") is gone.
     assert "24 hours or less" not in upload.replace("Deleted at Meta", "")
 
@@ -220,3 +220,21 @@ def test_upload_config_fails_loudly(tmp_path) -> None:
         upload_config.validate(bad)
     with pytest.raises(upload_config.UploadConfigError, match="needs values"):
         upload_config.render({"duration": "5 minutes"})
+
+
+def test_scope_is_stated_before_the_clip_is_chosen_and_matches_the_stop_message() -> None:
+    from app.hazards import SCOPE_LEAD, refusal_copy
+    from app.routes.site import create_site_app
+
+    assert SCOPE_LEAD in routes_mod._upload_page()
+    assert SCOPE_LEAD in TestClient(create_site_app()).get("/").text
+    assert refusal_copy("scope").startswith(SCOPE_LEAD)
+
+
+def test_cancelled_confirmation_comes_before_the_consent_facts() -> None:
+    page = routes_mod._preview_page(
+        job_id="j", duration="1.0", size="1", video_url="/v", state="cancelled",
+        show_video=False, notice=routes_mod.CANCELLED_COPY,
+    )
+    assert page.count('id="cancelled"') == 1
+    assert page.index("Cancelled. Your files were deleted.") < page.index("pf-pv-facts")

@@ -770,7 +770,7 @@ def guide_sample(request: Request) -> RedirectResponse | HTMLResponse:
 @router.get("/reader/sample", response_class=HTMLResponse, response_model=None)
 def reader_sample(request: Request) -> str | RedirectResponse:
     # One sample everywhere: the full app sends the old reader link to the
-    # stored sample guide (its "I'm fixing this" view is the beginner read).
+    # stored sample guide (its "Follow guide" view is the beginner read).
     notice = _sample_notice()
     if getattr(request.app.state, "settings", None) is not None:
         try:

@@ -276,7 +276,7 @@ def follower_html(
 {difficulty_line_html(guide)}
 <p class="meta">{sum(not s.is_intro for s in guide.steps)} steps · times are approximate · photos are the original frames</p>
 </div></div>
-<div class="pf-view-row"><span class="pf-view" role="group" aria-label="Guide view"><label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box" checked><span class="pf-view-opt" data-filmed>I filmed this</span><span class="pf-view-opt" data-fixing>I&#8217;m fixing this</span></label></span></div>
+<div class="pf-view-row"><span class="pf-view" role="group" aria-label="Guide view"><label class="pf-view-label"><input type="checkbox" id="simple-view" class="pf-view-box" checked><span class="pf-view-opt" data-filmed>Edit guide</span><span class="pf-view-opt" data-fixing>Follow guide</span></label></span></div>
 <div class="draft-notes">{draft_notes_html(guide)}</div>
 </header>
 <section class="tools" aria-label="Tools for this guide"><h2>Tools</h2><ul class="tool-list">{tools}</ul></section>

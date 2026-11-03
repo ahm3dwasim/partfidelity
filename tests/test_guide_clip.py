@@ -23,7 +23,7 @@ from app import db
 from app import guide_clip
 from app import export_links
 from app.admission import admit_job, job_dir
-from app.contracts import Guide, JobId, UploadPreview
+from app.contracts import Guide, JobId, MetaFileId, UploadPreview
 from app.deletion import cancel_and_delete, sweep_expired
 from app.ledger import LifecycleRepositoryImpl
 from app.main import create_app
@@ -32,6 +32,7 @@ from app.routes import uploads as routes_mod
 from app.routes.guides import router, set_guide_clip_loader, set_guide_loader
 from app.settings import Settings
 from app.uploads_store import UploadStoreImpl
+from tests.test_deletion import FakeMetaFiles
 from test_guide import _step
 from test_pipeline import make_clip, sample_clients
 
@@ -54,6 +55,11 @@ def lane_db(tmp_path: Path) -> Path:
 @pytest.fixture
 def uploads(lane_db: Path) -> UploadStoreImpl:
     return UploadStoreImpl(lane_db)
+
+
+@pytest.fixture
+def fake_meta_files() -> FakeMetaFiles:
+    return FakeMetaFiles()
 
 
 @pytest.fixture
@@ -88,8 +94,16 @@ def _register_preview(uploads, ctx, *, payload: bytes = b"preview-bytes"):
         audio_removed=True,
         confirmed_at=None,
     )
-    record = uploads.register_preview(
+    uploads.register_preview(
         ctx, preview, artifact_id, db.utcnow() + timedelta(hours=24)
+    )
+    # Publishing fixtures model a consented upload, which owns a worker slot.
+    claim = uploads.claim_confirmation(ctx.job_id, db.utcnow())
+    assert claim.acquired
+    now = db.utcnow()
+    record = uploads.complete_confirmation(
+        claim.record.claim_id, MetaFileId(f"meta-{ctx.job_id}"),
+        now + timedelta(hours=23), now, now,
     )
     return record, artifact_id, target
 
@@ -745,7 +759,7 @@ def test_preview_expiry_hides_preview_but_not_guide_clip(
 
 def test_upload_page_states_guide_retention() -> None:
     body = routes_mod._upload_page()
-    assert "own footage" in body
+    assert "filmed this video" in body
     assert body.count(CONSENT_SENTENCE) == 1
     assert RETENTION_SENTENCE in body
 

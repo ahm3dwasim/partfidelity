@@ -783,7 +783,7 @@ def test_expired_attachment_never_starts_extraction(
     page = TestClient(create_app(settings)).get(
         f"/jobs/{ctx.job_id}", headers={"accept": "text/html"},
     )
-    assert "expired before processing" in page.text
+    assert "has expired. Upload it again" in page.text
 
 
 def test_shutdown_rejection_settles_confirmed_waiting_job(tmp_path: Path, clip: Path) -> None:
@@ -892,6 +892,68 @@ def test_exception_after_done_keeps_committed_guide(
 
 
 # --- off the request ------------------------------------------------------
+
+
+@pytest.mark.parametrize("previews", [1, 2])
+def test_confirm_starts_despite_earlier_unconfirmed_previews(
+    tmp_path: Path, clip: Path, previews: int,
+) -> None:
+    settings = _settings(tmp_path, pipeline_mode="replay")
+    meta = ReplayMetaFilesClient()
+    uploads_routes.set_test_overrides(meta_client=meta)
+    client = TestClient(create_app(settings))
+    try:
+        # The client keeps the same anonymous cookie, including the one-person path.
+        earlier = [_upload(client, clip) for _ in range(previews)]
+        target = _upload(client, clip)
+        response = _confirm(client, target)
+        assert response.status_code == 303
+        assert response.headers["location"] == f"/jobs/{target}"
+        client.app.state.job_runner.wait(target, timeout=RELEASE_TIMEOUT_S)
+        assert _job_state(settings, target) == "done"
+        assert len(meta.upload_calls) == 1
+        assert all(_job_state(settings, job) == "waiting" for job in earlier)
+    finally:
+        client.app.state.job_runner.shutdown()
+
+
+def test_waiting_confirm_reclaims_expired_real_run_slots(
+    tmp_path: Path, clip: Path, monkeypatch
+) -> None:
+    now = db.utcnow()
+    monkeypatch.setattr(db, "utcnow", lambda: now)
+    settings = _settings(tmp_path, pipeline_mode="replay")
+    meta = ReplayMetaFilesClient()
+    uploads_routes.set_test_overrides(meta_client=meta)
+    client = TestClient(create_app(settings))
+    try:
+        holders = [_upload(client, clip) for _ in range(2)]
+        for job_id in holders:
+            status = client.get(f"/jobs/{job_id}").json()
+            assert status["state"] == "waiting" and status["stage"] is None
+        missing_consent = client.post(f"/preview/{holders[0]}/confirm", data={})
+        assert missing_consent.status_code == 400
+        assert meta.upload_calls == []
+        uploads = UploadStoreImpl(settings.db_path)
+        for job_id in holders:
+            assert uploads.claim_confirmation(job_id, now).acquired
+        now += timedelta(seconds=120)
+        waiter = _upload(client, clip)
+        waiting = _confirm(client, waiter)
+        assert waiting.status_code == 409
+        assert uploads_routes.CONFIRM_WAITING_COPY in waiting.text
+        assert meta.upload_calls == []
+
+        now += timedelta(seconds=121)
+        confirmed = _confirm(client, waiter)
+        assert confirmed.status_code == 303
+        assert confirmed.headers["location"] == f"/jobs/{waiter}"
+        client.app.state.job_runner.wait(waiter, timeout=RELEASE_TIMEOUT_S)
+        assert _job_state(settings, waiter) == "done"
+        assert len(meta.upload_calls) == 1
+        assert [_job_state(settings, job_id) for job_id in holders] == ["expired"] * 2
+    finally:
+        client.app.state.job_runner.shutdown()
 
 
 class _Gate:
@@ -1150,7 +1212,7 @@ def test_boot_fails_jobs_interrupted_mid_run(tmp_path: Path, clip: Path) -> None
     assert not guide_file.exists()
     assert not clip_file.exists() and not sidecar.exists()
     assert TestClient(create_app(settings)).get(f"/guides/{ctx.job_id}").status_code == 404
-    assert _job_state(settings, str(idle.job_id)) == "active"
+    assert _job_state(settings, str(idle.job_id)) == "waiting"
     assert meta.delete_calls == [str(file_id)]
     # Idempotent: a second boot finds nothing left to fail.
     assert service.fail_interrupted_jobs(settings, meta_client=meta) == 0

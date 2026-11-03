@@ -223,7 +223,7 @@ def test_calls_and_battery_evidence_within_two_clicks(client):
     # leaves the same sample guide (reader render) for the calls page
     # and the battery-order evidence.
     sample = client.get("/guide/sample").text
-    assert '<a href="/calls/sample">Calls</a>' in sample
+    assert '<a href="/calls/sample">What the models did</a>' in sample
     assert (
         '<a href="/calls/sample#battery-order">Battery order evidence</a>'
         in sample

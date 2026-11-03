@@ -261,7 +261,7 @@ def test_reader_page_includes_component_and_switch():
     assert '<link rel="stylesheet" href="/static/ui/guide_step.css">' in body
     assert '<script src="/static/ui/guide_step.js" defer></script>' in body
     assert 'id="simple-view"' in body
-    assert "I filmed this" in body and "fixing this" in body
+    assert "Edit guide" in body and "Follow guide" in body
     assert "Simple view" not in body
 
 
@@ -271,7 +271,7 @@ def test_guide_template_includes_component_and_switch():
     assert '<script src="/static/ui/guide_step.js" defer></script>' in template
     assert '<script src="/static/reader.js" defer></script>' in template
     assert 'id="simple-view"' in template
-    assert "I filmed this" in template and "fixing this" in template
+    assert "Edit guide" in template and "Follow guide" in template
 
 
 def test_component_assets_served():

@@ -1044,10 +1044,11 @@ def refusal_text_for_job(job_id: str, *, data_root: Path | None = None) -> str |
     """Plain-words reason a refused or failed job stopped, if recorded."""
     try:
         path = job_dir(job_id, root=data_root) / REFUSAL_MARKER_FILENAME
-        kind = json.loads(path.read_text(encoding="utf-8")).get("kind")
+        marker = json.loads(path.read_text(encoding="utf-8"))
+        kind, rule = marker.get("kind"), marker.get("rule")
     except (OSError, ValueError, AttributeError):
         return None
-    return refusal_copy(kind) if isinstance(kind, str) else None
+    return refusal_copy(kind, rule if isinstance(rule, str) else None) if isinstance(kind, str) else None
 
 
 def stage_for_job(job_id: str, *, data_root: Path | None = None) -> str | None:
@@ -1569,7 +1570,7 @@ def _settle_failed(
 
 
 def _write_refusal_marker(
-    ctx: JobContext, job_id: JobId | None, refusal_kind: str
+    ctx: JobContext, job_id: JobId | None, refusal_kind: str, refusal_rule: str | None = None
 ) -> None:
     # The job row ends "failed"; this marker lets the status page say why.
     try:
@@ -1581,7 +1582,7 @@ def _write_refusal_marker(
         fd = os.open(marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
-                handle.write(json.dumps({"kind": refusal_kind}))
+                handle.write(json.dumps({"kind": refusal_kind, "rule": refusal_rule} if refusal_rule else {"kind": refusal_kind}))
                 handle.flush()
                 os.fsync(handle.fileno())
         except BaseException:
@@ -1747,10 +1748,11 @@ def _refuse(
     replay: bool,
     settings: Settings | None = None,
     refusal_kind: str,
+    refusal_rule: str | None = None,
 ) -> PipelineResult:
     state: PipelineState = "refused"
     if ctx is not None:
-        _write_refusal_marker(ctx, job_id, refusal_kind)
+        _write_refusal_marker(ctx, job_id, refusal_kind, refusal_rule)
     if ctx is not None:
         if _settle_failed(ctx, error, settings=settings) == "pending_settlement":
             state = "pending_settlement"
@@ -3623,7 +3625,8 @@ def _run_stages_inner(
             "pipeline job=%s refused: %s", job_id, assessment.refusal_kind
         )
         return _refuse(ctx, job_id, "not a teardown", replay=replay,
-                       settings=settings, refusal_kind=assessment.refusal_kind)
+                       settings=settings, refusal_kind=assessment.refusal_kind,
+                       refusal_rule=assessment.refusal_rule)
     _write_stage(ctx, RECEIPT_STAGE_SEGMENT)
     try:
         frames = score_frames(local_video, tuple(bundle.steps))

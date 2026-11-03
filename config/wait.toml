@@ -25,7 +25,7 @@ log_done = "Clip received"
 [[stages]]
 id = "steps"
 label = "Find the steps"
-detail = "Muse Spark follows the repair and finds the steps."
+detail = "Muse Spark (Meta's model that reads the video) follows the repair and finds the steps."
 receipts = ["extract"]
 marker = "extract"
 log_done = "Steps found"
@@ -33,7 +33,7 @@ log_done = "Steps found"
 [[stages]]
 id = "outline"
 label = "Outline the parts"
-detail = "SAM 3.1 finds the part that matters in each frame and scores it; the guide draws the outline."
+detail = "SAM 3.1 (Meta's model that outlines the part) finds the part that matters in each frame and scores it; the guide draws the outline."
 receipts = ["locate", "segment"]
 marker = "segment"
 log_done = "Parts outlined"

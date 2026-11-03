@@ -602,7 +602,8 @@ def _extend_chunked_parent_deadline(
     extra_s = len(windows) * settings.chunk_deadline_allowance_s
     with contextlib.closing(db.connect(settings.db_path)) as conn:
         before = conn.execute(
-            "SELECT created_at, deadline_at FROM jobs WHERE id = ?",
+            "SELECT COALESCE((SELECT claim_started_at FROM uploads"
+            " WHERE job_id = jobs.id AND hidden = 0), created_at) AS started_at, deadline_at FROM jobs WHERE id = ?",
             (str(ctx.job_id),),
         ).fetchone()
     if before is None:
@@ -629,7 +630,7 @@ def _extend_chunked_parent_deadline(
                 (str(ctx.job_id),),
             ).fetchone()
         required = db.parse_dt(
-            before["deadline_at"] if extended else before["created_at"]
+            before["deadline_at"] if extended else before["started_at"]
         ) + timedelta(seconds=extra_s + (0 if extended else JOB_DEADLINE_S))
         if (after is not None and after["state"] == "active"
                 and after["upload_state"] == "confirmed"

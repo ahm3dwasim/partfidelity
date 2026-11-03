@@ -163,13 +163,13 @@ def _sample_note_html(database=None, job_id: str = "") -> str:
     return (
         '<p class="gd-sample-note" role="note">'
         f'<span class="replay-badge">{html.escape(R.SAMPLE_REPLAY_LABEL)}</span> '
-        f"{html.escape(R.SAMPLE_RUN_NOTE)}. Your own guide uses your footage.</p>"
+        f"{html.escape(R.SAMPLE_RUN_NOTE)}. Your own guide uses your footage. {html.escape(TEXT['view_hint'])}</p>"
         # What the old reader page offered, kept on the one sample: the catch,
         # the call evidence and the hard-stop example. Sharing is the guide's
         # own downloads below; the sample has no share link.
         '<nav class="gd-sample-links" aria-label="More from the sample">'
         f'<a href="/catch">{html.escape(proof_links.load()["catch_cta"])}</a> '
-        f'<a href="{html.escape(proof_links.load()["sample_calls"], quote=True)}">Calls</a> '
+        f'<a href="{html.escape(proof_links.load()["sample_calls"], quote=True)}">What the models did</a> '
         f'<a href="{html.escape(proof_links.load()["hard_stop"], quote=True)}">Battery warning in the sample</a></nav>'
         + proof_links.open_weights_note_html(database, job_id)
     )
