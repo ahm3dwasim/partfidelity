@@ -58,7 +58,7 @@ def build_image() -> modal.Image:
         deps = tomllib.load(handle)["project"]["dependencies"]
     # ffmpeg ships ffprobe; the upload path shells out to both.
     image = image.apt_install("ffmpeg").pip_install(*deps)
-    image = image.env({"PARTFIDELITY_PRODUCTION": "1", ROOT_ENV: str(modal_cfg.remote_root)})
+    image = image.env({**dict(modal_cfg.app_env), "PARTFIDELITY_PRODUCTION": "1", ROOT_ENV: str(modal_cfg.remote_root)})
     from tools.film_frames import unpack  # the deploy machine unpacks the frame archives into static/ first
 
     unpack(ROOT)

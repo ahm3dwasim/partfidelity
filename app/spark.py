@@ -147,11 +147,27 @@ class SparkStageConfig:
     )
     boundary_tolerance_s: float | None = None
     reservation_usd: Decimal = SPARK_3RUNS_RESERVATION_USD
+    # Fewest valid runs a consensus may rest on after a run fails; equal
+    # to ``runs`` (the default) turns the fallback off.
+    consensus_min_runs: int | None = None
+
+    @property
+    def min_valid_runs(self) -> int:
+        return self.runs if self.consensus_min_runs is None else self.consensus_min_runs
 
     def __post_init__(self) -> None:
         runs = self.runs
         if isinstance(runs, bool) or not isinstance(runs, int) or runs < 2:
             raise ValueError(f"spark runs must be an int >= 2, got {runs!r}")
+        min_runs = self.min_valid_runs
+        if (
+            isinstance(min_runs, bool)
+            or not isinstance(min_runs, int)
+            or not 2 <= min_runs <= runs
+        ):
+            raise ValueError(
+                f"spark consensus_min_runs must be an int in 2..{runs}, got {min_runs!r}"
+            )
         spread_s = self.spread_s
         if (
             isinstance(spread_s, bool)
@@ -364,12 +380,19 @@ class SparkClientError(RuntimeError):
     """The client returned an unusable run result (bad cost/latency/shape)."""
 
 
+SERVICE_FAILURE_KINDS = ("timeout", "transport", "http_5xx", "empty", "malformed")
+
+
 class SparkServiceError(SparkClientError):
     """A provider service failure; only this failure may be retried."""
 
     def __init__(self, kind: str) -> None:
         super().__init__(kind)
         self.kind = kind
+
+
+def _failure_error(kind: str) -> SparkClientError:
+    return SparkServiceError(kind) if kind in SERVICE_FAILURE_KINDS else SparkClientError(kind)
 
 
 class StepsDisagreement(ValueError):
@@ -1076,7 +1099,7 @@ def _time_consensus_bundle(
         device_guess=device_guess,
         confidence=confidence,
         steps=tuple(steps),
-        source_runs=config.runs,
+        source_runs=len(runs),
         timestamps_approximate=True,
         boundaries=boundaries,
     )
@@ -1115,8 +1138,13 @@ def consensus_bundle(
     the median-start sample (wording-grouped) or the winning overlap
     sample (time consensus).
     """
-    if len(runs) != config.runs:
-        raise ValueError(f"consensus needs exactly {config.runs} runs, got {len(runs)}")
+    if len(runs) != config.runs and not (
+        config.min_valid_runs <= len(runs) < config.runs
+    ):
+        raise ValueError(
+            f"consensus needs {config.runs} runs (at least"
+            f" {config.min_valid_runs}), got {len(runs)}"
+        )
     if chunk_extent is not None and not isinstance(chunk_extent, ChunkExtent):
         raise ValueError(
             "chunk_extent must be None or a ChunkExtent,"
@@ -1130,7 +1158,7 @@ def consensus_bundle(
     confidence = float(statistics.median([run.confidence for run in runs]))
     if confidence < SPARK_CONFIDENCE_CUTOFF:
         raise NotATeardown(StepsRefusal(reason="low_confidence"))
-    majority = step_alignment.majority_of(config.runs)
+    majority = step_alignment.majority_of(len(runs))
     if config.span_mode == "contiguous" and config.alignment_mode == "align":
         return _time_consensus_bundle(
             runs, config, device_guess, confidence, majority, chunk_extent
@@ -1186,7 +1214,7 @@ def consensus_bundle(
         device_guess=device_guess,
         confidence=confidence,
         steps=tuple(steps),
-        source_runs=config.runs,
+        source_runs=len(runs),
         timestamps_approximate=True,
     )
 
@@ -1267,7 +1295,7 @@ def _extract_with_raw(
     scene_cuts: Sequence[float] | None = None,
     clocked: bool = False,
     on_raw: Callable[[int, Mapping[str, JSONValue]], None] | None = None,
-    retry_call: Callable[[str, float | None, tuple[float, ...] | None, bool], SparkRunResult] | None = None,
+    retry_call: Callable[..., SparkRunResult] | None = None,
     retryable_failures: frozenset[str] = frozenset(),
 ) -> tuple[StepBundle, list[Mapping[str, JSONValue]]]:
     _require_video_file_id(video_file_id)
@@ -1282,8 +1310,9 @@ def _extract_with_raw(
     clip_duration_s = chunk_extent.duration_s if chunk_extent is not None else None
     raws: list[Mapping[str, JSONValue]] = []
     runs: list[_ValidRun] = []
-    retried = False
-    for share in config.run_shares:
+    failed: list[SparkClientError] = []
+
+    def one_run(run_index: int, share: Decimal) -> SparkRunResult:
         hold = ctx.reserve(RESERVE_KIND, share)  # refusal propagates: no invoke
         try:
             if (
@@ -1315,33 +1344,56 @@ def _extract_with_raw(
         try:
             failure = getattr(result, "failure_kind", None)
             if failure is not None:
-                raise SparkServiceError(failure) if failure in ("timeout", "transport", "http_5xx", "empty") else SparkClientError(failure)
+                raise _failure_error(failure)
             checked = _require_valid_run_result(result)
+            try:
+                validate_spark_payload(checked.payload)
+            except SparkSchemaError as schema_error:
+                # A billed 200 with a schema-invalid body is a malformed
+                # answer: classify it before its hold settles as a success.
+                # With no retry available the schema error surfaces as is.
+                if retry_call is None or "malformed" not in retryable_failures:
+                    hold.settle(_failed_actual(result), "failed")
+                    raise
+                raise SparkServiceError("malformed") from schema_error
         except SparkServiceError as error:
             hold.settle(_failed_actual(result), "failed")
-            if retry_call is None or retried or error.kind not in retryable_failures:
+            # One retry per run, not per window: the retry child's own
+            # claim, budget and deadline checks still bound the spend.
+            if retry_call is None or error.kind not in retryable_failures:
                 raise
-            retried = True
             retry_result = retry_call(
-                video_file_id, clip_duration_s, prompt_cuts, clocked
+                video_file_id, clip_duration_s, prompt_cuts, clocked,
+                run_index=run_index,
             )
             retry_failure = getattr(retry_result, "failure_kind", None)
             if retry_failure is not None:
-                if retry_failure in ("timeout", "transport", "http_5xx", "empty"):
-                    raise SparkServiceError(retry_failure)
-                raise SparkClientError(retry_failure)
+                raise _failure_error(retry_failure)
             checked = _require_valid_run_result(retry_result)
         except SparkClientError:
             hold.settle(_failed_actual(result), "failed")
             raise
         else:
             hold.settle(checked.cost_usd, "succeeded")
-        if on_raw is not None:
-            # Before validation and consensus: a paid raw survives even
-            # when consensus raises StepsDisagreement downstream.
-            on_raw(len(raws), checked.payload)
-        raws.append(checked.payload)
-        runs.append(validate_spark_payload(checked.payload))
+        return checked
+
+    for run_index, share in enumerate(config.run_shares):
+        try:
+            checked = one_run(run_index, share)
+            if on_raw is not None:
+                # Before validation and consensus: a paid raw survives even
+                # when consensus raises StepsDisagreement downstream.
+                on_raw(len(raws), checked.payload)
+            raws.append(checked.payload)
+            valid = validate_spark_payload(checked.payload)
+        except (SparkClientError, SparkSchemaError) as error:
+            # One run may fail when the rest still reach the minimum
+            # run count; a second failure fails the job as before.
+            failed.append(error)
+            if len(failed) > 1 or config.runs - 1 < config.min_valid_runs:
+                raise
+            continue
+        runs.append(valid)
     return consensus_bundle(runs, config, chunk_extent=chunk_extent), raws
 
 
@@ -1672,7 +1724,7 @@ def bundle_from_json(
     if (
         not isinstance(source_runs, int)
         or isinstance(source_runs, bool)
-        or source_runs != config.runs
+        or not config.min_valid_runs <= source_runs <= config.runs
     ):
         raise ValueError(
             f"cached consensus must carry {config.runs} runs and approximate times"
@@ -1780,7 +1832,7 @@ def bundle_from_json(
         device_guess=device_guess,
         confidence=confidence,
         steps=tuple(steps),
-        source_runs=config.runs,
+        source_runs=source_runs,
         timestamps_approximate=True,
         boundaries=boundaries,
         excluded_spans=excluded,
@@ -1795,7 +1847,7 @@ def extract_steps_cached(
     chunk_extent: ChunkExtent | None = None,
     scene_cuts: Sequence[float] | None = None,
     clocked: bool = False,
-    retry_call: Callable[[str, float | None, tuple[float, ...] | None, bool], SparkRunResult] | None = None,
+    retry_call: Callable[..., SparkRunResult] | None = None,
     retryable_failures: frozenset[str] = frozenset(),
 ) -> CachedExtraction:
     """Cached extraction: a hit replays with zero context/client calls.

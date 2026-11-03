@@ -23,7 +23,7 @@ def test_extract_retry_settings_are_configurable() -> None:
     assert default.extract_retry_count == 1
     assert default.extract_retry_backoff_s == 1.0
     assert default.extract_retry_min_remaining_s == 60.0
-    assert default.extract_retry_failures == frozenset({"timeout", "transport", "http_5xx", "empty"})
+    assert default.extract_retry_failures == frozenset({"timeout", "transport", "http_5xx", "empty", "malformed"})
     configured = load_settings({
         "PARTFIDELITY_EXTRACT_RETRY_COUNT": "0",
         "PARTFIDELITY_EXTRACT_RETRY_BACKOFF_S": "0",
@@ -40,7 +40,7 @@ def test_extract_retry_settings_are_configurable() -> None:
     {"PARTFIDELITY_EXTRACT_RETRY_COUNT": "2"},
     {"PARTFIDELITY_EXTRACT_RETRY_BACKOFF_S": "-1"},
     {"PARTFIDELITY_EXTRACT_RETRY_MIN_REMAINING_S": "nan"},
-    {"PARTFIDELITY_EXTRACT_RETRY_FAILURES": "malformed"},
+    {"PARTFIDELITY_EXTRACT_RETRY_FAILURES": "local"},
 ))
 def test_extract_retry_settings_reject_invalid_values(env) -> None:
     with pytest.raises((RuntimeError, ValueError)):

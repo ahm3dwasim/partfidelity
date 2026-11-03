@@ -356,6 +356,55 @@ def fold_short_phases(
     return replace(bundle, steps=renumbered, boundaries=tuple(records))
 
 
+def _fuse_pair(current: Step, nxt: Step) -> Step | None:
+    """``current`` spanning ``nxt`` too, or None when the parts overflow."""
+    parts = _union_in_order(current.parts, nxt.parts)
+    if len(parts) > MAX_PARTS_PER_STEP:
+        return None
+    kind = current.kind if current.kind == nxt.kind else DEFAULT_PHASE_KIND
+    return replace(
+        current,
+        end_s=nxt.end_s,
+        tools=_union_in_order(current.tools, nxt.tools),
+        parts=parts,
+        hazards=_union_in_order(current.hazards, nxt.hazards),
+        time_spread_s=max(current.time_spread_s, nxt.time_spread_s),
+        time_needs_check=current.time_needs_check or nxt.time_needs_check,
+        kind=kind,
+    )
+
+
+def fuse_lite_steps(
+    steps: Sequence[Step],
+    *,
+    max_span_s: float,
+    title_phrases: frozenset[str],
+) -> tuple[Step, ...]:
+    """Fold near-duplicate steps into the step before them (tiling kept).
+
+    A step folds into its predecessor when its normalised action repeats
+    an earlier step's and it is shorter than ``max_span_s``, or when the
+    action is a title card (contains one of ``title_phrases``). The fused
+    step spans both and unions tools, parts and hazards, so no warning is
+    lost; a pair whose parts would overflow stays separate. The first
+    step never folds. Steps renumber from 1.
+    """
+    out: list[Step] = []
+    seen: set[str] = set()
+    for step in steps:
+        key = step_alignment.normalize_action(step.action)
+        duplicate = bool(key) and key in seen and step.end_s - step.start_s < max_span_s
+        title = any(phrase in key for phrase in title_phrases)
+        fused = _fuse_pair(out[-1], step) if out and (duplicate or title) else None
+        if fused is not None:
+            out[-1] = fused
+            continue
+        if key:
+            seen.add(key)
+        out.append(step)
+    return tuple(replace(step, number=number) for number, step in enumerate(out, start=1))
+
+
 def _merge_key(action: str) -> str:
     """Action text normalised for neighbour merging: lowercased,
     punctuation to spaces, whitespace collapsed."""
@@ -395,25 +444,11 @@ def merge_same_action_phases(bundle: StepBundle) -> StepBundle:
         if not key or key != _merge_key(nxt.action):
             index += 1
             continue
-        parts = _union_in_order(current.parts, nxt.parts)
-        if len(parts) > MAX_PARTS_PER_STEP:
+        fused = _fuse_pair(current, nxt)
+        if fused is None:
             index += 1
             continue
-        kind = (
-            current.kind if current.kind == nxt.kind else DEFAULT_PHASE_KIND
-        )
-        steps[index] = replace(
-            current,
-            end_s=nxt.end_s,
-            tools=_union_in_order(current.tools, nxt.tools),
-            parts=parts,
-            hazards=_union_in_order(current.hazards, nxt.hazards),
-            time_spread_s=max(current.time_spread_s, nxt.time_spread_s),
-            time_needs_check=(
-                current.time_needs_check or nxt.time_needs_check
-            ),
-            kind=kind,
-        )
+        steps[index] = fused
         del steps[index + 1]
         del records[index]
     renumbered = tuple(
@@ -510,6 +545,7 @@ def refine_consensus_bundle(
 __all__ = (
     "drop_edge_outro_phases",
     "fold_short_phases",
+    "fuse_lite_steps",
     "merge_same_action_phases",
     "refine_consensus_bundle",
     "snap_bundle_boundaries",

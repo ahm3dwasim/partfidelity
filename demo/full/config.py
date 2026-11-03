@@ -13,9 +13,11 @@ from pathlib import Path
 import sys
 import tomllib
 
+from app import built_config
 from demo.preview.config import BANNED, _int, _num, _span, _str
 
 CONFIG = Path(__file__).resolve().parents[2] / "config" / "demo_full.toml"
+BUILT = CONFIG.with_name("built.toml")   # the one config that holds the public repository link
 KINDS = ("footage", "window", "match", "card")
 TOL = 1e-6
 #: A stop is "capture.mark", optionally cut to a fraction of the mark: ":y0-y1" (top to bottom) and "@x0-x1" (left to right).
@@ -177,7 +179,7 @@ def _check_scene(i, sc, cfg, caps, footage_before):
 
 
 def card_lines(cfg, sc):
-    """The text lines a card scene shows: a line with {repo} is left out while links.repo_url is empty."""
+    """The text lines a card scene shows: a line with {repo} is left out only if links.repo_url is empty after load() (it never is: load fills it)."""
     return [s for s in sc["lines"] if not ("{repo}" in s and not cfg["links"]["repo_url"])]
 
 
@@ -261,9 +263,21 @@ def validate(cfg: dict) -> dict:
     return cfg
 
 
+def _built_repo_url() -> str:
+    try:   # the canonical validator: HTTPS, a host, no user or password
+        url = built_config.load(BUILT)["page"]["repository_url"]
+    except (OSError, ValueError, KeyError) as exc:
+        raise DemoFullConfigError(f"{BUILT.name}: [page].repository_url is not a valid public https:// link ({exc})") from exc
+    if not url:
+        raise DemoFullConfigError(f"{BUILT.name}: [page].repository_url is empty (the end card's repo line needs it)")
+    return url
+
+
 def load(path: Path = CONFIG) -> dict:
     with open(path, "rb") as fh:
         cfg = validate(tomllib.load(fh))
+    if not cfg["links"]["repo_url"]:   # empty means "take it from config/built.toml [page].repository_url"
+        cfg["links"]["repo_url"] = _built_repo_url()
     t = 0.0
     for sc in cfg["scene"]:
         sc["start"], t = t, t + sc["dur"]

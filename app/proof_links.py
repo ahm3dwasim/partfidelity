@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 import tomllib
 
-KEYS = {"sample_calls", "hard_stop", "catch_cta", "meta_roles", "meta_roles_link", "meta_roles_catch_link", "meta_roles_built_link", "open_weights_job", "open_weights_run_date", "open_weights_calls", "open_weights_replay", "open_weights_note", "open_weights_calls_text", "open_weights_replay_text", "open_weights_second_check_replay_text", "sample_reason_from", "sample_reason_to", "open_weights_fixture_sha256", "open_weights_receipt_count", "open_weights_real_second_check_min"}
+KEYS = {"sample_calls", "hard_stop", "catch_cta", "meta_roles", "meta_roles_link", "meta_roles_catch_link", "meta_roles_built_link", "open_weights_job", "open_weights_run_date", "open_weights_calls", "open_weights_replay", "open_weights_note", "open_weights_calls_text", "open_weights_replay_text", "open_weights_second_check_replay_text", "sample_reason_from", "sample_reason_to", "open_weights_fixture_sha256", "open_weights_receipt_count", "open_weights_real_second_check_min", "open_weights_sample_note", "open_weights_sample_calls_text"}
 # Each role is a distinct phrase that must stand alone: not followed by a word character or ".digit", so
 # "SAM 3" is not satisfied by "SAM 3.1" and "Muse Spark" is not satisfied by "Muse Spark Open".
 ROLE_PATTERNS = tuple(re.compile(r"(?<![\w.])" + re.escape(t) + r"(?![\w]|\.\d)") for t in (
@@ -34,10 +34,28 @@ def load():
     return data
 
 
-def open_weights_note_html() -> str:
-    """The sample's open-weights line: what it lacks, and links to the newer job's receipts and the replay."""
+def sample_has_open_rows(database, job_id: str) -> bool:
+    """True when the job holds a real (succeeded) Spark Open second-check row."""
+    if database is None:
+        return False
+    from app import db
+    from app.contracts import RECEIPT_MODEL_SPARK_OPEN
+    with db.connect(database) as conn:
+        return conn.execute("SELECT 1 FROM model_calls WHERE job_id = ? AND model = ? AND status = 'succeeded' LIMIT 1",
+                            (job_id, RECEIPT_MODEL_SPARK_OPEN)).fetchone() is not None
+
+
+def open_weights_note_html(database=None, job_id: str = "") -> str:
+    """The sample's open-weights line: what it lacks, and links to the newer job's receipts and the replay.
+    Once the sample's own receipts hold Spark Open rows, the "made before" line gives way to one that says the check ran."""
     import html
     links = load()
+    if job_id and sample_has_open_rows(database, job_id):
+        return (
+            f'<p class="gd-open-weights" role="note">{html.escape(links["open_weights_sample_note"])} '
+            f'<a href="{links["sample_calls"]}">{html.escape(links["open_weights_sample_calls_text"])}</a> &#183; '
+            f'<a href="{links["open_weights_replay"]}">{html.escape(links["open_weights_replay_text"])}</a></p>'
+        )
     return (
         f'<p class="gd-open-weights" role="note">{html.escape(links["open_weights_note"])} '
         f'<a href="{links["open_weights_calls"]}">{html.escape(links["open_weights_calls_text"])}</a> &#183; '

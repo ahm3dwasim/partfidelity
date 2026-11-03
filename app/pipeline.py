@@ -50,6 +50,7 @@ import tempfile
 import time
 import uuid
 from collections.abc import Callable, Iterator, Mapping, Sequence
+import dataclasses
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from decimal import Decimal
@@ -66,6 +67,7 @@ from app import sam as sam_module
 from app.admission import admit_job, job_dir
 from app.boundaries import (
     drop_edge_outro_phases,
+    fuse_lite_steps,
     merge_same_action_phases,
     refine_consensus_bundle,
 )
@@ -84,6 +86,7 @@ from app.chunks import (
     real_cut_window,
     require_contiguous_cover,
     stitch_bundles,
+    trim_seam_overlaps,
 )
 from app.contracts import (
     JSONValue,
@@ -123,7 +126,7 @@ from app.deletion import cleanup_failed_guide, request_meta_deletion
 from app.evidence import record_call, record_event
 from app.frame_scoring import score_frames
 from app.guides import assemble_guide
-from app.hazards import assess_hazards, difficulty_for, refusal_copy
+from app.hazards import assess_hazards, difficulty_for, fewer_checks_reason, refusal_copy
 from app.ledger import (
     active_job_publication,
     BudgetExhausted,
@@ -200,6 +203,7 @@ from app.spark import (
     ChunkExtent,
     NotATeardown,
     SparkRunResult,
+    SERVICE_FAILURE_KINDS,
     SparkClientError,
     SparkSchemaError,
     SparkServiceError,
@@ -808,6 +812,20 @@ def _merge_same_action(settings: Settings | None) -> bool:
     if settings is not None:
         return settings.merge_same_action
     return DEFAULT_MERGE_SAME_ACTION
+
+
+def _fuse_lite(settings: Settings | None, steps: Sequence[Step]) -> tuple[Step, ...]:
+    if (
+        settings is None
+        or not settings.fuse_lite
+        or _step_alignment_mode(settings) != DEFAULT_ALIGNMENT_MODE
+    ):
+        return tuple(steps)
+    return fuse_lite_steps(
+        steps,
+        max_span_s=settings.fuse_lite_max_span_s,
+        title_phrases=settings.fuse_lite_title_phrases,
+    )
 
 
 def _exclude_outro_phases(settings: Settings | None) -> bool:
@@ -1557,18 +1575,18 @@ def _write_refusal_marker(
     try:
         marker = job_dir(str(ctx.job_id)) / REFUSAL_MARKER_FILENAME
         marker.parent.mkdir(parents=True, exist_ok=True)
-        fd, staging_name = tempfile.mkstemp(
-            dir=marker.parent, prefix=f".{REFUSAL_MARKER_FILENAME}."
-        )
-        staging = Path(staging_name)
+        # Exclusive create: first reason wins, and it works on the Modal volume
+        # where hard links are refused. A reader that races the write sees
+        # unparseable JSON and falls back to the generic copy.
+        fd = os.open(marker, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o644)
         try:
             with os.fdopen(fd, "w", encoding="utf-8") as handle:
                 handle.write(json.dumps({"kind": refusal_kind}))
                 handle.flush()
                 os.fsync(handle.fileno())
-            os.link(staging, marker)
-        finally:
-            staging.unlink(missing_ok=True)
+        except BaseException:
+            marker.unlink(missing_ok=True)  # never leave a partial marker behind
+            raise
     except FileExistsError:
         pass
     except OSError as write_error:
@@ -2424,16 +2442,18 @@ def _window_retry_call(
     planned_usd: Callable[[], Decimal],
     chunk_count: int,
     replay: bool,
-) -> Callable[[str, float | None, tuple[float, ...] | None, bool], SparkRunResult] | None:
+) -> Callable[..., SparkRunResult] | None:
     if settings is None or settings.extract_retry_count == 0:
         return None
     parent_id = str(parent_ctx.job_id)
-    share = spark_config_of(original_client).run_shares[0]
+    run_shares = spark_config_of(original_client).run_shares
 
     def retry(
         file_id: str, duration_s: float | None,
         cuts: tuple[float, ...] | None, clocked: bool,
+        *, run_index: int = 0,
     ) -> SparkRunResult:
+        share = run_shares[run_index]
         def check(backoff_pending: bool) -> None:
             if _parent_cancelled(uploads, parent_id):
                 raise _ParentCancelled(f"parent job {parent_id} was cancelled")
@@ -2451,7 +2471,8 @@ def _window_retry_call(
         check(True)
         time.sleep(settings.extract_retry_backoff_s)
         check(False)
-        label = f"{parent_id}/extract/retry/{window_index}"
+        # One claim per run: run 0 keeps the window-only label.
+        label = f"{parent_id}/extract/retry/{window_index}" + (f"/{run_index}" if run_index else "")
 
         def claim_budget(conn: sqlite3.Connection) -> None:
             # Admission holds the write lock until this check and the child
@@ -2473,7 +2494,10 @@ def _window_retry_call(
                     for item in reservations
                 ), Decimal("0"))
                 if row["state"] == "active" and row["anon_id"].startswith(f"{parent_id}/extract/retry/"):
-                    amount = max(amount, share)
+                    # Each child counts at its own run share (run 0 has no suffix).
+                    parts = row["anon_id"][len(f"{parent_id}/extract/retry/"):].split("/")
+                    child_run = int(parts[1]) if len(parts) > 1 else 0
+                    amount = max(amount, run_shares[child_run])
                 spent += amount
             if spent + share > settings.chunk_retry_budget_usd or planned_usd() + spent + share > settings.job_cost_cap_usd:
                 raise SparkServiceError("retry budget")
@@ -2515,7 +2539,7 @@ def _window_retry_call(
             failure = getattr(result, "failure_kind", None)
             if failure:
                 hold.settle(_failed_actual(result), "failed")
-                raise SparkServiceError(failure) if failure in settings.extract_retry_failures else SparkClientError(failure)
+                raise SparkServiceError(failure) if failure in SERVICE_FAILURE_KINDS else SparkClientError(failure)
             try:
                 checked = _require_valid_run_result(result)
                 validate_spark_payload(checked.payload)
@@ -3324,15 +3348,22 @@ def _extract_chunked(
     # Edge outros drop only after deriving, so the gates still see
     # the full cover and only whole-video edges can go.
     duration_s = windows[len(windows) - 1].end_s - windows[0].start_s
+    seams = [
+        (b.start_s, a.end_s)
+        for (a, _), (b, _) in zip(chunk_bundles, chunk_bundles[1:])
+    ]
     derived = derive_contiguous_ends(
-        stitched.steps, duration_s, tolerance_s=tolerance_s
+        trim_seam_overlaps(stitched.steps, seams, stitched.origins),
+        duration_s,
+        tolerance_s=tolerance_s,
     )
-    kept, excluded = _trim_edge_outro(derived, settings)
+    kept, excluded = _trim_edge_outro(_fuse_lite(settings, derived), settings)
     return StitchedSteps(
         steps=kept,
         device_guess=stitched.device_guess,
         confidence=stitched.confidence,
         excluded_spans=excluded,
+        fewest_runs=stitched.fewest_runs,
     )
 
 
@@ -3404,7 +3435,7 @@ def _extract_bundle(
             window.end_s - window.start_s,
             tolerance_s=_contiguity_tolerance_s(settings),
         )
-        kept, excluded = _trim_edge_outro(derived, settings)
+        kept, excluded = _trim_edge_outro(_fuse_lite(settings, derived), settings)
         return StepBundle(
             device_guess=bundle.device_guess,
             confidence=bundle.confidence,
@@ -3527,7 +3558,7 @@ def _run_stages_inner(
             ctx, job_id, "job cancelled",
             replay=replay, settings=settings,
         )
-    except SparkServiceError:
+    except (SparkClientError, SparkSchemaError):
         return _fail(
             ctx, job_id, "step extraction failed", replay=replay,
             settings=settings, refusal_kind="extract_service_failure",
@@ -3555,8 +3586,17 @@ def _run_stages_inner(
         logger.info(
             "pipeline job=%s extraction failed: %s", job_id, type(error).__name__
         )
-        return _fail(ctx, job_id, "step extraction failed", replay=replay,
-                     settings=settings)
+        # "No reliable steps" only when the runs succeeded and disagreed;
+        # any other cause is the one service-failure reason.
+        return _fail(
+            ctx, job_id, "step extraction failed", replay=replay,
+            settings=settings,
+            refusal_kind=(
+                "extraction"
+                if isinstance(error, (StepsDisagreement, ContiguityError))
+                else "extract_service_failure"
+            ),
+        )
     except BaseException:
         # KeyboardInterrupt/SystemExit from extraction: settle the parent
         # (failed, or a pending marker when the transition cannot
@@ -3566,6 +3606,18 @@ def _run_stages_inner(
         _settle_failed(ctx, "step extraction failed", settings=settings)
         raise
     assessment = assess_hazards(tuple(bundle.steps), bundle.device_guess)
+    used_runs = getattr(bundle, "source_runs", None) or getattr(bundle, "fewest_runs", None)
+    if (
+        not assessment.refused
+        and settings is not None
+        and used_runs is not None
+        and used_runs < settings.providers.spark_runs
+    ):
+        # Never worded as verified or safe: fewer reads simply agreed.
+        assessment = dataclasses.replace(
+            assessment, draft=True,
+            draft_reasons=(*assessment.draft_reasons, fewer_checks_reason(used_runs, settings.providers.spark_runs)),
+        )
     if assessment.refused:
         logger.info(
             "pipeline job=%s refused: %s", job_id, assessment.refusal_kind

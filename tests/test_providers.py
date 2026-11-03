@@ -30,6 +30,7 @@ from app.providers._transport import (
     HttpResponse,
     HttpTransport,
     ProviderConnectError,
+    ProviderDeadline,
     ProviderError,
     ProviderHttpError,
     ProviderMalformed,
@@ -798,6 +799,12 @@ def test_spark_429_exhausted_raises_and_settles_zero():
         (HttpResponse(status=200, body=b"nope", headers={}), False, "malformed"),
         (ok({"nope": True}), False, "malformed"),
         (ok({"output": []}), False, "empty"),
+        # Live V3: 200, tokens billed, but no output_text span; a service failure.
+        (
+            ok({"output": [{"type": "reasoning", "content": []}],
+                "usage": {"input_tokens": 1, "output_tokens": 1}}),
+            True, "empty",
+        ),
         (
             ok({"output": [{"content": [{"type": "output_text", "text": "nope"}]}],
                 "usage": {"input_tokens": 1, "output_tokens": 1}}),
@@ -1815,7 +1822,6 @@ def test_factory_uses_configured_sam_price(tmp_path):
     "var,value,match",
     [
         ("PARTFIDELITY_SPARK_RUNS", "5", "count cap"),
-        ("PARTFIDELITY_SPARK_RUNS", "1", "consensus"),
         (
             "PARTFIDELITY_SPARK_INPUT_USD_PER_TOKEN",
             "1",
@@ -1839,6 +1845,12 @@ def test_factory_refuses_configs_that_break_the_budget(var, value, match):
     replay = load_settings({var: value})
     with pytest.raises(RuntimeError, match=match):
         select_providers(replay, replay=Providers(spark=1, sam=2, readback=3))
+
+
+def test_settings_refuse_one_spark_run_with_default_consensus_minimum():
+    # Moved from the factory: load_settings now refuses it before any provider exists.
+    with pytest.raises(RuntimeError, match="CONSENSUS_MIN_RUNS"):
+        load_settings({"PARTFIDELITY_SPARK_RUNS": "1"})
 
 
 def test_factory_derives_default_shares_from_prices():
@@ -1891,15 +1903,19 @@ def test_two_spark_runs_cannot_exceed_the_job_deadline():
     trio = select_providers(
         _live_settings(), ctx, transport=transport, monotonic=clock.now
     )
-    with pytest.raises(SparkClientError):
+    # Run 2's stall is tolerated (2-of-3 fallback); run 3 then finds the
+    # deadline spent and refuses before sending, so the job still fails.
+    with pytest.raises(ProviderDeadline):
         extract_steps(ctx, "vid-1", client=trio.spark)
     assert transport.posts[0]["timeout_s"] == 180.0
     assert transport.posts[1]["timeout_s"] == pytest.approx(61.0)
+    assert len(transport.posts) == 2
     assert clock.t - started <= 240.0  # the job deadline, not 179 + 180
     # The expired run settles conservatively (indeterminate: worst case).
-    (first,), (second,) = [h.settlements for h in ctx.holds]
+    (first,), (second,), (third,) = [h.settlements for h in ctx.holds]
     assert first[1] == "succeeded" and first[0] < SPARK_WORST
     assert second == (SPARK_WORST, "failed")
+    assert third == (Decimal("0"), "failed")
 
 
 def test_spark_backoff_is_truncated_to_the_job_deadline():

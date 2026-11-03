@@ -101,3 +101,21 @@ def test_caption_tag_weight_comes_from_caption_box_not_the_panel(tmp_path):
     assert "'--caption-tag-weight': CB.tag_font_weight" in js
     caption_tag = css.split(".caption .tag {")[1].split("}")[0]
     assert "font-weight: var(--caption-tag-weight, var(--panel-tag-weight))" in caption_tag
+
+
+def test_empty_repo_url_is_read_from_built_toml(tmp_path):
+    import tomllib
+    built = tomllib.loads(df.BUILT.read_text())["page"]["repository_url"]
+    assert df.load()["links"]["repo_url"] == built
+    assert _load(tmp_path, SRC)["links"]["repo_url"] == built
+
+
+@pytest.mark.parametrize("bad", ["", "https://", "https://user:pass@example.com/repo", "http://x"])
+def test_bad_built_repository_url_fails_loud(tmp_path, monkeypatch, bad):
+    import tomllib
+    good = tomllib.loads(df.BUILT.read_text())["page"]["repository_url"]
+    copy = tmp_path / "built.toml"
+    copy.write_text(df.BUILT.read_text().replace(good, bad, 1))
+    monkeypatch.setattr(df, "BUILT", copy)
+    with pytest.raises(df.DemoFullConfigError, match="repository_url"):
+        df.load()

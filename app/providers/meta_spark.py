@@ -477,6 +477,7 @@ class MetaSparkClient:
         transition_verbs: frozenset[str] | None = None,
         verb_less_overlap_fraction: float | None = None,
         boundary_tolerance_s: float | None = None,
+        consensus_min_runs: int | None = None,
         reservation_usd: Decimal | None = None,
         max_input_tokens: int | None = None,
         deadline_at: float | None = None,
@@ -557,6 +558,7 @@ class MetaSparkClient:
             boundary_tolerance_s=defaults.boundary_tolerance_s
             if boundary_tolerance_s is None
             else boundary_tolerance_s,
+            consensus_min_runs=consensus_min_runs,
             reservation_usd=defaults.reservation_usd
             if reservation_usd is None
             else reservation_usd,
@@ -656,8 +658,7 @@ class MetaSparkClient:
                 f"(200 with unusable step text: {error}); settles "
                 f"{measured if measured is not None else self._worst_case}; "
                 "reconcile against provider usage",
-                "empty" if units_in in (None, 0) and units_out in (None, 0)
-                and isinstance(error, ProviderMalformed)
+                "empty" if isinstance(error, ProviderMalformed)
                 and isinstance(payload, Mapping)
                 and (not payload or isinstance(payload.get("output"), list))
                 else "malformed",

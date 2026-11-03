@@ -42,6 +42,7 @@ __all__ = (
     "CTA_TRY",
     "CTA_SAMPLE",
     "refusal_copy",
+    "fewer_checks_reason",
     "HazardWarning",
     "BatteryOrderEvidence",
     "HazardAssessment",
@@ -611,6 +612,14 @@ def step_hazard_blocks(step: Step) -> tuple[tuple[str, str], ...]:
     return tuple(blocks)
 
 
+def fewer_checks_reason(used: int, expected: int) -> str:
+    """Draft note when a consensus rested on fewer AI reads than usual."""
+    return (
+        f"DRAFT: fewer checks ran on this video ({used} AI reads, not {expected});"
+        " compare each step with your clip"
+    )
+
+
 def refusal_copy(kind: str) -> str | None:
     """The plain-words refusal shown for a refusal kind, or None for other kinds."""
     if kind == "scope":
@@ -625,7 +634,7 @@ def refusal_copy(kind: str) -> str | None:
         "deadline": "This clip took longer than the time limit for one guide. Try a shorter clip.",
         "part_check": "We could not finish checking the parts in this clip. Try uploading it again.",
         "extraction": "We could not identify reliable repair steps in this clip. Try another clip.",
-        "extract_service_failure": "The AI service did not answer for part of your video. Nothing was wrong with your clip. Please try again.",
+        "extract_service_failure": "The AI service did not answer properly for this video. Try again.",
         "upload_failed": "The clip could not be sent for processing. Try uploading it again.",
         "upload_expired": "The sent video expired before processing started. Please upload it again.",
         "queue_unavailable": "The job could not start. Please try uploading your clip again.",

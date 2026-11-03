@@ -40,6 +40,7 @@ class ModalConfig:
     volume_mount: Path
     image_folders: tuple[str, ...]  # repo folders copied into the image
     image_files: tuple[str, ...]  # single repo files copied into the image
+    app_env: tuple[tuple[str, str], ...] = ()  # allowlisted settings for the container
 
 
 @dataclass(frozen=True)
@@ -76,6 +77,25 @@ def _positive_int(section: Mapping[str, Any], key: str) -> int:
     return value
 
 
+# The only settings config may pass to the container, with their allowed values;
+# a security limit, so it stays in code. Adding a setting is one line.
+ALLOWED_APP_ENV = {
+    "PARTFIDELITY_STEP_GROUPING": ("on", "off"),
+}
+
+
+def _app_env(modal: Mapping[str, Any]) -> tuple[tuple[str, str], ...]:
+    table = modal.get("app_env", {})
+    if not isinstance(table, dict):
+        raise RuntimeError("deploy config [modal.app_env] must be a table")
+    for key, value in table.items():
+        if key not in ALLOWED_APP_ENV:
+            raise RuntimeError(f"deploy config app_env key {key} is not an allowed setting (allowed: {', '.join(ALLOWED_APP_ENV)})")
+        if value not in ALLOWED_APP_ENV[key]:
+            raise RuntimeError(f"deploy config app_env {key} must be one of: {', '.join(ALLOWED_APP_ENV[key])}")
+    return tuple(sorted(table.items()))
+
+
 def load_deploy_config(path: Path | str) -> DeployConfig:
     """Read the deploy TOML; a missing or misspelled key fails loudly."""
     with open(path, "rb") as handle:
@@ -89,7 +109,9 @@ def load_deploy_config(path: Path | str) -> DeployConfig:
         "data_root", "snapshot_dir", "local_db",
         "snapshot_interval_s", "snapshot_settle_s", "sweep_interval_s", "snapshot_max_age_s",
     )
-    modal = _section(raw, "modal", modal_keys)
+    modal_raw = raw.get("modal")
+    optional = ("app_env",) if isinstance(modal_raw, dict) and "app_env" in modal_raw else ()
+    modal = _section(raw, "modal", modal_keys + optional)
     host = _section(raw, "host", host_keys)
     unknown = set(raw) - {"modal", "host"}
     if unknown:
@@ -125,6 +147,7 @@ def load_deploy_config(path: Path | str) -> DeployConfig:
             volume_mount=mount,
             image_folders=tuple(modal["image_folders"]),
             image_files=tuple(modal["image_files"]),
+            app_env=_app_env(modal),
         ),
         host=HostConfig(
             data_root=Path(host["data_root"]),

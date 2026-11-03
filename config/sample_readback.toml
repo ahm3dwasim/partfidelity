@@ -1,0 +1,9 @@
+# One-shot Spark Open second check of the sample's kept labels (app/sample_readback.py).
+# Loaded strictly (a missing or misspelled key fails). No credentials here: the key is read only
+# from BASETEN_API_KEY by app/providers/open_readback.py, whose caps (config/open_readback.toml) bound the spend.
+# The check runs once at app start inside the web container when enabled = true; labels that already have
+# a Spark Open row are skipped, so a restart changes nothing.
+
+[sample_readback]
+enabled = false                  # the maintainer sets true for the one real run (config-only change), then deploys
+labels = ["fan", "battery"]      # label phrases to check; any other kept label is left alone

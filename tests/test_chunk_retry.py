@@ -309,6 +309,37 @@ def test_disagreement_retried_once_fifteen_calls(
     ).exists() is False
 
 
+def test_billed_malformed_run_retried_then_two_run_draft_on_real_ledger(
+    tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
+    lifecycle: LifecycleRepositoryImpl, clip65: Path, tmp_cache: Path,
+) -> None:
+    # Real admission, holds and retry child; only the Spark replies are scripted.
+    settings = _settings(
+        tmp_path, lane_db, whole_video_max_s=120.0, chunk_s=120.0,
+    )
+    malformed = SparkRunResult(payload={}, cost_usd=Decimal("0.08"), latency_ms=900)
+    good = _agreeing_runs("Open the lid")
+    runs = [malformed, malformed, good[1], good[2]]  # run 0 and its retry fail
+    spark = _legacy_spark(runs)
+    spark.spark_stage_config = SparkStageConfig(span_mode="legacy", consensus_min_runs=2)
+    clients = PipelineClients(
+        spark=spark, sam=ReplaySamClient({}), meta=ReplayMetaFilesClient(),
+    )
+    ctx = admit_job("malformed-draft", "malformed-draft", "video-malformed-draft")
+    result = run_stages(
+        ctx, "parent-file-id", clip65,
+        clients=clients, lifecycle=lifecycle, uploads=uploads, replay=True,
+        settings=settings, duration_s=65.0,
+    )
+    assert result.state == "done", result.error
+    assert len(clients.spark.run_calls) == 4
+    assert result.guide is not None
+    assert any(
+        r.startswith("DRAFT: fewer checks ran") and "2 AI reads" in r
+        for r in result.guide.draft_reasons
+    )
+
+
 def test_retry_exhausted_fails_closed_without_touching_finished_chunks(
     tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
     lifecycle: LifecycleRepositoryImpl, clip65: Path, tmp_cache: Path,

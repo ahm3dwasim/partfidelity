@@ -114,10 +114,17 @@ SECOND_CHECK_LABEL = "Second check (Meta open weights, Spark Open)"
 
 def _render_second_check(calls) -> str:
     """One line per part the background Spark Open check covered; "" when it never ran."""
-    items = []
-    for c in calls:
+    shown: dict = {}  # one line per label: its latest row (highest generation, then later), so a receipt replaces its marker
+    for i, c in enumerate(calls):
         if c.model != RECEIPT_MODEL_SPARK_OPEN or c.stage != RECEIPT_STAGE_READBACK:
             continue
+        label = c.evidence.get("label")
+        key = label if isinstance(label, str) else i
+        if key in shown and shown[key].evidence.get("gen", 0) > c.evidence.get("gen", 0):
+            continue
+        shown[key] = c
+    items = []
+    for c in shown.values():
         phrase = escape_cell(c.evidence.get("phrase", "part"))
         decision = c.evidence.get("decision") if c.status == "succeeded" else None
         if decision == "yes":
@@ -146,10 +153,12 @@ def _saved_copy_note(job_id: str, database=None) -> str:
     return f'<p class="saved-copy" role="note">{escape_cell(line)}</p>' if line else ""
 
 
-def _sample_note(job_id: str) -> str:
+def _sample_note(job_id: str, database=None) -> str:
     """On the sample's own receipts: the sample has no open-weights rows; the newer job and the replay are one click away."""
     if f"/calls/{job_id}" != proof_links.load()["sample_calls"]:
         return ""
+    if proof_links.sample_has_open_rows(database, job_id):
+        return ""  # the real rows are listed in the second-check section above
     return '<section class="second-check" aria-label="Second check">' + proof_links.open_weights_note_html() + "</section>"
 
 
@@ -250,7 +259,7 @@ def render_calls_page(job_id: str, ctx: JobContext) -> str:
             ).fetchall()
         for child in children:
             if re.fullmatch(
-                r"(?:chunk/[0-9]+(?:/retry/[0-9]+)?|extract/retry/[0-9]+)",
+                r"(?:chunk/[0-9]+(?:/retry/[0-9]+)?|extract/retry/[0-9]+(?:/[0-9]+)?)",
                 child["anon_id"][len(prefix):],
             ):
                 child_id = JobId(child["id"])
@@ -276,7 +285,7 @@ def render_calls_page(job_id: str, ctx: JobContext) -> str:
         template.replace("{{PAGE_TITLE}}", escape_cell(f"{CALLS_PAGE_TITLE} · {job_id}"))
         .replace("{{JOB_ID}}", escape_cell(job_id))
         .replace("{{SUMMARY}}", _render_summary(summary))
-        .replace("{{READBACK}}", _saved_copy_note(job_id, getattr(ctx, "_db", None)) + _render_readback(readback) + _render_second_check(calls) + _sample_note(job_id))
+        .replace("{{READBACK}}", _saved_copy_note(job_id, getattr(ctx, "_db", None)) + _render_readback(readback) + _render_second_check(calls) + _sample_note(job_id, getattr(ctx, "_db", None)))
         .replace("{{TABLE}}", _render_table(summary, rows_html))
     )
 

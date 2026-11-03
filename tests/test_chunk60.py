@@ -1737,3 +1737,58 @@ def test_chunk_extraction_base_exception_settles_parent(
     finally:
         conn.close()
     assert open_holds == 0
+
+
+def test_seam_overlap_from_real_cut_windows_does_not_fail_the_cover():
+    # Live V2 (279 s): chunk 0 cut to 60.134 s, chunk 1 starts at 58 s, so the seam
+    # steps overlap by 2.134 s, just over the 2 s tolerance; every attempt failed.
+    from app.chunks import ContiguityError, derive_contiguous_ends, trim_seam_overlaps
+
+    steps = (
+        _step(1, 0.0, 60.134, "Open the laptop"),
+        _step(2, 58.0, 66.9, "Remove the cover"),
+        _step(3, 66.9, 120.0, "Replace the memory"),
+    )
+    with pytest.raises(ContiguityError):
+        derive_contiguous_ends(steps, 120.0, tolerance_s=2.0)
+    adjacent = (frozenset({0}), frozenset({1}), frozenset({1}))
+    derived = derive_contiguous_ends(
+        trim_seam_overlaps(steps, [(58.0, 60.134)], adjacent), 120.0, tolerance_s=2.0
+    )
+    assert [(s.start_s, s.end_s) for s in derived] == [
+        (0.0, 58.0), (58.0, 66.9), (66.9, 120.0)
+    ]
+    wide = trim_seam_overlaps(steps, [(59.0, 60.134)], adjacent)
+    with pytest.raises(ContiguityError):
+        derive_contiguous_ends(wide, 120.0, tolerance_s=2.0)
+
+
+def test_overlap_away_from_any_seam_still_fails_the_cover():
+    from app.chunks import ContiguityError, derive_contiguous_ends, trim_seam_overlaps
+
+    steps = (_step(1, 0.0, 10.0, "Open"), _step(2, 9.0, 20.0, "Remove"))
+    adjacent = (frozenset({0}), frozenset({1}))
+    for seams in ([], [(55.0, 57.0)]):
+        with pytest.raises(ContiguityError):
+            derive_contiguous_ends(
+                trim_seam_overlaps(steps, seams, adjacent), 20.0, tolerance_s=0.5
+            )
+
+
+def test_same_chunk_overlap_inside_a_seam_zone_still_fails_the_cover():
+    from app.chunks import ContiguityError, derive_contiguous_ends, trim_seam_overlaps
+
+    steps = (_step(1, 0.0, 59.5, "Open"), _step(2, 58.5, 65.0, "Remove"))
+    # [57,59.5]/[58.5,65] shape: both steps come from chunk 0, so no seam crossing.
+    shared = (frozenset({0, 1}), frozenset({1}))  # origins overlap: not a pure seam pair
+    for origins in (
+        (frozenset({0}), frozenset({0})),
+        (frozenset({1}), frozenset({1})),
+        shared,
+    ):
+        with pytest.raises(ContiguityError):
+            derive_contiguous_ends(
+                trim_seam_overlaps(steps, [(58.0, 60.134)], origins),
+                65.0,
+                tolerance_s=0.5,
+            )

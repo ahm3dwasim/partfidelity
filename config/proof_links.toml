@@ -27,3 +27,6 @@ open_weights_fixture_sha256 = "27be869781049fba6a2a2264b5721b51e9926e53c6df953d7
 open_weights_receipt_count = 24
 # When the job's receipts are a real run instead (the fixture is never installed beside them), /healthz needs at least this many spark-open second-check rows, or the exact count above.
 open_weights_real_second_check_min = 4
+# Shown on the sample guide instead of the line above once the sample's own receipts hold real Spark Open rows. It says only that the check ran, never that the labels are right.
+open_weights_sample_note = "The open-weights second check was run on the fan and battery labels of this sample after it was made; its rows are in the sample receipts."
+open_weights_sample_calls_text = "Sample receipts"

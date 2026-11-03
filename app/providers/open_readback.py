@@ -451,7 +451,8 @@ def check_part(
     return answer
 
 
-def record_unavailable(ctx: JobContext, decision: LabelDecision, gen: int) -> None:
+def record_unavailable(ctx: JobContext, decision: LabelDecision, gen: int,
+                       reason: str = "check could not be queued") -> None:
     """Record "not available" for one label generation whose check could not be queued,
     so the guide can say so; nothing was sent and it costs $0."""
     _records.persist_receipt(
@@ -471,7 +472,7 @@ def record_unavailable(ctx: JobContext, decision: LabelDecision, gen: int) -> No
             cost_usd=Decimal("0"),
             cost_basis="skipped",
             status="failed",
-            reason="check could not be queued",
+            reason=reason,
         ),
     )
 

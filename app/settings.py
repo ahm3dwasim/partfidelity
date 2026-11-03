@@ -53,6 +53,8 @@ META_API_BASE_URL_ENV_VAR = "META_API_BASE_URL"
 SPARK_MODEL_ENV_VAR = "META_SPARK_MODEL_ID"
 SAM_MODEL_ENV_VAR = "META_SAM_MODEL_ID"
 SPARK_RUNS_ENV_VAR = "PARTFIDELITY_SPARK_RUNS"
+CONSENSUS_MIN_RUNS_ENV_VAR = "PARTFIDELITY_CONSENSUS_MIN_RUNS"
+DEFAULT_CONSENSUS_MIN_RUNS = 2
 TIME_SPREAD_ENV_VAR = "PARTFIDELITY_TIME_SPREAD_FLAG_S"
 SAM_RATE_ENV_VAR = "PARTFIDELITY_SAM_RATE_PER_MIN"
 SAM_THRESHOLD_FAN_ENV_VAR = "PARTFIDELITY_SAM_THRESHOLD_FAN"
@@ -134,6 +136,8 @@ class ProviderSettings:
     spark_model_id: str = DEFAULT_SPARK_MODEL_ID
     sam_model_id: str = DEFAULT_SAM_MODEL_ID
     spark_runs: int = SPARK_RUNS_PER_GUIDE
+    # Fewest valid runs a consensus may rest on when one run fails.
+    consensus_min_runs: int = DEFAULT_CONSENSUS_MIN_RUNS
     time_spread_flag_s: float = float(TIME_SPREAD_FLAG_S)
     sam_max_starts_per_minute: int = SAM_MAX_REQUEST_STARTS_PER_MINUTE
     sam_threshold_fan: float = PART_CHECK_THRESHOLDS["fan"]
@@ -262,6 +266,9 @@ SNAP_WINDOW_S_ENV_VAR = "PARTFIDELITY_SNAP_WINDOW_S"
 MIN_PHASE_LENGTH_S_ENV_VAR = "PARTFIDELITY_MIN_PHASE_LENGTH_S"
 SPARK_RESERVATION_ENV_VAR = "PARTFIDELITY_SPARK_RESERVATION_USD"
 MERGE_SAME_ACTION_ENV_VAR = "PARTFIDELITY_MERGE_SAME_ACTION"
+FUSE_LITE_ENV_VAR = "PARTFIDELITY_FUSE_LITE"
+FUSE_LITE_MAX_SPAN_ENV_VAR = "PARTFIDELITY_FUSE_LITE_MAX_SPAN_S"
+FUSE_LITE_TITLE_PHRASES_ENV_VAR = "PARTFIDELITY_FUSE_LITE_TITLE_PHRASES"
 EXCLUDE_OUTRO_PHASES_ENV_VAR = "PARTFIDELITY_EXCLUDE_OUTRO_PHASES"
 
 # Integration-owned pipeline config defaults. The orchestrator reads output
@@ -331,7 +338,7 @@ DEFAULT_CHUNK_RETRY_BUDGET_USD = Decimal("0.26")
 DEFAULT_EXTRACT_RETRY_COUNT = 1
 DEFAULT_EXTRACT_RETRY_BACKOFF_S = 1.0
 DEFAULT_EXTRACT_RETRY_MIN_REMAINING_S = 60.0
-DEFAULT_EXTRACT_RETRY_FAILURES = frozenset({"timeout", "transport", "http_5xx", "empty"})
+DEFAULT_EXTRACT_RETRY_FAILURES = frozenset({"timeout", "transport", "http_5xx", "empty", "malformed"})
 DEFAULT_CHUNK_BUNDLE_TTL_S = 7.0 * 24.0 * 3600.0
 # Contiguous repair phases: guides tile [0, duration) with
 # ends derived from the next start; ``legacy`` keeps model spans as the
@@ -368,6 +375,11 @@ DEFAULT_MIN_PHASE_LENGTH_S = 5.0
 # Fuse adjacent phases with the same normalised action after fold
 # (the live consensus split one verify phase in two).
 DEFAULT_MERGE_SAME_ACTION = True
+# Fuse-lite (panel-measured): a repeat of an earlier action shorter than
+# this folds into the step before it; title-card steps fold too.
+DEFAULT_FUSE_LITE = True
+DEFAULT_FUSE_LITE_MAX_SPAN_S = 12.0
+DEFAULT_FUSE_LITE_TITLE_PHRASES = frozenset({"title card", "prep title"})
 # Drop leading/trailing phases the run majority tagged
 # outro_or_unrelated, recording their spans (the guide leaves out the
 # non-repair teaser).
@@ -510,6 +522,9 @@ class Settings:
     min_phase_length_s: float = DEFAULT_MIN_PHASE_LENGTH_S
     spark_reservation_usd: Decimal = DEFAULT_SPARK_RESERVATION_USD
     merge_same_action: bool = DEFAULT_MERGE_SAME_ACTION
+    fuse_lite: bool = DEFAULT_FUSE_LITE
+    fuse_lite_max_span_s: float = DEFAULT_FUSE_LITE_MAX_SPAN_S
+    fuse_lite_title_phrases: frozenset[str] = DEFAULT_FUSE_LITE_TITLE_PHRASES
     exclude_outro_phases: bool = DEFAULT_EXCLUDE_OUTRO_PHASES
 
     def __post_init__(self) -> None:
@@ -719,6 +734,7 @@ class Settings:
             "clock_burn_in",
             "scene_cuts_in_prompt",
             "merge_same_action",
+            "fuse_lite",
             "exclude_outro_phases",
         ):
             value = getattr(self, name)
@@ -1217,6 +1233,13 @@ def load_provider_settings(env: Mapping[str, str]) -> ProviderSettings:
         )
     base_raw = env.get(META_API_BASE_URL_ENV_VAR, "").strip()
     base_url = validate_meta_api_base_url(base_raw) if base_raw else DEFAULT_META_API_BASE_URL
+    spark_runs = _provider_int(env, SPARK_RUNS_ENV_VAR, SPARK_RUNS_PER_GUIDE)
+    min_runs = _provider_int(env, CONSENSUS_MIN_RUNS_ENV_VAR, DEFAULT_CONSENSUS_MIN_RUNS)
+    if not 2 <= min_runs <= spark_runs:
+        raise RuntimeError(
+            f"invalid {CONSENSUS_MIN_RUNS_ENV_VAR} value: {min_runs}"
+            f" (must be between 2 and {SPARK_RUNS_ENV_VAR}={spark_runs})"
+        )
     return ProviderSettings(
         mode=mode,
         meta_api_base_url=base_url,
@@ -1226,7 +1249,8 @@ def load_provider_settings(env: Mapping[str, str]) -> ProviderSettings:
         sam_model_id=_provider_model(
             env, SAM_MODEL_ENV_VAR, DEFAULT_SAM_MODEL_ID, SAM_MODEL_RECORD_NAMES
         ),
-        spark_runs=_provider_int(env, SPARK_RUNS_ENV_VAR, SPARK_RUNS_PER_GUIDE),
+        spark_runs=spark_runs,
+        consensus_min_runs=min_runs,
         time_spread_flag_s=_provider_float(env, TIME_SPREAD_ENV_VAR, float(TIME_SPREAD_FLAG_S)),
         sam_max_starts_per_minute=_provider_int(
             env, SAM_RATE_ENV_VAR, SAM_MAX_REQUEST_STARTS_PER_MINUTE
@@ -1503,6 +1527,19 @@ def load_settings(env: Mapping[str, str] | None = None) -> Settings:
         ),
         merge_same_action=_bool_setting(
             raw, MERGE_SAME_ACTION_ENV_VAR, DEFAULT_MERGE_SAME_ACTION
+        ),
+        fuse_lite=_bool_setting(raw, FUSE_LITE_ENV_VAR, DEFAULT_FUSE_LITE),
+        fuse_lite_max_span_s=_nonnegative_float(
+            raw, FUSE_LITE_MAX_SPAN_ENV_VAR, DEFAULT_FUSE_LITE_MAX_SPAN_S
+        ),
+        fuse_lite_title_phrases=(
+            frozenset(
+                value.strip().lower()
+                for value in raw[FUSE_LITE_TITLE_PHRASES_ENV_VAR].split(",")
+                if value.strip()
+            )
+            if FUSE_LITE_TITLE_PHRASES_ENV_VAR in raw
+            else DEFAULT_FUSE_LITE_TITLE_PHRASES
         ),
         exclude_outro_phases=_bool_setting(
             raw, EXCLUDE_OUTRO_PHASES_ENV_VAR, DEFAULT_EXCLUDE_OUTRO_PHASES

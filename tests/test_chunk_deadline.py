@@ -21,6 +21,7 @@ from types import SimpleNamespace
 import cv2
 import numpy as np
 import pytest
+from app.hazards import refusal_copy
 
 from app import db, service
 from app.admission import admit_job
@@ -459,7 +460,7 @@ def test_extract_service_retry_has_own_receipt_and_true_reason(
     assert (f"{ctx.job_id}/extract/retry/0", "succeeded" if failures == 1 else "failed") in receipts
     if failures == 2:
         assert len(calls) == 2
-        assert "Nothing was wrong with your clip" in refusal_text_for_job(str(ctx.job_id), data_root=settings.data_root)
+        assert "did not answer properly" in refusal_text_for_job(str(ctx.job_id), data_root=settings.data_root)
     else:
         assert len(calls) == 7
 
@@ -574,7 +575,7 @@ def test_schema_invalid_retry_settles_chunk_child_and_parent(
     )
 
 
-@pytest.mark.parametrize("block", ("cap", "job_cap", "deadline", "cancel", "malformed"))
+@pytest.mark.parametrize("block", ("cap", "job_cap", "deadline", "cancel"))
 def test_extract_service_retry_stops_before_second_call(
     tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
     lifecycle: LifecycleRepositoryImpl, live_settings: Settings,
@@ -602,7 +603,7 @@ def test_extract_service_retry_stops_before_second_call(
                 conn.execute("UPDATE uploads SET cancel_requested_at = ? WHERE job_id = ?",
                              (db.format_dt(db.utcnow()), str(ctx.job_id)))
         return SparkRunResult({}, Decimal("0.03"), 50,
-                              "malformed" if block == "malformed" else "timeout")
+                              "timeout")
 
     monkeypatch.setattr(spark, "run_steps", failing)
 
@@ -627,8 +628,46 @@ def test_extract_service_retry_stops_before_second_call(
             "SELECT COUNT(*) FROM jobs WHERE anon_id LIKE ?",
             (f"{ctx.job_id}/extract/retry/%",),
         ).fetchone()[0] == 0
-    if block == "malformed":
-        assert "reliable repair steps" in refusal_text_for_job(str(ctx.job_id), data_root=settings.data_root)
+
+
+@pytest.mark.parametrize("cause", ("local", "raises"))
+def test_any_non_disagreement_extract_failure_shows_the_service_reason(
+    tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
+    lifecycle: LifecycleRepositoryImpl, live_settings: Settings,
+    monkeypatch: pytest.MonkeyPatch, cause: str,
+) -> None:
+    import app.pipeline as pipeline_mod
+
+    meta = _FakeLiveMeta()
+    ctx = _confirm_65s_job(uploads, tmp_path, meta)
+    settings = Settings(**{**live_settings.__dict__, "extract_retry_backoff_s": 0.0})
+    spark = _FakeChunkSpark(_chunk_payloads())
+
+    def failing(*args, **kwargs):
+        if cause == "raises":
+            raise RuntimeError("provider returned something odd")
+        return SparkRunResult({}, Decimal("0.03"), 50, "local")  # type: ignore[arg-type]
+
+    monkeypatch.setattr(spark, "run_steps", failing)
+    monkeypatch.setattr(
+        pipeline_mod, "select_providers",
+        lambda settings, sub_ctx, **kwargs: SimpleNamespace(
+            spark=RecordingSparkClient(spark, sub_ctx)
+        ),
+    )
+    service.set_client_factory(lambda settings: PipelineClients(
+        spark=_FakeParentSpark(), sam=_FakeLiveSam(), meta=meta,
+    ))
+    try:
+        result = service.run_upload_job(
+            ctx.job_id, settings, uploads=uploads, lifecycle=lifecycle
+        )
+    finally:
+        service.clear_client_factory()
+    assert result.state == "failed"
+    assert refusal_text_for_job(
+        str(ctx.job_id), data_root=settings.data_root
+    ) == refusal_copy("extract_service_failure")
 
 
 def test_existing_refusal_marker_is_preserved(lane_db: Path, tmp_path: Path) -> None:
@@ -1411,3 +1450,141 @@ def test_child_verification_exception_settles_before_clients(
     with db.connect(lane_db) as conn:
         assert conn.execute("SELECT state FROM jobs WHERE id = ?", (str(children[0]),)).fetchone()[0] == "failed"
     assert "service was unavailable" in refusal_text_for_job(str(children[0]), data_root=live_settings.data_root)
+
+
+def test_refusal_marker_is_written_where_hard_links_are_refused(
+    lane_db: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # The Modal volume answers os.link with PermissionError; the marker (and so the
+    # reason a failed job shows) was silently dropped there.
+    import app.pipeline as pipeline_mod
+
+    ctx = admit_job("no-hardlink", "no-hardlink", "no-hardlink")
+    marker = tmp_path / "data" / "jobs" / str(ctx.job_id) / "refusal.json"
+
+    def refused(*_args: object) -> None:
+        raise PermissionError("hard links not permitted")
+
+    monkeypatch.setattr(pipeline_mod.os, "link", refused)
+    pipeline_mod._write_refusal_marker(ctx, ctx.job_id, "extract_service_failure")
+    assert marker.read_text(encoding="utf-8") == '{"kind": "extract_service_failure"}'
+    pipeline_mod._write_refusal_marker(ctx, ctx.job_id, "cancelled")
+    assert marker.read_text(encoding="utf-8") == '{"kind": "extract_service_failure"}'
+
+
+def test_billed_empty_200_retries_once_then_ends_with_service_failure(
+    tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
+    lifecycle: LifecycleRepositoryImpl, live_settings: Settings,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import app.pipeline as pipeline_mod
+
+    meta = _FakeLiveMeta()
+    ctx = _confirm_65s_job(uploads, tmp_path, meta)
+    settings = Settings(**{**live_settings.__dict__, "extract_retry_backoff_s": 0.0})
+    spark = _FakeChunkSpark(_chunk_payloads())
+    calls: list[str] = []
+
+    def empty(*args, **kwargs):
+        calls.append(args[0])
+        return SparkRunResult({}, Decimal("0.03"), 50, "empty")
+
+    monkeypatch.setattr(spark, "run_steps", empty)
+    monkeypatch.setattr(
+        pipeline_mod, "select_providers",
+        lambda settings, sub_ctx, **kwargs: SimpleNamespace(
+            spark=RecordingSparkClient(spark, sub_ctx)
+        ),
+    )
+    service.set_client_factory(lambda settings: PipelineClients(
+        spark=_FakeParentSpark(), sam=_FakeLiveSam(), meta=meta,
+    ))
+    try:
+        result = service.run_upload_job(
+            ctx.job_id, settings, uploads=uploads, lifecycle=lifecycle
+        )
+    finally:
+        service.clear_client_factory()
+    assert result.state == "failed" and len(calls) == 2
+    with db.connect(lane_db) as conn:
+        retry = conn.execute(
+            "SELECT id FROM jobs WHERE anon_id = ?",
+            (f"{ctx.job_id}/extract/retry/0",),
+        ).fetchone()
+    assert retry is not None
+    assert job_reservation_spend_usd(retry["id"], path=lane_db)[0] == Decimal("0.03")
+    assert refusal_text_for_job(
+        str(ctx.job_id), data_root=settings.data_root
+    ) == refusal_copy("extract_service_failure")
+
+
+@pytest.mark.parametrize(
+    "override",
+    [{"extract_retry_min_remaining_s": 1e9}, {"chunk_retry_budget_usd": Decimal("0")}],
+    ids=["deadline", "retry-budget"],
+)
+def test_billed_empty_200_without_retry_room_ends_with_no_second_call(
+    tmp_path: Path, lane_db: Path, uploads: UploadStoreImpl,
+    lifecycle: LifecycleRepositoryImpl, live_settings: Settings,
+    monkeypatch: pytest.MonkeyPatch, override: dict,
+) -> None:
+    import app.pipeline as pipeline_mod
+
+    meta = _FakeLiveMeta()
+    ctx = _confirm_65s_job(uploads, tmp_path, meta)
+    settings = Settings(
+        **{**live_settings.__dict__, "extract_retry_backoff_s": 0.0, **override}
+    )
+    spark = _FakeChunkSpark(_chunk_payloads())
+    calls: list[str] = []
+
+    def empty(*args, **kwargs):
+        calls.append(args[0])
+        return SparkRunResult({}, Decimal("0.03"), 50, "empty")
+
+    monkeypatch.setattr(spark, "run_steps", empty)
+    monkeypatch.setattr(
+        pipeline_mod, "select_providers",
+        lambda settings, sub_ctx, **kwargs: SimpleNamespace(
+            spark=RecordingSparkClient(spark, sub_ctx)
+        ),
+    )
+    service.set_client_factory(lambda settings: PipelineClients(
+        spark=_FakeParentSpark(), sam=_FakeLiveSam(), meta=meta,
+    ))
+    try:
+        result = service.run_upload_job(
+            ctx.job_id, settings, uploads=uploads, lifecycle=lifecycle
+        )
+    finally:
+        service.clear_client_factory()
+    assert result.state == "failed" and len(calls) == 1
+    with db.connect(lane_db) as conn:
+        retries = conn.execute(
+            "SELECT id FROM jobs WHERE anon_id LIKE ?",
+            (f"{ctx.job_id}/extract/retry/%",),
+        ).fetchall()
+    assert retries == []
+    assert refusal_text_for_job(
+        str(ctx.job_id), data_root=settings.data_root
+    ) == refusal_copy("extract_service_failure")
+
+
+def test_refusal_marker_race_keeps_the_first_reason(
+    lane_db: Path, tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import app.pipeline as pipeline_mod
+
+    ctx = admit_job("marker-race", "marker-race", "marker-race")
+    marker = tmp_path / "data" / "jobs" / str(ctx.job_id) / "refusal.json"
+    real_open = pipeline_mod.os.open
+
+    def second_writer_wins_the_gap(path, flags, *args):
+        # The other writer lands between this writer's start and its create.
+        if Path(path) == marker and not marker.exists():
+            marker.write_text('{"kind": "cancelled"}', encoding="utf-8")
+        return real_open(path, flags, *args)
+
+    monkeypatch.setattr(pipeline_mod.os, "open", second_writer_wins_the_gap)
+    pipeline_mod._write_refusal_marker(ctx, ctx.job_id, "extract_service_failure")
+    assert marker.read_text(encoding="utf-8") == '{"kind": "cancelled"}'

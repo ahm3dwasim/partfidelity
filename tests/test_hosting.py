@@ -212,6 +212,116 @@ def test_boot_serves_keeps_db_off_the_volume_and_snapshots_first(tmp_path):
     assert (host.snapshot_dir / "db.snapshot").is_file()
 
 
+LIVE_ENV = {"PARTFIDELITY_PIPELINE_MODE": "live", "PARTFIDELITY_PROVIDER_MODE": "live", "META_API_KEY": "test-only"}
+
+
+def test_a_bad_sample_readback_config_leaves_startup_and_healthz_up(tmp_path, monkeypatch):
+    from app import sample_readback
+
+    calls = []
+
+    def broken(*a, **k):
+        calls.append(1)
+        raise sample_readback.SampleReadbackConfigError("bad")
+
+    monkeypatch.setattr(sample_readback, "load_config", broken)
+    app = build_hosted_app(_host(tmp_path), env=LIVE_ENV, client_factory=lambda s: None)  # loops on, live, provider mocked
+    with TestClient(app) as client:
+        assert calls  # the guarded live path really ran
+        assert client.get("/healthz").json() == {"status": "ok"}
+
+
+def test_shutdown_past_the_drain_wait_writes_interrupted_receipts_before_the_final_snapshot(tmp_path, monkeypatch):
+    import json
+    from dataclasses import replace
+
+    from app import sample_readback, service
+    from app.admission import job_dir
+    from app.contracts import RECEIPT_MODEL_SPARK_OPEN, JobId
+    from app.evidence import list_calls
+    from app.ledger import JobContextImpl
+    from app.providers import open_readback
+    from app.providers._transport import HttpResponse
+
+    release = threading.Event()
+    posted = threading.Event()
+    posts = []
+
+    class Transport:
+        def __init__(self, block):
+            self.block = block
+
+        def post(self, url, *, headers, body, timeout_s):
+            posts.append(1)
+            posted.set()
+            if self.block:
+                release.wait(30)  # outlives the drain wait
+            out = {"choices": [{"message": {"content": "yes"}}], "usage": {"prompt_tokens": 1, "completion_tokens": 1}}
+            return HttpResponse(200, json.dumps(out).encode(), {})
+
+    real_run_once = sample_readback.run_once
+    short = replace(open_readback.load_config(), timeout_s=0.1, cancel_wait_s=0.3)
+    monkeypatch.setattr(open_readback, "load_config", lambda *a, **k: short)
+    monkeypatch.setattr(open_readback, "_jpeg_data_url", lambda *a: "data:image/jpeg;base64,AAAA")
+    monkeypatch.setattr(sample_readback, "load_config",
+                        lambda *a, **k: sample_readback.SampleReadbackConfig(True, ("fan", "battery")))
+    env = {"BASETEN_API_KEY": "k-test"}
+    holder = {}
+
+    def run_blocking(settings, **k):
+        holder["settings"] = settings
+        service.ensure_sample_job(settings)  # the shipped sample guide, so there are labels to check
+        return real_run_once(settings, transport=Transport(True), environ=env, **k)
+
+    monkeypatch.setattr(sample_readback, "run_once", run_blocking)
+    host = _host(tmp_path)
+    try:
+        with TestClient(build_hosted_app(host, env=LIVE_ENV, client_factory=lambda s: None)):
+            assert posted.wait(10)  # the paid call is in flight
+    finally:
+        release.set()
+    assert (host.snapshot_dir / "db.snapshot").is_file()
+
+    # Restore the real final snapshot into a fresh store: the interrupted receipts are there.
+    fresh = tmp_path / "fresh" / "partfidelity.sqlite3"
+    fresh.parent.mkdir()
+    persistence.restore_latest(fresh, host.snapshot_dir)
+    settings = holder["settings"]
+    job_id = service.sample_job_id(settings)
+    ctx = JobContextImpl(fresh, JobId(job_id), job_dir(job_id, root=settings.data_root))
+    rows = [c for c in list_calls(ctx) if c.model == RECEIPT_MODEL_SPARK_OPEN]
+    interrupted = [r for r in rows if r.evidence.get("reason") == sample_readback.INTERRUPTED_REASON]
+    # Exactly the configured eligible labels (fan, battery), one row per image, no more and no fewer.
+    cfg = sample_readback.load_config()
+    assert set(cfg.labels) == {"fan", "battery"}
+    from app.pipeline import load_guide
+    guide = load_guide(job_id, data_root=settings.data_root, guide_filename=settings.guide_filename)
+    eligible = sample_readback.pending(guide.labels, cfg, set())
+    assert {d.detection.phrase for d in eligible} == {"fan", "battery"}
+    assert sorted(r.evidence.get("label") for r in interrupted) == sorted(
+        d.provisional.rendered_image_path.name for d in eligible)
+    assert all(r.status != "succeeded" for r in interrupted)
+
+    # A restart over that snapshot does not send those labels again.
+    # Each boot gets a fresh readback runner: the first shutdown left the module-level one stopped.
+    def boot(name, **overrides):
+        posted.clear()
+        posts.clear()
+        monkeypatch.setattr(open_readback, "_RUNNER", open_readback._Runner())
+        monkeypatch.setattr(sample_readback, "run_once", lambda settings, **k: (
+            service.ensure_sample_job(settings),
+            real_run_once(settings, transport=Transport(False), environ=env, **k))[1])
+        with TestClient(build_hosted_app(_host(tmp_path, name, **overrides), env=LIVE_ENV, client_factory=lambda s: None)):
+            posted.wait(2)  # returns early when a call is sent; times out when none is
+
+    # Control: a snapshot with no receipts does post, so the transport path is live in this setup.
+    boot("c", snapshot_dir=tmp_path / "empty-snapshots")
+    assert posts, "control boot with no receipts must post"
+
+    boot("b")
+    assert posts == []
+
+
 def test_graceful_shutdown_takes_a_final_snapshot(tmp_path):
     host = _host(tmp_path)
     app = _boot(host)

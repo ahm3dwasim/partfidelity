@@ -82,13 +82,17 @@ class StitchedSteps:
     bundle's 12-step bound, so this is deliberately not a StepBundle.
     Downstream stages read ``steps`` and ``device_guess`` only.
     ``excluded_spans`` records whole-video edge outros dropped after
-    deriving ends (empty until the pipeline trims).
+    deriving ends (empty until the pipeline trims). ``origins`` holds,
+    per step, the set of chunk indices whose sightings it merged.
     """
 
     steps: tuple[Step, ...]
     device_guess: str
     confidence: float
     excluded_spans: tuple[ExcludedSpan, ...] = ()
+    origins: tuple[frozenset[int], ...] = ()
+    # Fewest runs any chunk's consensus rested on (None: not recorded).
+    fewest_runs: int | None = None
 
 
 class ChunkCutError(RuntimeError):
@@ -478,11 +482,13 @@ def stitch_bundles(
         )
     merged: list[Step] = []
     merged_keys: list[object] = []
+    merged_origins: list[frozenset[int]] = []
     for members in groups:
         members.sort(key=lambda i: (shifted[i][1].start_s, shifted[i][0]))
         first = shifted[members[0]][1]
         start = min(shifted[i][1].start_s for i in members)
         end = max(shifted[i][1].end_s for i in members)
+        merged_origins.append(frozenset(shifted[i][0] for i in members))
         merged.append(
             Step(
                 number=0,
@@ -548,7 +554,13 @@ def stitch_bundles(
     confidence = float(
         statistics.median([bundle.confidence for _, bundle in chunk_bundles])
     )
-    return StitchedSteps(steps=steps, device_guess=device_guess, confidence=confidence)
+    return StitchedSteps(
+        steps=steps,
+        device_guess=device_guess,
+        confidence=confidence,
+        origins=tuple(merged_origins[i] for i in order),
+        fewest_runs=min(bundle.source_runs for _, bundle in chunk_bundles),
+    )
 
 
 def require_contiguous_cover(
@@ -634,6 +646,43 @@ def require_contiguous_cover(
         )
 
 
+def trim_seam_overlaps(
+    steps: Sequence[Step],
+    seams: Sequence[tuple[float, float]],
+    origins: Sequence[frozenset[int]],
+) -> tuple[Step, ...]:
+    """End a step where the next starts when the pair crosses a chunk seam.
+
+    ``seams[k]`` is the overlap zone ``(start_s, end_s)`` between chunk
+    ``k`` and ``k + 1`` on the original timeline (next window start,
+    previous window end); ``origins`` holds each step's source chunk
+    indices. Adjacent chunk cuts overlap by design (plus cut slop), so a
+    pair is trimmed only when the left step comes from chunk ``k``, the
+    right from ``k + 1`` and both edges lie in seam ``k``'s zone; any
+    other overlap is left for the cover check to refuse.
+    """
+    ordered = tuple(steps)
+    eps = 1e-6
+
+    def at_seam(left: int, right: int) -> bool:
+        return any(
+            not origins[left] & origins[right]
+            and k in origins[left]
+            and k + 1 in origins[right]
+            and zone_start - eps <= ordered[right].start_s
+            and ordered[left].end_s <= zone_end + eps
+            for k, (zone_start, zone_end) in enumerate(seams)
+        )
+
+    return tuple(
+        replace(ordered[i], end_s=ordered[i + 1].start_s)
+        if ordered[i].end_s > ordered[i + 1].start_s > ordered[i].start_s
+        and at_seam(i, i + 1)
+        else ordered[i]
+        for i in range(len(ordered) - 1)
+    ) + ordered[-1:]
+
+
 def derive_contiguous_ends(
     steps: Sequence[Step], duration_s: float, *, tolerance_s: float
 ) -> tuple[Step, ...]:
@@ -676,4 +725,5 @@ __all__ = (
     "real_cut_window",
     "require_contiguous_cover",
     "stitch_bundles",
+    "trim_seam_overlaps",
 )

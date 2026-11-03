@@ -197,6 +197,8 @@ def job_status(job_id: str, request: Request) -> Response:
             ).fetchone()
         if cancelled is not None and cancelled["cancel_requested_at"] is not None:
             reason = refusal_copy("cancelled")
+    if state == "failed" and reason is None:
+        reason = refusal_copy("failure")  # a failed job always says why
     if wants_html:
         if guide_url is not None:
             return RedirectResponse(guide_url, status_code=303)

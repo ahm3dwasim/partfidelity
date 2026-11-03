@@ -461,7 +461,8 @@ def _is_status_value(value: object) -> bool:
 UNAVAILABLE_REASONS = frozenset({
     "provider key not configured", "label text too long to check", "label image could not be read",
     "second-check budget reached", "request failed or timed out", "answer not understood",
-    "check could not be queued",
+    "check could not be queued", "check started, receipt not yet recorded",
+    "interrupted at shutdown, not retried",
 })
 
 # Stage -> {key: shape predicate} for record_call evidence.

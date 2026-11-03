@@ -21,7 +21,7 @@ from typing import Any, Callable, Mapping
 from fastapi import FastAPI
 from starlette.concurrency import run_in_threadpool
 
-from app import db, persistence, service
+from app import db, persistence, sample_readback, service
 from app.deploy_config import HostConfig
 from app.deletion import SweepResult, sweep_expired
 from app.ledger import LifecycleRepositoryImpl
@@ -159,9 +159,20 @@ def build_hosted_app(
     app.state.snapshot_max_age_s = host.snapshot_max_age_s
     persistence.install(snapshotter)
 
+    sample_batch: list = []  # the one-shot sample batch, if started
+
     def _shutdown() -> None:
         app.state.job_runner.shutdown()
-        open_readback.shutdown()
+        # Drain the in-flight paid call (bounded by cancel_wait_s) so its receipt exists before the final snapshot.
+        wait_s = open_readback.load_config().cancel_wait_s
+        drained = open_readback.shutdown(wait_s)
+        for batch in sample_batch:
+            drained = batch.join(wait_s) and drained
+        if not drained and sample_batch:
+            try:  # a call outlived the wait: say so in the receipts before the final snapshot
+                sample_readback.mark_interrupted(settings)
+            except Exception as error:
+                logger.warning("sample read-back interrupt receipt failed: %s", type(error).__name__)
         sweeper.stop()
         snapshotter.stop()
         persistence.install(None)
@@ -180,4 +191,13 @@ def build_hosted_app(
     if start_loops:
         snapshotter.start()
         sweeper.start()
+        if settings.providers.mode == "live":
+            try:  # one-shot, idempotent; never blocks or fails start-up
+                batch = sample_readback.run_once(settings, snapshot=snapshotter.snapshot_now)
+                if batch is not None:
+                    sample_batch.append(batch)
+                    threading.Thread(target=lambda: sample_readback.persist_when_done(batch, snapshotter),
+                                     name="sample-readback-snap", daemon=True).start()
+            except Exception as error:
+                logger.warning("sample read-back not started: %s", type(error).__name__)
     return app

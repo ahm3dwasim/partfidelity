@@ -158,7 +158,7 @@ def _is_sample(request: Request, job_id: str) -> bool:
     return settings is not None and service.sample_job_id(settings) == job_id
 
 
-def _sample_note_html() -> str:
+def _sample_note_html(database=None, job_id: str = "") -> str:
     """The sample's plain provenance line: what it was made from."""
     return (
         '<p class="gd-sample-note" role="note">'
@@ -171,7 +171,7 @@ def _sample_note_html() -> str:
         f'<a href="/catch">{html.escape(proof_links.load()["catch_cta"])}</a> '
         f'<a href="{html.escape(proof_links.load()["sample_calls"], quote=True)}">Calls</a> '
         f'<a href="{html.escape(proof_links.load()["hard_stop"], quote=True)}">Battery warning in the sample</a></nav>'
-        + proof_links.open_weights_note_html()
+        + proof_links.open_weights_note_html(database, job_id)
     )
 
 
@@ -470,7 +470,7 @@ def _render_page(
         "OBSERVER_BOTTOM": str(film_config.cached()["film"]["observer_bottom_pct"]),
         "OBSERVER_HOLD": str(film_config.cached()["film"]["observer_hold_ms"]),
         "KICKER": "Sample guide" if sample else "Maker guide",
-        "SAMPLE_NOTE": _sample_note_html() if sample else "",
+        "SAMPLE_NOTE": _sample_note_html(getattr(settings, "db_path", None), job_id) if sample else "",
         "STEP_COUNT": str(sum(not step.is_intro for step in guide.steps)),
         "DRAFT_NOTES": proof_links.sample_wording(draft_notes_html(guide)) if sample else draft_notes_html(guide),
         "CARDS": cards_html,

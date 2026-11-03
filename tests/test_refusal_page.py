@@ -104,3 +104,11 @@ def test_refusal_copy_covers_every_user_visible_kind():
         "service_unavailable", "failure",
     ):
         assert refusal_copy(kind), kind
+
+
+def test_failed_job_without_marker_still_gets_a_reason(tmp_path):
+    client = _client(tmp_path, "jobnull01", None)
+    body = client.get("/jobs/jobnull01").json()
+    assert body["state"] == "failed"
+    assert body["reason"] == refusal_copy("failure")
+    assert refusal_copy("failure") in _page(client, "jobnull01")

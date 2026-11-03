@@ -22,7 +22,7 @@ def stub_private_media(monkeypatch, synthetic_sample_bundle):
     SAMPLE_TEST_BUNDLE = synthetic_sample_bundle
 
 
-def shipped(deploy_script=None, sources=None):
+def shipped(deploy_script=None, sources=None, envs=None):
     """(folders, files) the image would receive, read from the mocked build_image; `sources` collects each add_local_dir source path."""
     import runpy
     import types
@@ -53,6 +53,8 @@ def shipped(deploy_script=None, sources=None):
         else:
             sys.modules["modal"] = saved
     remote = ns["modal_cfg"].remote_root
+    if envs is not None:
+        envs.extend(c.args[0] for c in image.env.call_args_list)
     if sources is not None:
         sources.extend(Path(c.args[0]) for c in image.add_local_dir.call_args_list)
     rel = lambda call: Path(call.args[1]).relative_to(remote).as_posix()
@@ -221,6 +223,7 @@ def test_local_image_receives_configured_root(monkeypatch):
     namespace = runpy.run_path(str(REPO / "deploy" / "modal_app.py"))
     assert namespace["ROOT"] == REPO
     image.env.assert_called_once_with({
+        **dict(namespace["modal_cfg"].app_env),
         "PARTFIDELITY_PRODUCTION": "1",
         "PARTFIDELITY_ROOT": str(namespace["modal_cfg"].remote_root),
     })
@@ -317,3 +320,12 @@ def test_installed_wheel_resolves_display_images_config(tmp_path):
              "assert d.cached()['poster_quality']")
     run = subprocess.run([sys.executable, "-I", "-c", probe, str(site)], capture_output=True, text=True)
     assert run.returncode == 0, run.stderr
+
+
+def test_app_env_table_reaches_image_env_without_overriding_the_deploy_variables():
+    envs = []
+    shipped(envs=envs)
+    assert len(envs) == 1
+    assert envs[0]["PARTFIDELITY_STEP_GROUPING"] == "off"
+    assert envs[0]["PARTFIDELITY_PRODUCTION"] == "1"
+    assert envs[0]["PARTFIDELITY_ROOT"]

@@ -93,6 +93,11 @@ def _validate_against_budget(
         if not isinstance(price, Decimal) or not price.is_finite() or not price > 0:
             raise RuntimeError(f"{name}={price!r} must be a finite positive price")
     runs = tuned.spark_runs
+    if not 2 <= tuned.consensus_min_runs <= runs:
+        raise RuntimeError(
+            f"consensus_min_runs={tuned.consensus_min_runs} must be between 2 and"
+            f" spark_runs={runs}"
+        )
     if runs < 2:
         raise RuntimeError(
             f"spark_runs={runs} cannot form a median consensus: "
@@ -306,6 +311,7 @@ def _spark_config(
             tuned.step_alignment_verb_less_overlap_fraction
         ),
         boundary_tolerance_s=tuned.consensus_boundary_tolerance_s,
+        consensus_min_runs=tuned.consensus_min_runs,
     )
 
 
@@ -448,6 +454,7 @@ def select_providers(
                 tuned.step_alignment_verb_less_overlap_fraction
             ),
             boundary_tolerance_s=tuned.consensus_boundary_tolerance_s,
+            consensus_min_runs=tuned.consensus_min_runs,
             reservation_usd=spark_cap,
             deadline_at=deadline_at,
             transport=transport,

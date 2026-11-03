@@ -43,7 +43,7 @@ footage_width = 1280         # extracted frame width; the card shows at most abo
 
 [links]
 live_label = "was7mahmed--partfidelity-web.us-east.modal.run"
-repo_url = ""                # OWNER DECISION: the public repository link ("added at release" on /built). Empty: the line is left out.
+repo_url = ""                # keep empty: demo/full/config.py reads the public link from config/built.toml [page].repository_url (owner ruling: that file is the only home of the link)
 
 [layout]
 margin_px = 72               # nothing but background inside this band (checked by margin.sh)
