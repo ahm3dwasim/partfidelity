@@ -12,6 +12,35 @@ wherever the job turns dangerous (batteries, glued screens).
 
 *Screenshot of the live home page, taken 2 November 2026 at 1440 px wide. The laptop is a Blender model: the picture holds no repair footage, faces, serial numbers, QR codes or Windows screens. The guide pages show frames from the sample repair video, so none is pictured here (see "What is not in this repository").*
 
+## Judge index
+
+Built Oct 26–Nov 4, 2026; this public repo is a curated publication of that work. It is a set of publication
+snapshots, not the full build history, so its commit log does not show how the work progressed day by day.
+The event dates are the ones stated on `/built` (`config/built.toml`); the repository link is on that page too.
+
+**Implemented stages** (details in [How it works](#how-it-works) and `docs/FEATURES.md`): upload and your confirmation,
+Muse Spark step extraction (three runs), SAM 3.1 boxes for the fan and battery, a Muse Spark label read-back, a
+Muse Spark Open (open weights) second check that only flags a label for a person, the guide page with its hard stop,
+and a receipt page for every model call.
+
+**Safety invariants:** the hard stop is described under "How it fits together" below and in the `docs/FEATURES.md`
+entries [Deterministic repair guardrails](docs/FEATURES.md#deterministic-repair-guardrails) and
+[Live reader stop](docs/FEATURES.md#live-reader-stop); the code is [`app/hazards.py`](app/hazards.py) and
+[`static/reader_stop.js`](static/reader_stop.js), with tests in [`tests/test_hazards.py`](tests/test_hazards.py) and
+[`tests/test_hard_stop.py`](tests/test_hard_stop.py).
+
+**Proof pages on the live site** (`/built` itself links only the recorded probe and simulated replay, `/disagreement-replay`):
+[the sample guide's hard stop](https://was7mahmed--partfidelity-web.us-east.modal.run/guide/sample#step-5),
+[the sample's call receipts](https://was7mahmed--partfidelity-web.us-east.modal.run/calls/b3f79c933e2043afc3906a159f473a2b),
+[receipts of a newer, separate job that ran the second check](https://was7mahmed--partfidelity-web.us-east.modal.run/calls/6c1f4106e797d0dcf779425a66d48872),
+[the recorded probe and simulated replay](https://was7mahmed--partfidelity-web.us-east.modal.run/disagreement-replay),
+and [the catch page](https://was7mahmed--partfidelity-web.us-east.modal.run/catch), a controlled demonstration on a small frozen set.
+
+**Reading the evidence:** the sample's own receipts show four failed second-check rows followed by four successful ones;
+the saved rows do not say why the first four failed, so none is guessed here. The newer job's four rows all succeeded.
+A second-check disagreement asks a person to look; it is not a finding that a label is wrong. The Glimmer offline
+probe was run once on a Linux VM (a declared, not independently reproduced row) and never on a Mac, so nothing here shows it running on a laptop.
+
 ## Who it is for
 
 Repair-shop technicians and makers who already film their teardowns, and the
@@ -58,14 +87,11 @@ upload                    app/uploads.py, app/admission.py   preview, your confi
 ## What is not in this repository, and why
 
 Footage and everything cut from it stay out of git because repair video is
-personal and can show identifiers: the source clips, the sample guide's frames
-and masks (`app/sample_real/`), the catch page crops
-(`static/ui/media/catch/`) and their bundles under `var/`. They are copied
-privately to the deploy machine (`tools/sample_media.py`, `tools/catch_media.py`),
-and the deploy refuses to build without them. The source clip was filmed by a
-friend of the author who gave written permission; no name or permission record
-is published. A test that needs these files skips when they are absent, so
-nothing below needs private footage.
+personal and can show identifiers. The sample guide and its clip are served by
+the live demo; the footage and the stills cut from it are not in this repository.
+The source clip was filmed by a friend of the author who gave written
+permission; no name or permission record is published. A test that needs
+footage skips when it is absent, so nothing below needs it.
 
 ## Run the code and the tests
 
@@ -76,12 +102,12 @@ uv pip install --python .venv/bin/python -e '.[test]'
 make verify-public                       # the whole tests/ tree (long)
 ```
 
-The demo video tooling (`demo/`, `config/demo_*.toml`) is render-time only; the private footage it renders is not shipped. Its caption word filter and
+The demo video tooling (`demo/`, `config/demo_*.toml`) is render-time only; the footage it renders is not shipped. Its caption word filter and
 cut validator are advisory lint, not guarantees; what the video says is pinned by the exact `[captions] approved` list in each
 config (`tests/test_demo_captions.py`). Machine paths come from `PF_FFMPEG`, `PF_PLAYWRIGHT_FROM` and `PF_FOOTAGE_ZIP`.
 
-To serve locally without private media: `.venv/bin/partfidelity` (uvicorn, 127.0.0.1:8000).
-Without the private sample media, the sample route serves an illustrated
+To serve locally without the sample media: `.venv/bin/partfidelity` (uvicorn, 127.0.0.1:8000).
+Without the sample media, the sample route serves an illustrated
 fallback (`app/routes/site.py`), not the filmed guide. Production mode needs
 `PARTFIDELITY_PRODUCTION=1`, `PARTFIDELITY_DATA_ROOT` and `META_API_KEY` in the
 process environment and refuses to start without them; the key is never logged,
